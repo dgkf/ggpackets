@@ -3,5 +3,7 @@
 ^\.travis\.yml$
 ^_pkgdown\.yml$
 ^README\.Rmd$
-^README-.*\.png$
+^README[-_].*\.png$
 ^Jenkinsfile$
+^githooks*
+^docs$
