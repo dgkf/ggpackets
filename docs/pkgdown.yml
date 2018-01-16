@@ -1,0 +1,8 @@
+urls:
+  reference: https://pages.github.roche.com/kelkhofd/ggpackets//reference
+  article: https://pages.github.roche.com/kelkhofd/ggpackets//articles
+articles:
+  composing-functions: composing-functions.html
+  ggpackets: ggpackets.html
+  inspection-and-documentation: inspection-and-documentation.html
+
