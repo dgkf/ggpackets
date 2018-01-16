@@ -1,4 +1,4 @@
-language: R
+language: r
 sudo: false
 cache: packages
 
@@ -8,3 +8,9 @@ r:
 - oldrel
 - release
 - devel
+
+r_packages:
+  - covr
+
+after_success:
+  - Rscript -e 'library(covr); codecov()'
