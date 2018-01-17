@@ -12,11 +12,11 @@ test_that("Ensure that terms separate by multiple relationships are still added 
 context("Aesthetic Handling => allowed_aesthetics")
 
 test_that("Allowed aesthetics returns vector that includes Geom required aesthetics", {
-  expect_true( 'label' %in% allowed_aesthetics(GeomLabel) )
+  expect_true( 'label' %in% allowed_aesthetics(ggplot2::GeomLabel) )
 })
 
 test_that("Allowed aesthetics returns vector that includes added base equivalent aesthetics", {
-  expect_true( all(c('bg', 'fg') %in% allowed_aesthetics(GeomLabel)) )
+  expect_true( all(c('bg', 'fg') %in% allowed_aesthetics(ggplot2::GeomLabel)) )
 })
 
 test_that("Allowed aesthetics returns all aesthetcis if geom is NULL", {
@@ -29,14 +29,14 @@ context("Aesthetic Handling => filter_aesthetics")
 
 test_that("inappropriate aesthetics for the specified Geom get filtered and moved to group", {
   expect_equal(
-    filter_aesthetics(GeomBar, aes(x = test1, y = test2, linestyle = test3)),
+    filter_aesthetics(ggplot2::GeomBar, aes(x = test1, y = test2, linestyle = test3)),
     aes(x = test1, y = test2, group = interaction(test3))
   )
 })
 
 test_that("inappropriate Geom aesthetics get converted to interaction term in group", {
   expect_equal(
-    filter_aesthetics(GeomBar, aes(x = test1, y = test2, group = test3, linestyle = test4)),
+    filter_aesthetics(ggplot2::GeomBar, aes(x = test1, y = test2, group = test3, linestyle = test4)),
     aes(x = test1, y = test2, group = interaction(test3, test4))
   )
 })
@@ -101,7 +101,7 @@ test_that("Splitting aes from dots pulls out common aesthetics", {
 
 test_that("Splitting aes respects Geom specific refinement", {
   expect_equal(
-    split_aes_from_dots(geom = GeomBar, x = test1, y = test2, vjust = test3),
+    split_aes_from_dots(geom = ggplot2::GeomBar, x = test1, y = test2, vjust = test3),
     list(aes = aes(x = test1, y = test2),
          not_aes = aes(vjust = test3))
   )

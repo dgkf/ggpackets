@@ -37,7 +37,7 @@
 #'   dots = list(fill = 'blue'), # named 'args' param will overwrite prior ...'s
 #'   fill = 'green')             # ...'s after 'args' will overwrite any others
 #'
-#' @importFrom utils modifyList head tail
+#' @importFrom utils head tail
 #' @export
 ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...', 
     auto_remove_aes = (!is.null(id) && any(sapply(id, is.null))),
@@ -91,7 +91,7 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...',
   args <- flatten_aes_to_mapping(args, allowed_aesthetics(geom), auto_remove_aes, envir)
   
   if (auto_remove_aes) # remove invalid argnames and unevaluated aesthetics
-    args <- filter_args(callfname, geom, stat, args[!uneval_aes(args)])
+    args <- filter_args(geom, stat, args[!uneval_aes(args)])
   args <- Map(function(v) if (is_uneval(v)) eval(v, envir) else v, args)
   
   # ring ring, time to make a call!
@@ -173,6 +173,9 @@ last_args <- function(args, sources = list(), warn = c(), desc = c(),
 #'   in the aes_list terms
 #' @param envir environment in which to attempt evaluation of mapping term
 #'
+#' @importFrom utils tail modifyList
+#' @importFrom ggplot2 aes_string
+#'
 #' @return a list of arguments with aesthetics matching values in
 #'   \code{aes_list} flattened into a list stored within the mapping value
 #'   
@@ -202,7 +205,7 @@ flatten_aes_to_mapping <- function(args,
     args <- args[!names(args) %in% names(c(aes_pre_args, aes_pst_args))]
   
   if (filter_mapping) mapped_aes <- mapped_aes[mapped_aes %in% aes_list]
-  args$mapping <- Reduce(modifyList, list(
+  args$mapping <- Reduce(utils::modifyList, list(
     do.call(ggplot2::aes_string, aes_pre_args),
     as.list(eval(args$mapping))[mapped_aes],
     do.call(ggplot2::aes_string, aes_pst_args)

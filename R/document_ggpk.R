@@ -58,7 +58,7 @@ document_ggpk <- function(f, header = TRUE, ..., prefix = "#' ",
     } else if (any(fix <- utils::tail(which(names(call_args) %in% 'dots'), 1))) {
       if (!dots_as_ellipses) {
         message('No ellipses args found in call to ggpack()')
-        message(gsub('\\s+', ' ', paste(capture.output(as.call(ggpack_call)), collapse = ' ')))
+        message(gsub('\\s+', ' ', paste(utils::capture.output(as.call(ggpack_call)), collapse = ' ')))
         dots_as_ellipses_i <- tolower(readline('Consider arguments after dots argument fixed? [Y/n]: ')) %in% c('y', '')
       }
       if (dots_as_ellipses || dots_as_ellipses_i) {
@@ -117,8 +117,9 @@ document_ggpk <- function(f, header = TRUE, ..., prefix = "#' ",
 #' @param ... additional arguments will be ignored
 #'
 #' @return the expression representation of the function body
-#' @export
 #'
+#' @importFrom utils capture.output
+#' @export
 as.expression.function <- function(x, ...) {
   if (length(list(...))) warning('additional arguments will be ignored.')
   txt <- utils::capture.output(x)

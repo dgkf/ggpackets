@@ -34,6 +34,13 @@ allowed_aesthetics <- function(geom = NULL) {
 }
 
 
+#' Get allowed paramters for ggplot objects
+#'
+#' @param geom A Geom (or Stat) object
+#'
+#' @return the allowed paramters for the given object
+#' @export
+#'
 allowed_params <- function(geom = NULL) {
   c(allowed_aesthetics(geom), geom$parameters())
 }
@@ -61,7 +68,6 @@ allowed_params <- function(geom = NULL) {
 #' 
 #' @keywords aesthetics aes
 #'   
-#' @import ggplot2
 add_eqv_aes <- function(aes_names) {
   base_eqv_idx <- unlist(.base_to_ggplot) %in% aes_names |
                   names(.base_to_ggplot)  %in% aes_names
@@ -112,7 +118,6 @@ rename_to_ggplot <- function(args) {
 #'   
 #' @keywords aesthetics aes
 #'   
-#' @import ggplot2
 #' @export
 filter_aesthetics <- function(geom, mapping) {
   allowed_aes <- allowed_aesthetics(geom)
@@ -123,7 +128,15 @@ filter_aesthetics <- function(geom, mapping) {
 
 
 
-filter_args <- function(fname, geom, stat, args) {
+#' Filter arguments for given Geom and Stat objects
+#' 
+#' @param geom Geom object for which argument should be filtered
+#' @param stat Stat object for which argument should be filtered
+#' @param args argument list to be filtered
+#' 
+#' @importFrom ggplot2 layer
+#' 
+filter_args <- function(geom, stat, args) {
   allowed_args <- c(
     names(formals(ggplot2::layer)), 
     allowed_params(geom), 

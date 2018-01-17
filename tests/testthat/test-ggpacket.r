@@ -11,12 +11,12 @@ test_that("ggpackets initialize properly", {
 
 test_that("Check ggpacket initialization equal to ggpack()", {
   expect_equal(
-    ggpacket() + geom_line(),
-    ggpack(geom_line)
+    ggpacket() + ggplot2::geom_line(),
+    ggpack(ggplot2::geom_line)
   )
   expect_equivalent(
-    ggpack() + geom_line(),
-    ggpack(geom_line)
+    ggpack() + ggplot2::geom_line(),
+    ggpack(ggplot2::geom_line)
   )
 })
 
@@ -26,15 +26,15 @@ context("Class Structure => ggpacket => indexing")
 
 test_that("ggpacket can be indexed using [ primitive.", {
   expect_equal(
-    (ggpacket() + geom_bar() + geom_point() + geom_line())[c(2, 3)],
-    ggpacket() + geom_point() + geom_line()
+    (ggpacket() + ggplot2::geom_bar() + ggplot2::geom_point() + ggplot2::geom_line())[c(2, 3)],
+    ggpacket() + ggplot2::geom_point() + ggplot2::geom_line()
   )
 })
 
 test_that("ggpacket can be indexed using [[ primitive.", {
   expect_equal(
-    (ggpacket() + geom_bar() + geom_point() + geom_line())[[2]],
-    ggpacket() + geom_point()
+    (ggpacket() + ggplot2::geom_bar() + ggplot2::geom_point() + ggplot2::geom_line())[[2]],
+    ggpacket() + ggplot2::geom_point()
   )
 })
 
@@ -44,23 +44,23 @@ context("Class Structure => ggpacket => global methods")
 
 test_that("ggpacket names method functioning properly", {
   expect_equal(
-    names(ggpacket(list(geom_bar(), geom_point()), c('bar', 'point'))),
+    names(ggpacket(list(ggplot2::geom_bar(), ggplot2::geom_point()), c('bar', 'point'))),
     c('bar', 'point')
   )
 })
 
 test_that("When no data is present, outputs plot info", {
-  expect_output(show(ggpacket() + geom_point()),
+  expect_output(show(ggpacket() + ggplot2::geom_point()),
                 "Not all layers have been passed sufficient data")
 })
 
 test_that("Ensure show method produces error for insufficient data.", {
-  expect_output(show(ggpacket() + geom_point()), 
+  expect_output(show(ggpacket() + ggplot2::geom_point()), 
                "Not all layers have been passed sufficient data")
 })
 
 test_that("Ensure show method outputs errors from ggplot", {
-  expect_output(show(ggpacket() + geom_point(aes(x = c(1, 2)))), 
+  expect_output(show(ggpacket() + ggplot2::geom_point(aes(x = c(1, 2)))), 
                ".*requires the following missing aesthetics:.*")
 })
 
@@ -70,13 +70,13 @@ context("Class Structure => ggpacket => arithmetic operators")
 
 test_that("Check ggpacket + NULL", {
   expect_equal(
-    ggpacket() + NULL + geom_line() + ggpack(NULL),
-    ggpack(geom_line)
+    ggpacket() + NULL + ggplot2::geom_line() + ggpack(NULL),
+    ggpack(ggplot2::geom_line)
   )
 })
 
 test_that("ggpacket can be plotted with ggplot", {
-  p <- ggpacket() + geom_line()
+  p <- ggpacket() + ggplot2::geom_line()
   expect_s3_class(
     ggplot(mtcars) + aes(x = wt, y = mpg) + p,
     "gg"
@@ -84,9 +84,9 @@ test_that("ggpacket can be plotted with ggplot", {
 })
 
 test_that("ggpacket can be plotted with a theme", {
-  p <- ggpacket() + geom_line()
+  p <- ggpacket() + ggplot2::geom_line()
   expect_s3_class(
-    ggplot(mtcars) + aes(x = wt, y = mpg) + p + theme_minimal(),
+    ggplot2::ggplot(mtcars) + ggplot2::aes(x = wt, y = mpg) + p + ggplot2::theme_minimal(),
     "gg"
   )
 })
@@ -97,33 +97,33 @@ test_that("ggpacket can be plotted with a theme", {
 context("Class Structure => ggpacket => nesting")
 
 test_that("ggpacket objects can be nested", {
-  x <- ggpacket() + geom_line() + geom_point()
-  y <- function() { ggpacket() + geom_line() + geom_point() }
+  x <- ggpacket() + ggplot2::geom_line() + ggplot2::geom_point()
+  y <- function() { ggpacket() + ggplot2::geom_line() + ggplot2::geom_point() }
   
   expect_equal(ggpack(x)[[1]], x)
   expect_equal(ggpack(y)[[1]], y())
   
-  expect_equal((ggpack(x) + geom_point())[[2]], ggpacket() + geom_point())
-  expect_equal((ggpack(y) + geom_point())[[2]], ggpacket() + geom_point())
+  expect_equal((ggpack(x) + ggplot2::geom_point())[[2]], ggpacket() + ggplot2::geom_point())
+  expect_equal((ggpack(y) + ggplot2::geom_point())[[2]], ggpacket() + ggplot2::geom_point())
   
   expect_equal(
     (ggplot(mtcars) + aes(x = carb, y = mpg) + 
-       (ggpack(x) + geom_point()))$layers,
-    list(geom_line(), geom_point(), geom_point()))
+       (ggpack(x) + ggplot2::geom_point()))$layers,
+    list(ggplot2::geom_line(), ggplot2::geom_point(), ggplot2::geom_point()))
   expect_equal(
     (ggplot(mtcars) + aes(x = carb, y = mpg) + 
-      (ggpack(y) + geom_point()))$layers,
-    list(geom_line(), geom_point(), geom_point()))
+      (ggpack(y) + ggplot2::geom_point()))$layers,
+    list(ggplot2::geom_line(), ggplot2::geom_point(), ggplot2::geom_point()))
 })
 
 test_that("ggpacket objects can be nested, and arguments cascade", {
   nested <- function(...) { 
-    ggpack(geom_point, id = 'point', ...) + 
-    ggpack(geom_line, id = 'line', ...) 
+    ggpack(ggplot2::geom_point, id = 'point', ...) + 
+    ggpack(ggplot2::geom_line, id = 'line', ...) 
   }
   
   my_ggpk <- function(...) {
-    ggpack(geom_smooth, id = 'smooth', method = 'lm', ...) + 
+    ggpack(ggplot2::geom_smooth, id = 'smooth', method = 'lm', ...) + 
     ggpack(nested, id = 'nested', ...) 
   }
   

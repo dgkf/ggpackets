@@ -36,6 +36,7 @@ ggpk_decorators <- function(...) {
 #' @param ymin minimum y value to fill with text
 #' @param ymax maximum y value to fill with text
 #' 
+#' @importFrom stats rnorm
 #' @importFrom ggplot2 geom_path geom_point
 #' @export
 ggpk_ty <- function(..., xmin = 0, xmax = 1, ymin = 0, ymax = 1) { 

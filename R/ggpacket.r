@@ -46,7 +46,6 @@ ggpacket <- setClass("ggpacket",
 #' Initialize empty ggpacket
 #' @param .Object ggpacket object to be initialized
 #' @rdname initialize,ggpacket-method
-#' @importFrom methods signature
 setMethod(f = "initialize", methods::signature(.Object = "ggpacket"), 
   function(.Object) { .Object })
 
@@ -57,6 +56,7 @@ setMethod(f = "initialize", methods::signature(.Object = "ggpacket"),
 #' @param label an optional label to be able to index this component within the
 #'   ggpacket
 #' @rdname initialize,ggpacket,ggproto,character
+#' @importFrom stats setNames
 setMethod("initialize", "ggpacket", 
   function(.Object, ggproto_obj = NULL, label = NULL) {
     if (is.null(ggproto_obj)) return(.Object)
@@ -82,15 +82,13 @@ setMethod("show", "ggpacket", function(object) {
   ## attempt to build plot by calling packet with `ggplot() + ggpacket_obj`
   plt_output <- try(silent = TRUE, { 
     plt <- ggplot2::ggplot() + object
-    utils::capture.output(type = 'message', {
+    utils::capture.output({
       bld <- ggplot2::ggplot_build(plt)
     })
   })
   
   if (length(plt_output) == 0 && all(sapply(bld$data, nrow))) 
     return(show(plt))
-  
-  print(plt_output)
   
   cat("ggpacket\nA container for multiple ggplot ggproto objects\n\n")
   cat('standalone plotting status: \n')
@@ -112,7 +110,7 @@ setMethod("show", "ggpacket", function(object) {
       function(n, name, ggp) cat(sprintf("[[%s]] %s\n%s\n\n", n, name, ggp)),
       n = 1:length(object@ggcalls),
       ggp = Map(function(ggc) 
-        paste(capture.output(suppressMessages(print(ggc))), 
+        paste(utils::capture.output(suppressMessages(print(ggc))), 
               collapse = "\n", sep = "\n"), 
         object@ggcalls),
       name = names(object@ggcalls) %||% ""
