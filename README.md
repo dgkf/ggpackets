@@ -7,7 +7,7 @@ ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="13
 Overview
 --------
 
-Take a look at the **[ggpackets project page](https://pages.github.com/dgkf/ggpackets/)**!
+Take a look at the **[ggpackets project page](https://dgkf.github.io/ggpackets/)**!
 
 Easily build components of ggplots without sacraficing the ease of ggplot's layer parameters and construction syntax.
 
