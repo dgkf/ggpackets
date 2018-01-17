@@ -6,7 +6,7 @@ output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Inspection and Documentation}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE} 

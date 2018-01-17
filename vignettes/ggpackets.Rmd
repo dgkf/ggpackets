@@ -4,9 +4,9 @@ author: "Doug Kelkhoff"
 date: "`r Sys.time()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting Started}
+  %\VignetteIndexEntry{ggpackets}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE} 

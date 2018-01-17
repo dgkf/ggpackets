@@ -124,7 +124,13 @@ filter_aesthetics <- function(geom, mapping) {
 
 
 filter_args <- function(fname, geom, stat, args) {
-  args[names(args) %in% c('geom', 'stat', allowed_params(geom), allowed_params(stat))]
+  allowed_args <- c(
+    names(formals(ggplot2::layer)), 
+    allowed_params(geom), 
+    allowed_params(stat)
+  )
+  
+  args[names(args) %in% allowed_args]
 }
 
 

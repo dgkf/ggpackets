@@ -89,6 +89,7 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...',
   
   # flatten args to mapping, remove extra aes
   args <- flatten_aes_to_mapping(args, allowed_aesthetics(geom), auto_remove_aes, envir)
+  
   if (auto_remove_aes) # remove invalid argnames and unevaluated aesthetics
     args <- filter_args(callfname, geom, stat, args[!uneval_aes(args)])
   args <- Map(function(v) if (is_uneval(v)) eval(v, envir) else v, args)
