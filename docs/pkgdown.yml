@@ -1,6 +1,6 @@
 urls:
-  reference: https://pages.github.roche.com/kelkhofd/ggpackets//reference
-  article: https://pages.github.roche.com/kelkhofd/ggpackets//articles
+  reference: https://pages.github.com/dgkf/ggpackets//reference
+  article: https://pages.github.com/dgkf/ggpackets//articles
 articles:
   composing-functions: composing-functions.html
   ggpackets: ggpackets.html

@@ -2,59 +2,15 @@
 output: "github_document"
 ---
 
-```{r, include=FALSE}
-shieldio_badge <- function(name, text, color, hover = NULL, href = NULL, ..., 
-  url = 'https://img.shields.io/badge/{{name}}-{{text}}-{{color}}.svg',
-  style = 'flat-square') {
-  
-  .dots <- list(...)
-  name  <- RCurl::curlEscape(whisker::whisker.render(name, .dots))
-  text  <- RCurl::curlEscape(whisker::whisker.render(text, .dots))
-  color <- whisker::whisker.render(color, .dots)
-  
-  if (is.numeric(c <- type.convert(color)))
-    color <- switch(letters[[floor(pmax(pmin(c, 1), 0) * 6 + 1)]],
-      g = 'brightgreen',
-      f = 'brightgreen',
-      e = 'green',
-      d = 'yellowgreen',
-      c = 'yellow',
-      b = 'orange',
-      a = 'red')
-  
-  color <- RCurl::curlEscape(color)  
-  url <- whisker::whisker.render(paste(url, paste0('style=', style), sep = '?'))
-  hover <- if (is.null(hover)) name else hover
-  whisker::whisker.render('[![{{hover}}]({{url}})]({{href}})')
-}
-```
-
-```{r build.badges, include=FALSE}
-failed_tests = sum(devtools::test()$failed)
-build_badge <- shieldio_badge(
-  'build', '{{p}}', '{{d}}', 'Build Status', 
-  p = if (failed_tests == 0) 'passing' else 'failing', 
-  d = if (failed_tests == 0) 'brightgreen' else 'red', 
-  href='http://rkalv758783.kau.roche.com:8080/job/ggpackets/');
-
-coverage = covr::percent_coverage(covr::package_coverage()); 
-coverage_badge <- shieldio_badge(
-  'coverage', '{{p}}%', '{{d}}', 'Code Coverage', 
-  p = round(coverage,1), 
-  d = (coverage/100-0.8)/0.2, 
-  href='http://rkalv758783.kau.roche.com:8080/job/ggpackets/');
-```
-
 # ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="134px"/>
 
-`r build_badge` `r coverage_badge`
+[![Travis](https://img.shields.io/travis/dgkf/ggpackets/master.svg?style=flat-square)](https://travis-ci.org/dgkf/ggpackets)
+[![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg?style=flat-square)](https://codecov.io/gh/dgkf/ggpackets)
 
 
 ## Overview
 
-> **Note:** Build status and code coverage calculated when package documentation is updated using the command `pkgdown::build_site()`. Working on having a more formal continuous integration system in place.
-
-Take a look at the **[ggpackets project page](https://pages.github.roche.com/kelkhofd/ggpackets/)**!
+Take a look at the **[ggpackets project page](https://pages.github.com/dgkf/ggpackets/)**!
 
 Easily build components of ggplots without sacraficing the ease of ggplot's layer parameters and construction syntax. 
 
@@ -64,7 +20,7 @@ Easily build components of ggplots without sacraficing the ease of ggplot's laye
 There are plenty of ways to help contribute:
 
 1. **File issues!**  
-   Found a bug? Think the syntax looks ugly? Don't like the name? Tell me! [Issues](https://github.roche.com/kelkhofd/ggpackets/issues) are the best way to start the conversation.
+   Found a bug? Think the syntax looks ugly? Don't like the name? Tell me! [Issues](https://github.com/dgkf/ggpackets/issues) are the best way to start the conversation.
 
 2. **Write documentation!**  
    More resources always helps. If you use the package and would feel comfortable writing about what you find useful, feel free to wrap it all into a Rmarkdown file and include it with the vignettes.

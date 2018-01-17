@@ -2,14 +2,12 @@
 ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="134px"/>
 ======================================================================================
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)](http://rkalv758783.kau.roche.com:8080/job/ggpackets/) [![Code Coverage](https://img.shields.io/badge/coverage-95.3%25-green.svg?style=flat-square)](http://rkalv758783.kau.roche.com:8080/job/ggpackets/)
+[![Travis](https://img.shields.io/travis/dgkf/ggpackets/master.svg?style=flat-square)](https://travis-ci.org/dgkf/ggpackets) [![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg?style=flat-square)](https://codecov.io/gh/dgkf/ggpackets)
 
 Overview
 --------
 
-> **Note:** Build status and code coverage calculated when package documentation is updated using the command `pkgdown::build_site()`. Working on having a more formal continuous integration system in place.
-
-Take a look at the **[ggpackets project page](https://pages.github.roche.com/kelkhofd/ggpackets/)**!
+Take a look at the **[ggpackets project page](https://pages.github.com/dgkf/ggpackets/)**!
 
 Easily build components of ggplots without sacraficing the ease of ggplot's layer parameters and construction syntax.
 
@@ -19,7 +17,7 @@ Get Involved
 There are plenty of ways to help contribute:
 
 1.  **File issues!**
-    Found a bug? Think the syntax looks ugly? Don't like the name? Tell me! [Issues](https://github.roche.com/kelkhofd/ggpackets/issues) are the best way to start the conversation.
+    Found a bug? Think the syntax looks ugly? Don't like the name? Tell me! [Issues](https://github.com/dgkf/ggpackets/issues) are the best way to start the conversation.
 
 2.  **Write documentation!**
     More resources always helps. If you use the package and would feel comfortable writing about what you find useful, feel free to wrap it all into a Rmarkdown file and include it with the vignettes.
