@@ -126,7 +126,7 @@ into a list and handles adding into a ggplot construction.</p>
                <span class='kw'>vjust</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>geom</span> <span class='kw'>=</span> <span class='st'>'text'</span>)
 
 <span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/ggplot'>ggplot</a></span>(<span class='no'>mtcars</span>, <span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/aes'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>gear</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>mpg</span>)) +
-  <span class='no'>bar_error_counts</span></div><div class='img'><img src='ggpacket-class-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
+  <span class='no'>bar_error_counts</span></div><div class='img'><img src='ggpacket-class-5.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
 <span class='co'># easier functionalization of subcomponents of a ggplot</span>
 <span class='no'>custom_errorbars</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>error_function</span>, <span class='no'>...</span>) {
   <span class='fu'><a href='ggpack.html'>ggpack</a></span>(<span class='no'>stat_summary</span>, <span class='kw'>id</span> <span class='kw'>=</span> <span class='st'>'bar'</span>, <span class='no'>...</span>, <span class='kw'>fun.y</span> <span class='kw'>=</span> <span class='no'>mean</span>, <span class='kw'>geom</span> <span class='kw'>=</span> <span class='st'>'bar'</span>) +
@@ -136,7 +136,7 @@ into a list and handles adding into a ggplot construction.</p>
 
 <span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/ggplot'>ggplot</a></span>(<span class='no'>mtcars</span>, <span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/aes'>aes</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>gear</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>mpg</span>)) +
   <span class='fu'>custom_errorbars</span>(<span class='no'>mean_se</span>, <span class='kw'>bar.fill</span> <span class='kw'>=</span> <span class='no'>gear</span>) +
-  <span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/facet_grid'>facet_grid</a></span>(<span class='no'>.</span> ~ <span class='no'>am</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='st'>'free'</span>)</div><div class='img'><img src='ggpacket-class-2.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
+  <span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/facet_grid'>facet_grid</a></span>(<span class='no'>.</span> ~ <span class='no'>am</span>, <span class='kw'>scales</span> <span class='kw'>=</span> <span class='st'>'free'</span>)</div><div class='img'><img src='ggpacket-class-6.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

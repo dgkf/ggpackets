@@ -1,4 +1,4 @@
-url: https://pages.github.com/dgkf/ggpackets/
+url: https://dgkf.github.io/ggpackets/
 
 reference:
   - title: "ggpack"
@@ -53,7 +53,7 @@ reference:
 #  type: default
 #  left:
 #  - icon: fa-home fa-lg
-#    href: https://pages.github.com/dgkf/ggpackets/
+#    href: https://dgkf.github.io/ggpackets/
 #  - icon: fa-github fa-lg
 #    href: https://github.com/dgkf/ggpackets/
 #  - text: Getting Started
