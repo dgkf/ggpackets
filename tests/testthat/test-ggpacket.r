@@ -5,7 +5,7 @@ context("Class Structure => ggpacket => initialization")
 
 test_that("ggpackets initialize properly", {
   p <- ggpacket()
-  expect_s4_class(p, "ggpacket")
+  expect_true(isS4(p) && class(p) == "ggpacket")
   expect_equal(p@ggcalls, list())
 })
 

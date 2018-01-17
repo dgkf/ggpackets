@@ -9,7 +9,7 @@ test_that("document_ggpk properly formats ... param", {
   }
   
   expect_equal(length(find_calls(as.expression(f), 'ggpack')), 3)
-  expect_output(document_ggpk(f), strrep('\\item\\s.+', 3))
+  expect_output(document_ggpk(f), paste0(rep('\\item\\s.+', 3), collapse = ''))
   expect_output(document_ggpk(f), '\\itemize')
   expect_output(document_ggpk(f), '@param \\.\\.\\.')
   expect_output(document_ggpk(f), "^#'")

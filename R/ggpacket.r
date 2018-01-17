@@ -90,6 +90,8 @@ setMethod("show", "ggpacket", function(object) {
   if (length(plt_output) == 0 && all(sapply(bld$data, nrow))) 
     return(show(plt))
   
+  print(plt_output)
+  
   cat("ggpacket\nA container for multiple ggplot ggproto objects\n\n")
   cat('standalone plotting status: \n')
   if (length(plt_output)) 

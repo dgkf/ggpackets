@@ -58,7 +58,7 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...',
   # filter args passed as ellipses in parent frame from all ellipses arguments
   e_1 <- args[!names(args) %in% names(expand)]      # parent ellipses args
   e_all <- if (requireNamespace('rlang', quietly = TRUE)) dequos(rlang::quos(...))
-    else substitute(...())                          # all ellipses args
+    else as.list(substitute(...()))                 # all ellipses args
   expand$'...' <- if (is.null(names(e_all))) e_all  # all except parent
     else e_all[!(names(e_all) %in% names(e_1) & !duplicated(names(e_all)))]
   
