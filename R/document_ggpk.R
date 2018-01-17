@@ -103,7 +103,7 @@ document_ggpk <- function(f, header = TRUE, ..., prefix = "#' ",
     collapse = '\n', sep = ''), '\n')
   cat(paste(
     prefix,
-    strrep(' ', 2*header), 
+    paste0(rep(' ', 2*header), collapse = ''), 
     strwrap(items_txt, width = 80-nchar(prefix)-2, exdent = 2),
     collapse = '\n', sep = ''), '\n')
   

@@ -3,13 +3,14 @@ context("Tidyeval Compatibility => .aes()")
 test_that(".aes function accepts !! operator args", {
   expect_true(require(rlang))
   
-  expect_silent({
-    f <- function(x, y, z) {
-      x <- rlang::enquo(x); y <- rlang::enquo(y); z <- rlang::enquo(z)
-      .aes(!!x, !!y, color = !!z)
-    }
-    f(x, y, z)
-  })
+  f <- function(x, y, z) {
+    x <- rlang::enquo(x) 
+    y <- rlang::enquo(y) 
+    z <- rlang::enquo(z)
+    .aes(!!x, !!y, color = !!z)
+  }
+  
+  expect_silent(f(x, y, z))
   
   expect_equal(names(f(x,y,z)), c('x', 'y', 'colour'))
   
