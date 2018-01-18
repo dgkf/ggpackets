@@ -4,6 +4,7 @@ output: "github_document"
 
 # ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="134px"/>
 
+[![CRAN](https://img.shields.io/cran/v/ggpackets.svg?style=flat-square)](https://cran.r-project.org/package=ggpackets)
 [![Travis](https://img.shields.io/travis/dgkf/ggpackets/master.svg?style=flat-square)](https://travis-ci.org/dgkf/ggpackets)
 [![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg?style=flat-square)](https://codecov.io/gh/dgkf/ggpackets)
 
@@ -18,7 +19,7 @@ Easily build components of ggplots without sacraficing the ease of ggplot's laye
 
 `ggpackets` is not yet available on CRAN. Until it is, you can install the most recent development version using the short script below:
 
-```{r}
+```{r, eval = FALSE}
 if (!require(devtools, quietly = TRUE)) 
   install.packages('devtools')
 

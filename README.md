@@ -2,7 +2,7 @@
 ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="134px"/>
 ======================================================================================
 
-[![Travis](https://img.shields.io/travis/dgkf/ggpackets/master.svg?style=flat-square)](https://travis-ci.org/dgkf/ggpackets) [![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg?style=flat-square)](https://codecov.io/gh/dgkf/ggpackets)
+[![CRAN](https://img.shields.io/cran/v/ggpackets.svg?style=flat-square)](https://cran.r-project.org/package=ggpackets) [![Travis](https://img.shields.io/travis/dgkf/ggpackets/master.svg?style=flat-square)](https://travis-ci.org/dgkf/ggpackets) [![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg?style=flat-square)](https://codecov.io/gh/dgkf/ggpackets)
 
 Overview
 --------
@@ -10,6 +10,17 @@ Overview
 Take a look at the **[ggpackets project page](https://dgkf.github.io/ggpackets/)**!
 
 Easily build components of ggplots without sacraficing the ease of ggplot's layer parameters and construction syntax.
+
+### Installation
+
+`ggpackets` is not yet available on CRAN. Until it is, you can install the most recent development version using the short script below:
+
+``` r
+if (!require(devtools, quietly = TRUE)) 
+  install.packages('devtools')
+
+devtools::install_github('dgkf/ggpackets', build_vignettes = TRUE)
+```
 
 Get Involved
 ------------
@@ -20,7 +31,7 @@ There are plenty of ways to help contribute:
     Found a bug? Think the syntax looks ugly? Don't like the name? Tell me! [Issues](https://github.com/dgkf/ggpackets/issues) are the best way to start the conversation.
 
 2.  **Write documentation!**
-    More resources always helps. If you use the package and would feel comfortable writing about what you find useful, feel free to wrap it all into a Rmarkdown file and include it with the vignettes.
+    More resources always helps. Found a function unintuitive? Example code and improved function descriptors would be helpful. If you use the package and would feel comfortable writing about a topic not yet covered in a vignette, feel free to contribute a new vignette for it.
 
 3.  **Write Unit Tests!**
     There's some pretty sophisticated manipulations going on under the hood to make everything as clean as possible, because of that it's important to make sure everything stays working the way we expect it to. Unit test contributions always welcome!

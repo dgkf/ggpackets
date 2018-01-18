@@ -29,7 +29,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="/index.html">
+  <a href="index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
@@ -82,6 +82,15 @@
 <a href="#overview" class="anchor"></a>Overview</h2>
 <p>Take a look at the <strong><a href="https://dgkf.github.io/ggpackets/">ggpackets project page</a></strong>!</p>
 <p>Easily build components of ggplots without sacraficing the ease of ggplot’s layer parameters and construction syntax.</p>
+<div id="installation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h3>
+<p><code>ggpackets</code> is not yet available on CRAN. Until it is, you can install the most recent development version using the short script below:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span> (<span class="op">!</span><span class="kw">require</span>(devtools, <span class="dt">quietly =</span> <span class="ot">TRUE</span>)) 
+  <span class="kw">install.packages</span>(<span class="st">'devtools'</span>)
+
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">'dgkf/ggpackets'</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</code></pre></div>
+</div>
 </div>
 <div id="get-involved" class="section level2">
 <h2 class="hasAnchor">
@@ -91,7 +100,7 @@
 <li><p><strong>File issues!</strong><br>
 Found a bug? Think the syntax looks ugly? Don’t like the name? Tell me! <a href="https://github.com/dgkf/ggpackets/issues">Issues</a> are the best way to start the conversation.</p></li>
 <li><p><strong>Write documentation!</strong><br>
-More resources always helps. If you use the package and would feel comfortable writing about what you find useful, feel free to wrap it all into a Rmarkdown file and include it with the vignettes.</p></li>
+More resources always helps. Found a function unintuitive? Example code and improved function descriptors would be helpful. If you use the package and would feel comfortable writing about a topic not yet covered in a vignette, feel free to contribute a new vignette for it.</p></li>
 <li><p><strong>Write Unit Tests!</strong><br>
 There’s some pretty sophisticated manipulations going on under the hood to make everything as clean as possible, because of that it’s important to make sure everything stays working the way we expect it to. Unit test contributions always welcome!</p></li>
 <li><p><strong>Contribute Code</strong><br>
@@ -150,6 +159,7 @@ Last but not least, code contributors are welcome. Reach out and get in touch if
 </ul>
 <h2>Dev status</h2>
 <ul class="list-unstyled">
+<li><a href="https://cran.r-project.org/package=ggpackets"><img src="https://img.shields.io/cran/v/ggpackets.svg?style=flat-square" alt="CRAN"></a></li>
 <li><a href="https://travis-ci.org/dgkf/ggpackets"><img src="https://img.shields.io/travis/dgkf/ggpackets/master.svg?style=flat-square" alt="Travis"></a></li>
 <li><a href="https://codecov.io/gh/dgkf/ggpackets"><img src="https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg?style=flat-square" alt="Codecov"></a></li>
 </ul>
@@ -163,7 +173,7 @@ Last but not least, code contributors are welcome. Reach out and get in touch if
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
