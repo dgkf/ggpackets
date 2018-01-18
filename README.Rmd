@@ -40,7 +40,7 @@ There are plenty of ways to help contribute:
 3. **Write Unit Tests!**  
    There's some pretty sophisticated manipulations going on under the hood to make everything as clean as possible, because of that it's important to make sure everything stays working the way we expect it to. Unit test contributions always welcome!
    
-4. **Contribute Code**  
+4. **Contribute Code!**  
    Last but not least, code contributors are welcome. Reach out and get in touch if you're passionate about the goal of the project. 
 
 ## Quick Start

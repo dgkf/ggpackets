@@ -1,25 +1,21 @@
 #' Get Geom allowed aesthetics
 #'
-#' All \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-#' \code{\link[ggplot2]{Geom}} objects have a set of allowable aesthetics that
-#' are used for generating the layer of the plot. This function returns those
-#' aesthetics, as well as any alternative localizations and base R equivalent
-#' names which can all be used as inputs to specify aesthetics to a ggplot
-#' object.
+#' All ggplot2 \code{\link[ggplot2]{Geom}} objects have a set of allowable
+#' aesthetics that are used for generating the layer of the plot. This function
+#' returns those aesthetics, as well as any alternative localizations and base R
+#' equivalent names which can all be used as inputs to specify aesthetics to a
+#' ggplot object.
 #'
 #' @seealso [filter_aesthetics()], [remove_aesthetics()],
 #'   [flatten_aesthetics_to_group()], [add_eqv_aes()], [split_aes_from_dots()],
 #'   [is_uneval()]
 #'
-#' @param geom a \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-#'   \code{\link[ggplot2]{Geom}} object or NULL
+#' @param geom a ggplot2 \code{\link[ggplot2]{Geom}} object or NULL
 #' @return a character vector of the names of aesthetics permitted by this
 #'   geometry object (including alternative localizations of names and base R
-#'   equivalent names also accepted by
-#'   \href{[https://github.com/tidyverse/ggplot2}{ggplot2}). If \code{geom} is
-#'   \code{NULL}, returns all of
-#'   \href{[https://github.com/tidyverse/ggplot2}{ggplot2})'s default allowed
-#'   aesthetics.
+#'   equivalent names also accepted by ggplot2. If \code{geom} is
+#'   \code{NULL}, returns all of ggplot2's default allowed
+#'   aesthetics.)
 #'
 #' @examples
 #' library(ggplot2)
@@ -48,11 +44,10 @@ allowed_params <- function(geom = NULL) {
 
 #' Add equivalent aesthetics to vector
 #' 
-#' Many \href{[https://github.com/tidyverse/ggplot2}{ggplot2} 
-#' \code{\link[ggplot2]{Geom}} objects will accept a number of alternative 
-#' spellings and base R equivalent arguments as aesthetic parameters. This 
-#' function adds those equivalent values to a character vector of aesthetic 
-#' names.
+#' Many ggplot2 \code{\link[ggplot2]{Geom}} objects will accept a number of
+#' alternative spellings and base R equivalent arguments as aesthetic
+#' parameters. This function adds those equivalent values to a character vector
+#' of aesthetic names.
 #'   
 #' @seealso [allowed_aesthetics()], [filter_aesthetics()],
 #'   [remove_aesthetics()], [flatten_aesthetics_to_group()], [add_eqv_aes()],
@@ -60,8 +55,7 @@ allowed_params <- function(geom = NULL) {
 #'   
 #' @param aes_names a character vector of aesthetic names
 #' @return a character vector of aesthetic names including any localized or base
-#'   R equivalent argument names accepted by 
-#'   \href{[https://github.com/tidyverse/ggplot2}{ggplot2}.
+#'   R equivalent argument names accepted by ggplot2.
 #'   
 #' @examples
 #' ggpackets:::add_eqv_aes(c('color', 'fill'))
@@ -73,7 +67,8 @@ add_eqv_aes <- function(aes_names) {
                   names(.base_to_ggplot)  %in% aes_names
   base_eqv <- .base_to_ggplot[base_eqv_idx]
   aes_names_new <- unique(c(aes_names, names(base_eqv), unlist(base_eqv, use.names = F)))
-  # attempt to add new equivalent mappings if anything new added (e.g. (color => colour) => fg)
+  # attempt to add new equivalent mappings if anything new added 
+  # (e.g. (color => colour) => fg)
   if (!(all(aes_names_new %in% aes_names))) add_eqv_aes(aes_names_new)
   else aes_names_new
 }
@@ -105,10 +100,8 @@ rename_to_ggplot <- function(args) {
 #'   [remove_aesthetics()], [flatten_aesthetics_to_group()], [add_eqv_aes()],
 #'   [split_aes_from_dots()], [is_uneval()]
 #'   
-#' @param geom a \href{[https://github.com/tidyverse/ggplot2}{ggplot2} 
-#'   \code{\link[ggplot2]{Geom}} object
-#' @param mapping a \href{[https://github.com/tidyverse/ggplot2}{ggplot2} 
-#'   aesthetic mapping
+#' @param geom a ggplot2 \code{\link[ggplot2]{Geom}} object
+#' @param mapping a ggplot2 aesthetic mapping
 #' @return the provided aesthetic mapping, filtered by accepted aesthetics for 
 #'   the given \code{\link[ggplot2]{Geom}}
 #'   
@@ -167,8 +160,7 @@ filter_args <- function(geom, stat, args) {
 #'   [remove_aesthetics()], [flatten_aesthetics_to_group()], [add_eqv_aes()],
 #'   [split_aes_from_dots()], [is_uneval()]
 #' 
-#' @param mapping a \href{[https://github.com/tidyverse/ggplot2}{ggplot2} 
-#'   aesthetic mapping
+#' @param mapping a ggplot2 aesthetic mapping
 #' @param ... aesthetic handles to flatten into the group aesthetic as 
 #'   interaction terms
 #' @return the mapping aesthetics with specified aesthetics stored additionally
@@ -208,10 +200,9 @@ flatten_aesthetics_to_group <- function(mapping, ...) {
 #'   [split_aes_from_dots()], [is_uneval()]
 #' 
 #' @param ... arguments containing aesthetics mapping
-#' @param geom if specified, a 
-#'   \href{[https://github.com/tidyverse/ggplot2}{ggplot2} 
-#'   \code{\link[ggplot2]{Geom}} object can be passed to filter aesthetics for 
-#'   only a specified \code{\link[ggplot2]{Geom}}.
+#' @param geom if specified, a ggplot2 \code{\link[ggplot2]{Geom}} object can be
+#'   passed to filter aesthetics for only a specified
+#'   \code{\link[ggplot2]{Geom}}.
 #' @return a list containing two named elements: 'aes' which contains the 
 #'   aesthetic mappings (of the \code{\link[ggplot2]{Geom}} object if specified)
 #'   as a pairlist with class `uneval` akin to the result of an 
@@ -239,8 +230,7 @@ split_aes_from_dots <- function(..., geom = NULL) {
 
 #' Remove specific aesthetics from mapping
 #' 
-#' Remove specified aesthetics by name from a 
-#' \href{[https://github.com/tidyverse/ggplot2}{ggplot2} aesthetic mapping, 
+#' Remove specified aesthetics by name from a ggplot2 aesthetic mapping,
 #' returning the same mapping with the specified aesthetics removed an preserved
 #' as an interaction term in the group aesthetic.
 #'   
