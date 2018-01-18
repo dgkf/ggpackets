@@ -2,7 +2,7 @@
 #'
 #' @param f function to generate ellipses documentation for
 #' @param header whether to include a brief intro, adding context to arg list
-#' @param ... additional arugments used for substituting unknown variables
+#' @param ... additional arguments used for substituting unknown variables
 #' @param prefix prefix to insert before lines of documentation
 #' @param dots_as_ellipses build documentation for arguments passed via dots
 #'   argument

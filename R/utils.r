@@ -8,7 +8,7 @@
 #' 
 `%||%` <- function(a, b) { if (is.null(a) || !length(a)) b else a }
 
-#' Format a list of items as it would be in a sentance
+#' Format a list of items as it would be in a sentence
 #'
 #' @param l a character vector list of strings to format
 #' @param oxford whether to include an oxford comma

@@ -126,11 +126,11 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...',
 #'   to use for each of the sources. (e.g. \code{c("..." = "ellipses
 #'   arguments")})
 #' @param call an optional object of type call to include with the warning if a
-#'   statment associated with the arguments is desired to be included with the
+#'   statement associated with the arguments is desired to be included with the
 #'   warning message.
 #'
 #' @return a named list of arguments with duplicated names omitted, leaving only
-#'   the last occurance of each named value
+#'   the last occurence of each named value
 #'   
 last_args <- function(args, sources = list(), warn = c(), desc = c(), 
     call = NULL) {

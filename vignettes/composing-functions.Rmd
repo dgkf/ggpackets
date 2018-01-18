@@ -101,7 +101,7 @@ as shown below.
 > Be aware that this usage isn't particularly intuitive without a bit of added
 documentation. If you're building a function for someone else to use or to
 export from a package you're making, it's probably worth writing up some good
-documentation about what paramters you expect people to use.
+documentation about what parameters you expect people to use.
 
 ```{r function_ggpacket_standalone_output}
 ggpk_my_template(Loblolly, x = age, y = height, color = Seed)
