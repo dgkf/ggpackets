@@ -38,7 +38,7 @@ allowed_aesthetics <- function(geom = NULL) {
 #' @export
 #'
 allowed_params <- function(geom = NULL) {
-  c(allowed_aesthetics(geom), geom$parameters())
+    c(allowed_aesthetics(geom), geom$parameters())
 }
 
 
@@ -81,12 +81,15 @@ add_eqv_aes <- function(aes_names) {
 #' @return the list with aesthetic names remapped to ggplot equivalents
 #'   
 rename_to_ggplot <- function(args) {
-  names(args) <- ifelse(names(args) %in% names(.base_to_ggplot), 
-    .base_to_ggplot[names(args)], 
-    names(args))
+  names(args) <- to_ggplot(names(args))
   args
 }
 
+to_ggplot <- function(args) {
+  Map(function(arg) { 
+    ifelse(arg %in% names(.base_to_ggplot), .base_to_ggplot[arg], arg)
+  }, args)
+}
 
 #' Filter aesthetics for Geom
 #' 
@@ -129,12 +132,15 @@ filter_aesthetics <- function(geom, mapping) {
 #' 
 #' @importFrom ggplot2 layer
 #' 
-filter_args <- function(geom, stat, args) {
-  allowed_args <- c(
-    names(formals(ggplot2::layer)), 
-    allowed_params(geom), 
-    allowed_params(stat)
-  )
+filter_args <- function(call, geom, stat, args) {
+  if (any(c(class(geom), class(stat)) %in% 'ggproto')) {
+    allowed_args <- c(
+      names(formals(ggplot2::layer)), 
+      allowed_params(geom), 
+      allowed_params(stat))
+  } else {
+    allowed_args <- names(formals(call))
+  }
   
   args[names(args) %in% allowed_args]
 }

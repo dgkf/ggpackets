@@ -39,32 +39,109 @@
 #'
 #' @importFrom utils head tail
 #' @export
-ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...', 
-    auto_remove_aes = (!is.null(id) && any(sapply(id, is.null))),
-    null_empty = FALSE, envir = parent.frame()) {
-  
+# ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, 
+#     # warn = '...', (parameter relinquished to ... arg to allow multiple args)
+#     auto_remove_aes = is.null(id) || any(sapply(id, is.null)),
+#     null_empty = FALSE, envir = parent.frame()) {
+#   
+#   if (is.null(.call) && length(list(...)) == 0) return(ggpacket())
+#   
+#   callfname <- deparse(as.list(match.call())$'.call')
+#   expand <- list('...' = NULL, 'dots' = as.list(dots))
+#   
+#   # get all call-specific args
+#   args <- as.list(sys.call()[-1])[-1]
+#   names(args)[args %in% '...'] <- rep('...', length(args[args %in% '...']))
+#   excluded_args <- setdiff(names(formals()), names(expand))
+#   if (!is.null(names(args))) args <- args[!names(args) %in% excluded_args]
+#   
+#   # filter args passed as ellipses in parent frame from all ellipses arguments
+#   e_1 <- args[!names(args) %in% names(expand)]      # parent ellipses args
+#   e_all <- if (requireNamespace('rlang', quietly = TRUE)) dequos(rlang::quos(...))
+#     else as.list(substitute(...()))                 # all ellipses args
+#   expand$'...' <- if (is.null(names(e_all))) e_all  # all except parent
+#     else e_all[!(names(e_all) %in% names(e_1) & !duplicated(names(e_all)))]
+#   
+#   # remove any arguments from ellipses or dots that don't begin with id
+#   expand <- lapply(expand, remove_by_prefix, id = id)
+#   
+#   # substitute ellipses args and dots args in place, record origin and indices
+#   sources <- rep('call', length(args))
+#   for (i in length(args) - which(names(args) %in% names(expand))) {
+#     i <- length(args) - i
+#     args <- append(args[-i], e <- expand[[a <- names(args[i])]], i-1)
+#     sources <- append(sources[-i], rep(a, length(e)), i-1)
+#   }
+#   
+#   # handle `warn` argument (captured via ellipses args to allow overriding)
+#   warn <- warn_arg(args)
+#   args <- args[!names(args) %in% 'warn']
+#   
+#   # strip args list of duplicate args, optionally warning during removal
+#   args <- rename_to_ggplot(args)
+#   args <- last_args(args, sources, warn, call = sys.call(),
+#     desc = list('...' = '"..."', dots = '"dots"', call = 'call construction'))
+#   if (null_empty && length(args) == 0) return(ggpacket(NULL))
+#   
+#   # call ggproto construction with stripped args to determine geom
+#   # might cause issue if aesthetics are dependent on additional arguments
+#   ggproto_tmp <- tryCatch({
+#       do.call(.call, args[names(args) %in% c('geom', 'stat')])
+#     }, error = function(e) NULL)
+#   geom <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$geom else NULL
+#   stat <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$stat else NULL
+#   
+#   # flatten args to mapping, remove extra aes
+#   args <- flatten_aes_to_mapping(args, allowed_aesthetics(geom), auto_remove_aes, envir)
+#   
+#   if (auto_remove_aes) # remove invalid argnames and unevaluated aesthetics
+#     args <- filter_args(geom, stat, args[!uneval_aes(args)])
+#   args <- Map(function(v) if (is_uneval(v)) eval(v, envir) else v, args)
+#   
+#   # ring ring, time to make a call!
+#   ggpacket_name <- if (is.null(id)) NULL else paste(id, collapse = '.')
+#   if (any(class(.call) == 'function'))
+#     ggpacket(tryCatch(withCallingHandlers(do.call(.call, args),
+#       warning = function(w) if (!auto_remove_aes) {
+#         message("In ggpack of call to ", callfname, ": \n", w$message, "\n")
+#         invokeRestart("muffleWarning")
+#       }),
+#       error = function(e) {
+#         message(sprintf('Error during call to "%s" with id%s %s: \n',
+#           callfname,
+#           if (length(id) > 1) 's' else '',
+#           paste0('"', id %||% 'NULL', '"', collapse = ', ')),
+#           e$message, '\n')
+#       }), ggpacket_name)
+#   else
+#     ggpacket(.call, ggpacket_name)
+# }
+ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, 
+     # warn = '...', (parameter relinquished to ... arg to allow multiple args)
+     auto_remove_aes = is.null(id) || any(sapply(id, is.null)),
+     null_empty = FALSE, envir = parent.frame()) {
+
   if (is.null(.call) && length(list(...)) == 0) return(ggpacket())
-  
-  warn <- match.arg(warn, c('call', '...', 'dots'), several.ok = TRUE)
+
   callfname <- deparse(as.list(match.call())$'.call')
   expand <- list('...' = NULL, 'dots' = as.list(dots))
-  
+
   # get all call-specific args
   args <- as.list(sys.call()[-1])[-1]
   names(args)[args %in% '...'] <- rep('...', length(args[args %in% '...']))
   excluded_args <- setdiff(names(formals()), names(expand))
   if (!is.null(names(args))) args <- args[!names(args) %in% excluded_args]
-  
+
   # filter args passed as ellipses in parent frame from all ellipses arguments
   e_1 <- args[!names(args) %in% names(expand)]      # parent ellipses args
   e_all <- if (requireNamespace('rlang', quietly = TRUE)) dequos(rlang::quos(...))
     else as.list(substitute(...()))                 # all ellipses args
   expand$'...' <- if (is.null(names(e_all))) e_all  # all except parent
     else e_all[!(names(e_all) %in% names(e_1) & !duplicated(names(e_all)))]
-  
+
   # remove any arguments from ellipses or dots that don't begin with id
   expand <- lapply(expand, remove_by_prefix, id = id)
-  
+
   # substitute ellipses args and dots args in place, record origin and indices
   sources <- rep('call', length(args))
   for (i in length(args) - which(names(args) %in% names(expand))) {
@@ -72,13 +149,17 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...',
     args <- append(args[-i], e <- expand[[a <- names(args[i])]], i-1)
     sources <- append(sources[-i], rep(a, length(e)), i-1)
   }
-  
+
+  # handle `warn` argument (captured via ellipses args to allow overriding)
+  warn <- warn_arg(args)
+  args <- args[!names(args) %in% 'warn']
+
   # strip args list of duplicate args, optionally warning during removal
   args <- rename_to_ggplot(args)
   args <- last_args(args, sources, warn, call = sys.call(),
     desc = list('...' = '"..."', dots = '"dots"', call = 'call construction'))
   if (null_empty && length(args) == 0) return(ggpacket(NULL))
-  
+
   # call ggproto construction with stripped args to determine geom
   # might cause issue if aesthetics are dependent on additional arguments
   ggproto_tmp <- tryCatch({
@@ -86,31 +167,38 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...',
     }, error = function(e) NULL)
   geom <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$geom else NULL
   stat <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$stat else NULL
-  
+
   # flatten args to mapping, remove extra aes
   args <- flatten_aes_to_mapping(args, allowed_aesthetics(geom), auto_remove_aes, envir)
   
   if (auto_remove_aes) # remove invalid argnames and unevaluated aesthetics
-    args <- filter_args(geom, stat, args[!uneval_aes(args)])
+    args <- filter_args(.call, geom, stat, args[!uneval_aes(args)])
   args <- Map(function(v) if (is_uneval(v)) eval(v, envir) else v, args)
   
-  # ring ring, time to make a call!
-  ggpacket_name <- if (is.null(id)) NULL else paste(id, collapse = '.')
-  if (any(class(.call) == 'function'))
-    ggpacket(tryCatch(withCallingHandlers(do.call(.call, args),
-      warning = function(w) if (!auto_remove_aes) {
-        message("In ggpack of call to ", callfname, ": \n", w$message, "\n")
-        invokeRestart("muffleWarning")
-      }),
-      error = function(e) {
-        message(sprintf('Error during call to "%s" with id%s %s: \n',
-          callfname,
-          if (length(id) > 1) 's' else '',
-          paste0('"', id %||% 'NULL', '"', collapse = ', ')),
-          e$message, '\n')
-      }), ggpacket_name)
-  else
-    ggpacket(.call, ggpacket_name)
+  ggpacket() + ggpacked_layer(
+    id = id, ggcall = .call, ggargs = args, geom = geom, stat = stat, 
+    ggpackargs = list(auto_remove_aes = auto_remove_aes, envir = envir))
+}
+
+#' Retrieve last named 'warn' value from list with default and restricted values
+#'
+#' @param args named list of values, potentially containing a named element
+#'   'warn'
+#' @param warn.default the default value if 'warn' is not found
+#' @param warn.opts the options for possible values within the 'warn' element
+#'
+#' @return the values retrieved from the 'warn' named element in args
+#' 
+warn_arg <- function(args, warn.default = '...', 
+    warn.opts = c('...', 'dots', 'call')) {
+  
+  warn <- unlist(tail(args[names(args) %in% 'warn'], 1), use.names = FALSE)
+  if (is.null(warn)) warn <- warn.default
+  
+  if (isTRUE(warn)) 
+    warn.opts
+  else if (!warn %in% list(NULL, FALSE)) 
+    match.arg(warn, warn.opts, several.ok = TRUE)
 }
 
 
@@ -188,9 +276,9 @@ flatten_aes_to_mapping <- function(args,
   aes_idx <- which(names(args) %in% aes_list)
   
   # split args into those pre- and post- mapping arugment
-  aes_pre_idx <- Filter(function(i) i < map_idx, aes_idx)
+  aes_pre_idx <- aes_idx[aes_idx < map_idx]
   aes_pre_args <- Map(deparse, Filter(is_uneval, args[aes_pre_idx]))
-  aes_pst_idx <- Filter(function(i) i > map_idx, aes_idx)
+  aes_pst_idx <- aes_idx[aes_idx > map_idx]
   aes_pst_args <- Map(deparse, Filter(is_uneval, args[aes_pst_idx]))
   
   # strip preceeding free aes vars if they appear in mapping
@@ -205,13 +293,32 @@ flatten_aes_to_mapping <- function(args,
     args <- args[!names(args) %in% names(c(aes_pre_args, aes_pst_args))]
   
   if (filter_mapping) mapped_aes <- mapped_aes[mapped_aes %in% aes_list]
-  args$mapping <- Reduce(utils::modifyList, list(
+  mapping <- Reduce(utils::modifyList, list(
     do.call(ggplot2::aes_string, aes_pre_args),
     as.list(eval(args$mapping))[mapped_aes],
     do.call(ggplot2::aes_string, aes_pst_args)
   )) %||% NULL
   
+  if ('mapping' %in% names(args)) args$mapping <- mapping
+  else args <- append(args, list(mapping = mapping), 0)
+  
   args
+}
+
+
+replace_reserved_aesthetic_references <- function(args, 
+    re = '^\\.\\.(.+)\\.\\.$') { 
+  
+  Filter(Negate(is.null), Map(function(arg) { 
+    argd <- deparse(arg)
+    if (length(m <- regmatches(argd, regexec(re, argd))[[1]])) {
+      replacement <- unlist(to_ggplot(m[[2]]))
+      if (replacement %in% names(args))
+        args[[replacement]]
+      else
+        NULL
+    } else arg
+  }, args))
 }
 
 
