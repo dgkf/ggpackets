@@ -86,9 +86,9 @@ rename_to_ggplot <- function(args) {
 }
 
 to_ggplot <- function(args) {
-  Map(function(arg) { 
-    ifelse(arg %in% names(.base_to_ggplot), .base_to_ggplot[arg], arg)
-  }, args)
+  ifelse(args %in% names(.base_to_ggplot), 
+    unlist(.base_to_ggplot[args], use.names = FALSE), 
+    args)
 }
 
 #' Filter aesthetics for Geom
@@ -134,15 +134,16 @@ filter_aesthetics <- function(geom, mapping) {
 #' 
 filter_args <- function(call, geom, stat, args) {
   if (any(c(class(geom), class(stat)) %in% 'ggproto')) {
-    allowed_args <- c(
+    allowed_args <- c('',
       names(formals(ggplot2::layer)), 
       allowed_params(geom), 
       allowed_params(stat))
   } else {
-    allowed_args <- names(formals(call))
+    allowed_args <- c('', names(formals(call)))
   }
   
-  args[names(args) %in% allowed_args]
+  argnames <- names(args) %||% rep('', length(args))
+  args[argnames %in% allowed_args]
 }
 
 

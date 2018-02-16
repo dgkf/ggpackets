@@ -90,31 +90,19 @@ setMethod("show", "ggpacket", function(object) {
   if (length(plt_output) == 0 && all(sapply(bld$data, nrow))) 
     return(show(plt))
   
-  cat("ggpacket\nA container for multiple ggplot ggproto objects\n\n")
+  cat(safecrayon('darkblue', 'ggpacket'), '\n')
   cat('standalone plotting status: \n')
   if (length(plt_output)) 
-    cat(strwrap(
+    cat(safecrayon('midred', strwrap(
         attr(plt_output, 'condition')$message, 
-        indent = 2, exdent = 2), 
-      '\n')
+        indent = 2, exdent = 2)), '\n')
   else if (!all(sapply(bld$data, nrow))) 
-    cat(strwrap(
+    cat(safecrayon('midred', strwrap(
         'Not all layers have been passed sufficient data', 
-        indent = 2, exdent = 2),
-      '\n')
+        indent = 2, exdent = 2)), '\n')
   
   cat('\n')
-  if (length(object@ggcalls) == 0) cat("empty\n\n")
-  else
-    mapply(
-      function(n, name, ggp) cat(sprintf("[[%s]] %s\n%s\n\n", n, name, ggp)),
-      n = 1:length(object@ggcalls),
-      ggp = Map(function(ggc) 
-        paste(utils::capture.output(suppressMessages(print(ggc))), 
-              collapse = "\n", sep = "\n"), 
-        object@ggcalls),
-      name = names(object@ggcalls) %||% ""
-    )
+  print(object@ggcalls)
 })
 
 #' Overload names method to print ggpacket ggcall list names

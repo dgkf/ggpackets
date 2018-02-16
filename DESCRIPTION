@@ -16,6 +16,7 @@ Imports:
     ggplot2
 Suggests:
     rlang,
+    crayon,
     testthat,
     knitr,
     rmarkdown
