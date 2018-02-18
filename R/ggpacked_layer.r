@@ -73,17 +73,21 @@ setMethod("show", "ggpacked_layer", function(object) {
     cat(safecrayon('darkblue', 
       'Anonymous ggpacket layer\n'))
   
-  ggcallname <- match.call(ggpack, object@ggpackargs$ggpackcall)
-  ggcallname <- ggcallname$.call
+  args <- object@ggargs
+  sources <- args$source
+  args <- with(args, setNames(val, name))
   
-  sources <- object@ggpackargs$sources
-  src_chr <- max(nchar(sources))
+  src_chr <- max(nchar(sources), 0)
   
-  cat(safecrayon('blue', ggcallname, ': \n', sep = ''))
+  cat(safecrayon('blue', object@ggpackargs$callfname, ': \n', sep = ''))
   cat(paste0('  ', 
     Map(function(a, an, i, s) {
-      src <- paste0(s, rep(' ', src_chr - nchar(s)), collapse = '') 
-    
+      src <- paste0(safecrayon('grey4', s), safecrayon('grey7', 
+        if ((pad <- src_chr - nchar(s)) > 2) 
+          paste0(' ', paste0(rep('.', pad-1), collapse = ''))
+        else 
+          paste0(rep(' ', pad), collapse = '')))
+      
       if (is_uneval(a)) out <- paste0(trimws(deparse(a)), collapse = ' ')
       else              out <- deparse(a)
       
@@ -91,18 +95,21 @@ setMethod("show", "ggpacked_layer", function(object) {
         (w <- getOption('width', default = 80) - src_chr - 7 - nchar(an))) 
           out <- paste0(strtrim(out, w - 3), '...')
       
-      if (an != '' && i != tail(which(names(object@ggargs) %in% an), 1)) 
-        out <- safecrayon('grey6', an, out, collapse = '')
-      else { 
-        an <- if (an == '') an else paste0(an, ' = ')
-        out <- safecrayon('grey2', an, out, collapse = '', sep = '')
-      }
+      if (i == tail(which(names(args) %in% an), 1)) 
+        col <- 'grey2' 
+      else 
+        col <- 'grey6'
+      
+      if (an != '')
+        out <- safecrayon(col, an, '=', out, collapse = '')
+      else 
+        out <- safecrayon(col, an, out, collapse = '', sep = '')
         
-      paste0(safecrayon('grey4', src), '  ', out)
+      paste(src, out)
     }, 
-    object@ggargs, 
-    tsnames(object@ggargs, fill = ''), 
-    1:length(object@ggargs),
+    args, 
+    tsnames(args, fill = ''), 
+    seq(length.out = length(args)),
     sources), collapse = '\n'))
   cat('\n')
 })
@@ -137,22 +144,22 @@ setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
   
   # flatten incoming mapping into ggplot aesthetics (also annotate their source)
   i <- max(head(which(names(args) != ''), 1) %||% length(args)-1, 0)
-  args <- append(args, e1$mapping %||% list(), i)
-  sources <- append(sources, rep('inherited mapping', length(e1$mapping)), i)
+  args <- rbind(args[row(args[,1]) <= i,],
+    tibble(
+      name = tsnames(e1$mapping, fill = ''), 
+      val = e1$mapping, 
+      source = 'inherited mapping'),
+    args[row(args[,1]) > i,])
   
+  # unpack args tibble into argument list
+  args <- with(args, setNames(val, name))
+    
   # evaluate reserved aesthetics 
   # e.g. list(color = a, fill = ..color..) => list(color = a, fill = a)
   args <- replace_reserved_aesthetic_references(args)
   
-  # strip args list of duplicate args, optionally warning during removal
-  args <- last_args(args, sources, warn, call = ggpackcall,
-    desc = list(
-      mapping = 'inherited mapping aesthetics',
-      '...' = '"..."',
-      dots = '"dots"', 
-      call = 'call construction'))
-  
-  # flatten args to mapping, remove extra aes
+  # strip last and flatten args to mapping, remove extra aes
+  args <- last_args(args)
   args <- flatten_aes_to_mapping(args, allowed_aesthetics(e2@geom), auto_remove_aes, envir)
   if (null_empty && length(args) == 0) return(ggpacket(NULL))
   
@@ -169,5 +176,6 @@ setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
 
   # add a default mapping to make standalone plot messages more informative
   args$mapping <- args$mapping %||% aes()
+  
   e1 + do.call(e2@ggcall, args)
 })

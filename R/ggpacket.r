@@ -43,35 +43,13 @@ ggpacket <- setClass("ggpacket",
   prototype = list(ggcalls = list())
 )
 
+
 #' Initialize empty ggpacket
 #' @param .Object ggpacket object to be initialized
 #' @rdname initialize,ggpacket-method
 setMethod(f = "initialize", methods::signature(.Object = "ggpacket"), 
   function(.Object) { .Object })
 
-#' Initialize new object by adding ggproto to list with name label
-#' @param .Object ggpacket object to be initialized
-#' @param ggproto_obj an object of class ggproto to add to the ggpacket's
-#'   internal list
-#' @param label an optional label to be able to index this component within the
-#'   ggpacket
-#' @rdname initialize,ggpacket,ggproto,character
-#' @importFrom stats setNames
-setMethod("initialize", "ggpacket", 
-  function(.Object, ggproto_obj = NULL, label = NULL) {
-    if (is.null(ggproto_obj)) return(.Object)
-    else if (all(class(ggproto_obj) == 'list'))
-      .Object <- .Object + stats::setNames(
-        ggproto_obj, 
-        names(ggproto_obj) %||% label)
-    else
-      .Object <- .Object + stats::setNames(
-        list(ggproto_obj), 
-        label)
-    
-    .Object
-  }
-)
 
 #' Overload show method to show ggpacket
 #' @param object the ggpacket object to show
@@ -108,24 +86,40 @@ setMethod("show", "ggpacket", function(object) {
 #' Overload names method to print ggpacket ggcall list names
 #' @param x the ggpacket object to show
 #' @rdname names-ggpacket
-setMethod("names", "ggpacket", function(x) { names(x@ggcalls) })
+setMethod("names", "ggpacket", function(x) { 
+  Map(function(ggc) ggc@id, x@ggcalls)
+})
+
+#' Overload names method to print ggpacket ggcall list names
+#' @param x the ggpacket object to show
+#' @rdname names-ggpacket
+setMethod("names<-", "ggpacket", function(x, value) {
+  x@ggcalls <- Map(function(ggc, v) { 
+    ggc@id <- as.list(v); ggc 
+  }, x@ggcalls, value)
+  x
+})
 
 #' Overload [ generic to index into ggcalls list
 #' @param x ggpacket object
 #' @param i index of the ggcall in the ggpacket object
 #' @rdname ggpacket-indexing
 setMethod("[", "ggpacket", function(x, i) { 
-  if (any(sapply(x@ggcalls[i], function(i) 'ggproto' %in% class(i)))) 
-    ggpacket(x@ggcalls[i]) 
-  else 
-    x@ggcalls[i]
+  if (is.numeric(i))
+    ggpacket() + x@ggcalls[i]
+  else {
+    is <- which(sapply(x@ggcalls, function(ggc) any(i %in% ggc@id)))
+    ggpacket() + x@ggcalls[is]
+  }
 })
 
 #' Overload [[ generic to index into ggcalls list
 #' @rdname ggpacket-indexing
 setMethod("[[", "ggpacket", function(x, i) { 
-  if ('ggproto' %in% class(x@ggcalls[[i]])) ggpacket(x@ggcalls[[i]]) 
-  else x@ggcalls[[i]]
+  if ('ggproto' %in% class(x@ggcalls[[i]])) 
+    ggpacket() + x@ggcalls[[i]]
+  else 
+    ggpacket() + x@ggcalls[[i]]
 })
 
 #' Primitive methods for adding ggpackets to various ggplot objects
@@ -133,9 +127,17 @@ setMethod("[[", "ggpacket", function(x, i) {
 #' @param e2 right side argument for addition
 #' @rdname ggpacket-addition
 setMethod("+", c("ggpacket", "ANY"), function(e1, e2) {
-  if      ("ggpacket" %in% class(e2)) e1@ggcalls <- append(e1@ggcalls, e2@ggcalls)
-  else if ("theme" %in% class(e2))    e1@ggcalls <- append(e1@ggcalls, list(e2))
-  else                                e1@ggcalls <- append(e1@ggcalls, e2)
+  e2call <- as.list(as.list(sys.call()[-1])[[2]])
+  
+  if ('ggpacked_layer' %in% class(e2))
+    e1@ggcalls <- append(e1@ggcalls, e2)
+  else if ('ggpacket' %in% class(e2))
+    e1@ggcalls <- append(e1@ggcalls, e2@ggcalls)
+  else if ('list' %in% class(e2))
+    e1 <- Reduce("+", init = e1, e2)
+  else
+    e1@ggcalls <- append(e1@ggcalls, do.call(ggpack, e2call)@ggcalls)
+    
   e1
 })
 
@@ -146,6 +148,8 @@ setMethod("+", c("NULL", "ggpacket"), function(e1, e2) e2)
 # register unexported gg class from ggplot2 so signature is accepted
 setOldClass("gg")
 
-#' Combine ggpacket contents with gg call to incorporate seamlessly with ggplot calls
+#' Combine ggpacket contents with gg call to incorporate seamlessly with ggplot
+#' calls
 #' @rdname ggpacket-addition
-setMethod("+", c("gg", "ggpacket"), function(e1, e2) Reduce("+", e2@ggcalls, e1))
+setMethod("+", c("gg", "ggpacket"), function(e1, e2) 
+  Reduce("+", e2@ggcalls, e1))

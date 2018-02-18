@@ -49,49 +49,64 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL,
 
   # get all call-specific args
   args <- as.list(sys.call()[-1])[-1]
-  names(args)[args %in% '...'] <- rep('...', length(args[args %in% '...']))
+  args <- tibble(name = tsnames(args), val = args, source = 'call')
+  args[args$val %in% '...','name'] <- '...'
+  
   excluded_args <- setdiff(names(formals()), names(expand))
-  if (!is.null(names(args))) args <- args[!names(args) %in% excluded_args]
-
+  args <- args[!args$name %in% excluded_args,]
+  
   # filter args passed as ellipses in parent frame from all ellipses arguments
-  e_1 <- args[!names(args) %in% names(expand)]      # parent ellipses args
+  e_1 <- args[!args$name %in% names(expand),]$val  # parent ellipses args
   e_all <- if (requireNamespace('rlang', quietly = TRUE)) {  
       dequos(rlang::quos(...))
     } else { as.list(substitute(...())) }           # all ellipses args
-  
   expand$'...' <- if (is.null(names(e_all))) e_all else list_diff(e_1, e_all)
-  expand$mapping <- args$mapping %||% list()
-  
   # remove any arguments from ellipses or dots that don't begin with id
   expand <- lapply(expand, remove_by_prefix, id = id)
   
   # substitute ellipses args and dots args in place, record origin and indices
-  sources <- rep('call', length(args))
-  for (i in length(args) - which(names(args) %in% names(expand))) {
-    i <- length(args) - i
-    args <- append(args[-i], e <- expand[[a <- names(args[i])]], i-1)
-    sources <- append(sources[-i], rep(a, length(e)), i-1)
+  for (row_ind_from_end in nrow(args) - which(args$name %in% names(expand))) { 
+    i <- nrow(args) - row_ind_from_end
+    e <- expand[[ a <- args[[i,'name']] ]]
+    args <- rbind(
+      args[row(args[,1]) < i,], 
+      tibble(val = e, name = names(e), source = a), 
+      args[row(args[,1]) > i,])
+  }
+  
+  # unpack mapping aesthetics
+  for (row_ind_from_end in nrow(args) - which(args$name %in% 'mapping')) { 
+    i <- nrow(args) - row_ind_from_end
+    args <- rbind(
+      args[row(args[,1]) < i,],
+      with(args[i,], {
+        mappings <- Reduce(c, Map(eval, val))
+        sources  <- paste(source, 'mapping')
+        tibble(name = names(mappings), val = mappings, source = sources) }), 
+      args[row(args[,1]) > i,])
   }
   
   # handle `warn` argument (captured via ellipses args to allow overriding)
-  warn <- warn_arg(args)
-  args <- args[!names(args) %in% 'warn']
-  args <- rename_to_ggplot(args)
-  
+  # warn <- warn_arg(args)
+  # warn <- NULL
+  # args <- args[!names(args) %in% 'warn']
+  args$name <- to_ggplot(args$name)
+
   # call ggproto construction with stripped args to determine geom
   # might cause issue if aesthetics are dependent on additional arguments
   ggproto_tmp <- tryCatch({
-      do.call(.call, args[names(args) %in% c('geom', 'stat')])
+      ggproto_args <- with(args[args$name %in% c('geom', 'stat'),], { 
+        setNames(val, name) 
+      })
+      do.call(.call, ggproto_args)
     }, error = function(e) NULL)
   geom <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$geom else NULL
   stat <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$stat else NULL
-  ggpackcall <- sys.call()
   
   ggpacket() + ggpacked_layer(
     id = id, ggcall = .call, ggargs = args, geom = geom, stat = stat, 
-    ggpackargs = list(warn = warn, sources = sources, null_empty = null_empty, 
-      auto_remove_aes = auto_remove_aes, envir = envir, 
-      ggpackcall = ggpackcall))
+    ggpackargs = list(null_empty = null_empty, callfname = callfname,
+      auto_remove_aes = auto_remove_aes, envir = envir))
 }
 
 #' Retrieve last named 'warn' value from list with default and restricted values
@@ -242,7 +257,7 @@ replace_reserved_aesthetic_references <- function(args, re = '^\\.\\.(.+)\\.\\.$
       if (length(repi)) args[[repi]]
       else NULL
     } else arg
-  }, args, tsnames(args, fill = ''), 1:length(args)))
+  }, args, tsnames(args, fill = ''), seq(length.out = length(args))))
 }
 
 
@@ -262,7 +277,7 @@ replace_reserved_aesthetic_references <- function(args, re = '^\\.\\.(.+)\\.\\.$
 remove_by_prefix <- function(id, args, sep = '\\.') {
   if (is.null(args)) return(list())
   
-  # args same as id e.g. "xlab" in ggpack(xlab, id = 'xlab', xlab = 'x axis') 
+  # args same as id e.g. "xlab" in ggpack(xlab, id = 'xlab', xlab = 'x axis')
   id_idx <- which(names(args) %in% id)
   names(args)[id_idx] <- ''
   

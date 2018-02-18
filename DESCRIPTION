@@ -13,6 +13,7 @@ Imports:
     methods,
     stats,
     utils,
+    tibble,
     ggplot2
 Suggests:
     rlang,

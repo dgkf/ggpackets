@@ -6,7 +6,9 @@
 #' @name if-not-null-else
 #' @rdname if-not-null-else
 #' 
-`%||%` <- function(a, b) { if (is.null(a) || !length(a)) b else a }
+`%||%` <- function(a, b) { 
+  if (missing(a) || is.null(a) || !length(a)) b else a 
+}
 
 #' Format a list of items as it would be in a sentence
 #'
@@ -46,6 +48,7 @@ safecrayon <- function(fname, ...) {
         grey2 = crayon::make_style(rgb(2/8, 2/8, 2/8))(...),
         grey4 = crayon::make_style(rgb(4/8, 4/8, 4/8))(...),
         grey6 = crayon::make_style(rgb(6/8, 6/8, 6/8))(...),
+        grey7 = crayon::make_style(rgb(7/8, 7/8, 7/8))(...),
         paste(...))
     }
   } else { 
