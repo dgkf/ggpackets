@@ -37,6 +37,7 @@ and the counts in each bar labelled at the base of the bar. We'll start by
 building this plot using standard `ggplot`.
 
 ```{r libraries, message = FALSE, warning = FALSE}
+library(Hmisc) # for ggplot stat summary functions
 library(ggplot2)
 ```
 
@@ -161,8 +162,8 @@ my_ggpk <- function(...) {
   ggpack(geom_bar, id = list(NULL, 'bar'),
     fun.data = mean_se,
     position = position_dodge(width = 1.0),
-    ..., 
-    stat= 'summary') + 
+    ...,
+    stat= 'summary') +
     
   ggpack(geom_errorbar, id = list(NULL, 'errorbar'),
     fun.data = mean_se,
@@ -184,7 +185,7 @@ my_ggpk <- function(...) {
 ```{r, warning = FALSE}
 ggplot(mtcars) + 
   aes(x = carb, y = mpg) + 
-  my_ggpk(fun.data = mean_sdl, bar.fill = carb)
+  my_ggpk(fun.data = mean_se, bar.fill = carb)
 ```
 
 > **Tip:**
@@ -230,8 +231,8 @@ my_ggpk2 <- ggpacket() +
 
 ggplot(mtcars) + 
   aes(x = carb, y = wt) + 
-  my_ggpk2 + 
-  my_ggpk(fun.data = median_hilow)
+  my_ggpk() + 
+  my_ggpk2
 ```
 
 ### Composing with `ggplot` annotations and themes
@@ -239,7 +240,7 @@ ggplot(mtcars) +
 ```{r ex1.ggpackets.ex4, warning = FALSE}
 ggplot(mtcars) + 
   aes(x = carb, y = wt, fill = carb) + 
-  my_ggpk(fun.data = median_hilow) + 
+  my_ggpk() + 
   ggtitle('A beautiful ggpackets plot!') + 
   theme_light()
 ```

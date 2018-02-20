@@ -80,16 +80,12 @@ add_eqv_aes <- function(aes_names) {
 #'
 #' @return the list with aesthetic names remapped to ggplot equivalents
 #'   
-rename_to_ggplot <- function(args) {
-  names(args) <- to_ggplot(names(args))
-  args
-}
-
 to_ggplot <- function(args) {
   ifelse(args %in% names(.base_to_ggplot), 
     unlist(.base_to_ggplot[args], use.names = FALSE), 
     args)
 }
+
 
 #' Filter aesthetics for Geom
 #' 
@@ -117,11 +113,10 @@ to_ggplot <- function(args) {
 #' @export
 filter_aesthetics <- function(geom, mapping) {
   allowed_aes <- allowed_aesthetics(geom)
-  mapping_aes_names <- names(rename_to_ggplot(mapping))
+  mapping_aes_names <- to_ggplot(names(mapping))
   disallowed_aes <- setdiff(mapping_aes_names, allowed_aes)
   do.call(remove_aesthetics, c(list(mapping), disallowed_aes))
 }
-
 
 
 #' Filter arguments for given Geom and Stat objects
@@ -138,9 +133,10 @@ filter_args <- function(call, geom, stat, args) {
       names(formals(ggplot2::layer)), 
       allowed_params(geom), 
       allowed_params(stat))
-  } else {
+  } else if (is.function(call))
     allowed_args <- c('', names(formals(call)))
-  }
+  else 
+    allowed_args <- c()
   
   argnames <- names(args) %||% rep('', length(args))
   args[argnames %in% allowed_args]

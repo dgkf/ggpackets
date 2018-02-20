@@ -55,3 +55,13 @@ safecrayon <- function(fname, ...) {
     paste(...)
   }
 }
+
+safenchar <- function(...) {
+  if (require(crayon, quietly = TRUE)) crayon::col_nchar(...)
+  else nchar(...)
+}
+
+safesubstr <- function(...) {
+  if (require(crayon, quietly = TRUE)) crayon::col_substr(...)
+  else substring(...)
+}

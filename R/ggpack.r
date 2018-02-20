@@ -43,71 +43,108 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL,
      auto_remove_aes = is.null(id) || any(sapply(id, is.null)),
      null_empty = FALSE, envir = parent.frame()) {
   
+  ## This function's principle purpose is to preprocess the arguments being
+  ## passed to the ggplot call and store them for easier construction when the
+  ## plot is being built. Outwardly, it's meant to appear like a ggplot call,
+  ## but in actuality it only serves as an API to the ggpacked_layer constructor
+  
   if (is.null(.call) && length(list(...)) == 0) return(ggpacket())
-  callfname <- deparse(as.list(match.call())$'.call')
-  expand <- list('...' = NULL, 'dots' = as.list(dots))
-
+  
+  expand <- list('...' = NULL, 'dots' = NULL)
+  callname <- as.list(match.call())$'.call'
+  excluded_args <- setdiff(names(formals()), names(expand))
+  
   # get all call-specific args
   args <- as.list(sys.call()[-1])[-1]
-  args <- tibble(name = tsnames(args), val = args, source = 'call')
-  args[args$val %in% '...','name'] <- '...'
-  
-  excluded_args <- setdiff(names(formals()), names(expand))
+  args <- tibble(name = tsnames(args, ''), val = args, source = 'call')
+  args$name <- ifelse(args$val %in% '...', '...', args$name)
   args <- args[!args$name %in% excluded_args,]
+  args <- match_argdf(args, .call)
+  
+  # call ggproto construction with stripped args to determine geom
+  # might cause issue if aesthetics are dependent on additional arguments
+  ggproto_tmp <- with(args[args$name %in% c('geom', 'stat'),], 
+    build_proto(.call, setNames(val, name)))
   
   # filter args passed as ellipses in parent frame from all ellipses arguments
   e_1 <- args[!args$name %in% names(expand),]$val  # parent ellipses args
-  e_all <- if (requireNamespace('rlang', quietly = TRUE)) {  
-      dequos(rlang::quos(...))
-    } else { as.list(substitute(...())) }           # all ellipses args
-  expand$'...' <- if (is.null(names(e_all))) e_all else list_diff(e_1, e_all)
-  # remove any arguments from ellipses or dots that don't begin with id
+  e_all <- safedequos(...)                         # parent + grandparent+
+  
+  # prep lists of arguments that need to be added in
+  expand$'...' <- list_diff(e_1, e_all)            # grandparent+ ellipses args
+  expand$dots  <- as.list(dots)
   expand <- lapply(expand, remove_by_prefix, id = id)
   
-  # substitute ellipses args and dots args in place, record origin and indices
-  for (row_ind_from_end in nrow(args) - which(args$name %in% names(expand))) { 
-    i <- nrow(args) - row_ind_from_end
+  # substitute ellipses args and dots args in place
+  for (rows_from_end in nrow(args) - which(args$name %in% names(expand))) { 
+    i <- nrow(args) - rows_from_end
     e <- expand[[ a <- args[[i,'name']] ]]
-    args <- rbind(
-      args[row(args[,1]) < i,], 
-      tibble(val = e, name = names(e), source = a), 
-      args[row(args[,1]) > i,])
+    e_df <- match_argdf(tibble(val=e, name=names(e), source=a), .call)
+    args <- append_df(args[-i,], e_df, i-1)
   }
   
   # unpack mapping aesthetics
-  for (row_ind_from_end in nrow(args) - which(args$name %in% 'mapping')) { 
-    i <- nrow(args) - row_ind_from_end
-    args <- rbind(
-      args[row(args[,1]) < i,],
-      with(args[i,], {
-        mappings <- Reduce(c, Map(eval, val))
-        sources  <- paste(source, 'mapping')
-        tibble(name = names(mappings), val = mappings, source = sources) }), 
-      args[row(args[,1]) > i,])
+  for (rows_from_end in nrow(args) - which(args$name %in% 'mapping')) { 
+    i <- nrow(args) - rows_from_end
+    mapping <- eval(args[[i,'val']])
+    if ('uneval' %in% class(mapping))
+      arg_mapping <- tibble(val = mapping, name = names(mapping), 
+          source = paste(args[i,'source'], 'mapping'))
+    else 
+      arg_mapping <- args[i,]
+    args <- append_df(args[-i,], arg_mapping, i-1)
   }
   
-  # handle `warn` argument (captured via ellipses args to allow overriding)
-  # warn <- warn_arg(args)
-  # warn <- NULL
-  # args <- args[!names(args) %in% 'warn']
   args$name <- to_ggplot(args$name)
-
-  # call ggproto construction with stripped args to determine geom
-  # might cause issue if aesthetics are dependent on additional arguments
-  ggproto_tmp <- tryCatch({
-      ggproto_args <- with(args[args$name %in% c('geom', 'stat'),], { 
-        setNames(val, name) 
-      })
-      do.call(.call, ggproto_args)
-    }, error = function(e) NULL)
-  geom <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$geom else NULL
-  stat <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$stat else NULL
-  
   ggpacket() + ggpacked_layer(
-    id = id, ggcall = .call, ggargs = args, geom = geom, stat = stat, 
-    ggpackargs = list(null_empty = null_empty, callfname = callfname,
-      auto_remove_aes = auto_remove_aes, envir = envir))
+    id = id, ggcall = .call, ggargs = args, 
+    geom = ggproto_tmp$geom, stat = ggproto_tmp$stat, 
+    ggpackargs = list(null_empty = null_empty, auto_remove_aes = auto_remove_aes, 
+      callname = callname, envir = envir))
 }
+
+match_argdf <- function(argdf, .call) { 
+  if (!is.function(.call)) return(argdf)
+  
+  # filter for unamed args and named args appropriate for function call
+  call_formals <- names(formals(.call))
+  call_arg_l <- last_args(argdf$name) & argdf$name %in% c('', call_formals)
+  dummy_args <- with(argdf[call_arg_l,], setNames(as.list(rep(NA, length(name))), name))
+  
+  # match args to call
+  mcall <- do.call(call, c('.call', dummy_args))
+  matched_args <- as.list(match.call(.call, mcall))[-1]
+  
+  # match new named args against previously unnamed args
+  unmatched_args <- matched_args[!names(matched_args) %in% names(dummy_args)]
+  unmatched_call_arg_l <- call_arg_l[tsnames(dummy_args, '') %in% '']
+  argdf[unmatched_call_arg_l,'name'] <- tsnames(unmatched_args, '')
+  
+  argdf
+}
+
+build_proto <- function(.call, args) { 
+  ggp <- tryCatch(do.call(.call, args), error = function(e) NULL)
+  
+  if (!'ggproto' %in% class(ggp)) 
+    ggp <- list(geom = NULL, stat = NULL)
+  else 
+    ggp
+}
+
+  
+append_df <- function(x, values, after = nrow(x)) {
+  rbind(x[row(x[,1]) <= after,], values, x[row(x[,1]) > after,])
+}
+
+
+safedequos <- function(...) { 
+  if (requireNamespace('rlang', quietly = TRUE)) 
+    dequos(rlang::quos(...))
+  else 
+    as.list(substitute(...()))
+}
+
 
 #' Retrieve last named 'warn' value from list with default and restricted values
 #'
@@ -149,39 +186,7 @@ warn_arg <- function(args, warn.default = '...',
 #' @return a named list of arguments with duplicated names omitted, leaving only
 #'   the last occurence of each named value
 #'   
-last_args <- function(args, sources = list(), warn = c(), desc = c(), 
-    call = NULL) {
-  
-  if (is.null(names(args))) args
-  desc <- as.list(desc)
-  
-  # provide warning for overriden arguments
-  dup_args <- unique(names(args[duplicated(names(args))]))
-  dup_indx <- Map(function(a) which(names(args) %in% a), dup_args)
-  msg <- Filter(Negate(is.null), Map(function(arg, i, arg_src = sources[i]) {
-    if (any(arg_src[-length(arg_src)] %in% warn)) { 
-      arg_src <- Map(function(i) desc[[i]] %||% i, arg_src)
-      sprintf('argument "%s" defined within %s overwritten by last definition in %s', 
-        arg, str_format_list(unique(arg_src[-length(arg_src)])),
-        arg_src[length(arg_src)])
-    }
-  }, dup_args, dup_indx))
-
-  # print warning if a warning message was produced
-  # Functionality replaced with print function reflecting argument overwriting
-  # 
-  # if (length(msg)) {
-  #   msg <- paste0(1:length(msg), '. ', msg)
-  #   if (!is.null(call))
-  #     msg <- c('', paste0(deparse(call), collapse = ''), '', msg)
-  #   warning(call. = FALSE, immediate. = TRUE,
-  #     'During ggpack call, some arguments were overwritten: \n',
-  #     paste0(strwrap(msg, indent = 2, exdent = 5, width = getOption('width')), 
-  #       collapse = '\n'), '\n\n')
-  # }
-  
-  args[names(args) == '' | !duplicated(names(args), fromLast = TRUE)]
-}
+last_args <- function(args) args == '' | !duplicated(args, fromLast = TRUE)
 
 
 list_diff <- function(a, b) { 
@@ -189,7 +194,8 @@ list_diff <- function(a, b) {
   anh <- `length<-`(tsnames(a), length(b))
   ant <- rev(`length<-`(rev(tsnames(a)), length(b)))
   bn <- names(b)
-  b[as.logical(pmin(anh != bn, ant != bn, 1, na.rm = TRUE))]
+  if (is.null(bn)) b
+  else b[as.logical(pmin(anh != bn, ant != bn, 1, na.rm = TRUE))]
 }
 
 #' Move items in args to 'mapping' key if found in aes_list

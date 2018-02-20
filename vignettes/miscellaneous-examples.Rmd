@@ -1,0 +1,87 @@
+--- 
+title: "Miscellaneous Examples" 
+author: "Doug Kelkhoff" 
+date: "`r Sys.time()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Composing Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(
+  echo = TRUE, 
+  fig.align='center', 
+  fig.width = 6,
+  fig.height = 4,
+  out.width = '600px', 
+  out.height = '400px') 
+library(ggpackets)
+```
+
+# Tukey Ribbons
+
+```{r}
+ggpk_tukey_ribbons <- function(...) {
+  # Tukey Box Edges
+  ggpack(geom_ribbon,
+    stat = 'summary',
+    fun.data = function(d) c(
+      y = median(d),
+      ymax = quantile(d, 0.75, names = FALSE),
+      ymin = quantile(d, 0.25, names = FALSE)),
+    alpha = 0.15, 
+    ..., 
+    fill = ..color..,
+    color = NA)  +
+    
+  # Tukey Whiskers
+  ggpack(geom_ribbon,
+    stat = 'summary',
+    fun.data = function(d) {
+      d <- sort(d)
+      c(y = median(d),
+        ymax = d[tail(which(d <
+          quantile(d, 0.75, names = FALSE)
+          + 1.5 * IQR(d)), 1)],
+        ymin = d[head(which(d >
+          quantile(d, 0.25, names = FALSE)
+          - 1.5 * IQR(d)), 1)])
+    },
+    alpha = 0.15,
+    ...,
+    fill = ..color..,
+    color = NA) +
+
+  # Median Line
+  ggpack(geom_line,
+    stat = 'summary',
+    fun.data = function(d) c(y = median(d)),
+    alpha = 0.8,
+    size = 1.5,
+    ...)
+}
+```
+
+```{r}
+library(Hmisc)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+nasa <- dplyr::nasa %>% 
+  as.data.frame %>%
+  mutate(time = as_date(years(year-1970) + months(month)))
+  
+ggplot(nasa) + 
+  aes(x = time, y = temperature) + 
+  ggpk_tukey_ribbons(na.rm = TRUE)
+```
+
+
+```{r}
+x <- function(...) ggpack(geom_point, dots = list(na.rm = FALSE), ...)
+x(na.rm = TRUE)
+```
+

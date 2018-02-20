@@ -83,6 +83,14 @@ setMethod("show", "ggpacket", function(object) {
   print(object@ggcalls)
 })
 
+
+#' @rdname ggpacket-equivalence
+setMethod("==", c("ggpacket", "ggpacket"), function(e1, e2) {
+  length(e1@ggcalls) == length(e2@ggcalls) && 
+      do.call(all, Map(function(e1i, e2i) e1i == e2i, e1@ggcalls, e2@ggcalls))
+})
+
+
 #' Overload names method to print ggpacket ggcall list names
 #' @param x the ggpacket object to show
 #' @rdname names-ggpacket
@@ -116,11 +124,11 @@ setMethod("[", "ggpacket", function(x, i) {
 #' Overload [[ generic to index into ggcalls list
 #' @rdname ggpacket-indexing
 setMethod("[[", "ggpacket", function(x, i) { 
-  if ('ggproto' %in% class(x@ggcalls[[i]])) 
-    ggpacket() + x@ggcalls[[i]]
-  else 
-    ggpacket() + x@ggcalls[[i]]
+  if (is.numeric(i)) return(x@ggcalls[[i]])
+  i <- head(which(sapply(x@ggcalls, function(ggc) i %in% ggc@id)), 1)
+  x@ggcalls[[i]]
 })
+
 
 #' Primitive methods for adding ggpackets to various ggplot objects
 #' @param e1 left side argument for addition
@@ -129,9 +137,9 @@ setMethod("[[", "ggpacket", function(x, i) {
 setMethod("+", c("ggpacket", "ANY"), function(e1, e2) {
   e2call <- as.list(as.list(sys.call()[-1])[[2]])
   
-  if ('ggpacked_layer' %in% class(e2))
+  if ('ggpacked_layer' %in% class(e2)) { 
     e1@ggcalls <- append(e1@ggcalls, e2)
-  else if ('ggpacket' %in% class(e2))
+  } else if ('ggpacket' %in% class(e2))
     e1@ggcalls <- append(e1@ggcalls, e2@ggcalls)
   else if ('list' %in% class(e2))
     e1 <- Reduce("+", init = e1, e2)
@@ -153,3 +161,4 @@ setOldClass("gg")
 #' @rdname ggpacket-addition
 setMethod("+", c("gg", "ggpacket"), function(e1, e2) 
   Reduce("+", e2@ggcalls, e1))
+

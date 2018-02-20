@@ -12,14 +12,14 @@
 ggpacked_layer <- setClass("ggpacked_layer",
   slots = c(
     id = "list", 
-    ggcall = "function", 
+    ggcall = "ANY", 
     ggargs = "list",
     geom = "ANY",
     stat = "ANY",
     ggpackargs = "list"),
   prototype = list(
     id = list(NULL), 
-    ggcall = function(gg) gg, 
+    ggcall = NULL, 
     ggargs = list(),
     geom = NULL,
     stat = NULL,
@@ -58,6 +58,26 @@ setMethod("initialize", "ggpacked_layer",
 )
 
 
+#' @rdname ggpacked_layer-equivalence
+setMethod("==", c("ggpacked_layer", "ggpacked_layer"), function(e1, e2) {
+  do.call(all, Map(`==`, e1@id, e2@id)) &&
+  deparse(e1@ggcall) == deparse(e2@ggcall) &&
+  class(e1@geom)     == class(e2@geom) &&
+  class(e1@stat)     == class(e2@stat) &&
+  
+  # compare all ggpack args except for envir
+  do.call(all, Map(`==`, 
+  e1@ggpackargs[-which(names(e1@ggpackargs) %in% 'envir')], 
+  e2@ggpackargs[-which(names(e2@ggpackargs) %in% 'envir')])) && 
+  
+  # compare cell-wise across entire ggargs tibble
+  (!length(e1@ggargs) && !length(e2@ggargs)) || 
+  do.call(all, Map(function(e1c, e2c) {
+    (!length(e1c) && !length(e2c)) || 
+    do.call(all, Map(`==`, e1c, e2c))
+  }, e1@ggargs, e2@ggargs))
+})
+
 
 #' Overload show method to show ggpacket
 #' @param object the ggpacket object to show
@@ -79,41 +99,55 @@ setMethod("show", "ggpacked_layer", function(object) {
   
   src_chr <- max(nchar(sources), 0)
   
-  cat(safecrayon('blue', object@ggpackargs$callfname, ': \n', sep = ''))
+  cat(safecrayon('cyan', 
+    deparse(object@ggpackargs$callname),  
+    ' (', class(object@ggcall)[[1]], ')',
+    ': \n', sep = ''))
+  
   cat(paste0('  ', 
     Map(function(a, an, i, s) {
+      # pretty print source info
       src <- paste0(safecrayon('grey4', s), safecrayon('grey7', 
-        if ((pad <- src_chr - nchar(s)) > 2) 
+        if ((pad <- src_chr - nchar(s) + 3) > 2) 
           paste0(' ', paste0(rep('.', pad-1), collapse = ''))
         else 
           paste0(rep(' ', pad), collapse = '')))
       
-      if (is_uneval(a)) out <- paste0(trimws(deparse(a)), collapse = ' ')
-      else              out <- deparse(a)
+      # pretty print argument info
+      if (is_uneval(a)) {
+        out <- paste0(trimws(deparse(a)), collapse = ' ')
+        if (grepl('^\\.\\..+\\.\\.$', out)) 
+          out <- paste0(
+            '..',
+            safecrayon('cyan', gsub('^\\.\\.(.+)\\.\\.$', '\\1', out)),
+            '..',
+            safecrayon('cyan', ' ⤴'))
+      } else 
+        out <- deparse(a)
       
-      if (nchar(out) > 
-        (w <- getOption('width', default = 80) - src_chr - 7 - nchar(an))) 
-          out <- paste0(strtrim(out, w - 3), '...')
+      # color code argument overloading
+      if (i == tail(which(names(args) %in% an), 1)) col <- 'grey2'
+      else col <- 'grey6'
       
-      if (i == tail(which(names(args) %in% an), 1)) 
-        col <- 'grey2' 
-      else 
-        col <- 'grey6'
-      
-      if (an != '')
-        out <- safecrayon(col, an, '=', out, collapse = '')
-      else 
+      # format unnamed arguments appropriately
+      if (is.na(an) || an == '') 
         out <- safecrayon(col, an, out, collapse = '', sep = '')
-        
-      paste(src, out)
+      else 
+        out <- safecrayon(col, an, '=', out, collapse = '')
+      
+      out <- paste(src, out)
+      
+      # limit to line length
+      if (safenchar(out) > (w <- getOption('width', default=80)))
+        out <- paste0(safesubstr(out, 0, w-3), safecrayon('grey6', '...'))
+      
+      paste0(out, '\n')
     }, 
     args, 
     tsnames(args, fill = ''), 
     seq(length.out = length(args)),
-    sources), collapse = '\n'))
-  cat('\n')
+    sources), collapse = ''))
 })
-
 
 
 #' Add NULL to a ggpacket to return the ggpacket
@@ -121,13 +155,11 @@ setMethod("show", "ggpacked_layer", function(object) {
 setMethod("+", c("NULL", "ggpacked_layer"), function(e1, e2) e2)
 
 
-
 #' Sum of two ggpacked layers to return ggpacket object
 #' @rdname ggpacked_layer-addition
 setMethod("+", c("ggpacked_layer", "ggpacked_layer"), function(e1, e2) { 
   ggpacket() + e1 + e2
 })
-
 
 
 # register unexported gg class from ggplot2 so signature is accepted
@@ -142,14 +174,14 @@ setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
   list2env(e2@ggpackargs, environment())
   args <- e2@ggargs
   
-  # flatten incoming mapping into ggplot aesthetics (also annotate their source)
-  i <- max(head(which(names(args) != ''), 1) %||% length(args)-1, 0)
-  args <- rbind(args[row(args[,1]) <= i,],
-    tibble(
+  e1mappingdf <- tibble(
       name = tsnames(e1$mapping, fill = ''), 
       val = e1$mapping, 
-      source = 'inherited mapping'),
-    args[row(args[,1]) > i,])
+      source = 'inherited mapping')
+    
+  # flatten incoming mapping into ggplot aesthetics (also annotate their source)
+  i <- max(head(which(names(args) != ''), 1) %||% length(args)-1, 0)
+  args <- append_df(args, e1mappingdf, i)
   
   # unpack args tibble into argument list
   args <- with(args, setNames(val, name))
@@ -159,9 +191,14 @@ setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
   args <- replace_reserved_aesthetic_references(args)
   
   # strip last and flatten args to mapping, remove extra aes
-  args <- last_args(args)
+  args <- args[last_args(names(args))]
   args <- flatten_aes_to_mapping(args, allowed_aesthetics(e2@geom), auto_remove_aes, envir)
-  if (null_empty && length(args) == 0) return(ggpacket(NULL))
+  
+  if (is.function(e2@ggcall) && !'mapping' %in% names(formals(e2@ggcall)))
+    args <- args[!names(args) %in% 'mapping']
+  
+  # neglect construction if empty args means empty layer
+  if (null_empty && length(args) == 0) return(e1)
   
   # remove invalid argnames and unevaluated aesthetics
   if (auto_remove_aes) { 
@@ -174,8 +211,8 @@ setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
     if (is_uneval(v) && k != '') eval(v, envir) else v, 
     args, names(args) %||% rep('', length(args)))
 
-  # add a default mapping to make standalone plot messages more informative
-  args$mapping <- args$mapping %||% aes()
-  
-  e1 + do.call(e2@ggcall, args)
+  if (is.function(e2@ggcall)) e1 + do.call(e2@ggcall, args)
+  else                        e1 + eval(e2@ggcall)
 })
+
+
