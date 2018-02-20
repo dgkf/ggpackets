@@ -61,11 +61,6 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL,
   args <- args[!args$name %in% excluded_args,]
   args <- match_argdf(args, .call)
   
-  # call ggproto construction with stripped args to determine geom
-  # might cause issue if aesthetics are dependent on additional arguments
-  ggproto_tmp <- with(args[args$name %in% c('geom', 'stat'),], 
-    build_proto(.call, setNames(val, name)))
-  
   # filter args passed as ellipses in parent frame from all ellipses arguments
   e_1 <- args[!args$name %in% names(expand),]$val  # parent ellipses args
   e_all <- safedequos(...)                         # parent + grandparent+
@@ -95,6 +90,11 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL,
     args <- append_df(args[-i,], arg_mapping, i-1)
   }
   
+  # call ggproto construction with stripped args to determine geom
+  # might cause issue if aesthetics are dependent on additional arguments
+  ggproto_tmp <- with(args[args$name %in% c('geom', 'stat'),], 
+      build_proto(.call, setNames(val, name)))
+  
   args$name <- to_ggplot(args$name)
   ggpacket() + ggpacked_layer(
     id = id, ggcall = .call, ggargs = args, 
@@ -117,7 +117,7 @@ match_argdf <- function(argdf, .call) {
   
   # match new named args against previously unnamed args
   unmatched_args <- matched_args[!names(matched_args) %in% names(dummy_args)]
-  unmatched_call_arg_l <- call_arg_l[tsnames(dummy_args, '') %in% '']
+  unmatched_call_arg_l <- call_arg_l & argdf$name %in% ''
   argdf[unmatched_call_arg_l,'name'] <- tsnames(unmatched_args, '')
   
   argdf

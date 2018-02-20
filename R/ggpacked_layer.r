@@ -201,16 +201,15 @@ setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
   if (null_empty && length(args) == 0) return(e1)
   
   # remove invalid argnames and unevaluated aesthetics
-  if (auto_remove_aes) { 
+  if (auto_remove_aes)
     args <- args[!uneval_aes(args) | names(args) %in% '']
     args <- filter_args(e2@ggcall, e2@geom, e2@stat, args)
-  }
   
   # filter out remaining named unevaluated arguments
-  args <- Map(function(v, k) 
-    if (is_uneval(v) && k != '') eval(v, envir) else v, 
-    args, names(args) %||% rep('', length(args)))
-
+  args <- Map(function(v, k)
+    if (is_uneval(v) && k != '') eval(v, envir) else v,
+    args, tsnames(args, ''))
+  
   if (is.function(e2@ggcall)) e1 + do.call(e2@ggcall, args)
   else                        e1 + eval(e2@ggcall)
 })

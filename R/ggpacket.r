@@ -143,7 +143,7 @@ setMethod("+", c("ggpacket", "ANY"), function(e1, e2) {
     e1@ggcalls <- append(e1@ggcalls, e2@ggcalls)
   else if ('list' %in% class(e2))
     e1 <- Reduce("+", init = e1, e2)
-  else
+  else 
     e1@ggcalls <- append(e1@ggcalls, do.call(ggpack, e2call)@ggcalls)
     
   e1

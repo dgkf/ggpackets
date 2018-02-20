@@ -138,8 +138,7 @@ filter_args <- function(call, geom, stat, args) {
   else 
     allowed_args <- c()
   
-  argnames <- names(args) %||% rep('', length(args))
-  args[argnames %in% allowed_args]
+  args[tsnames(args, '') %in% allowed_args]
 }
 
 
