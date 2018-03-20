@@ -10,14 +10,17 @@ test_that("ggpackets initialize properly", {
 })
 
 test_that("Check ggpacket initialization equal to ggpack()", {
-  expect_equal(
-    ggpacket() + ggplot2::geom_line(),
-    ggpack(ggplot2::geom_line)
-  )
-  expect_equivalent(
-    ggpack() + ggplot2::geom_line(),
-    ggpack(ggplot2::geom_line)
-  )
+  expect_true({ 
+    a <- drop_envs(ggpacket() + ggplot2::geom_line())
+    b <- drop_envs(ggpack(ggplot2::geom_line))
+    a == b
+  })
+  
+  expect_true({
+    a <- ggpack() + ggplot2::geom_line()
+    b <- ggpack(ggplot2::geom_line)
+    a == b
+  })
 })
 
 
@@ -25,17 +28,36 @@ test_that("Check ggpacket initialization equal to ggpack()", {
 context("Class Structure => ggpacket => indexing")
 
 test_that("ggpacket can be indexed using [ primitive.", {
-  expect_equal(
-    (ggpacket() + ggplot2::geom_bar() + ggplot2::geom_point() + ggplot2::geom_line())[c(2, 3)],
-    ggpacket() + ggplot2::geom_point() + ggplot2::geom_line()
-  )
+  expect_true({
+    a <- (ggpacket() + 
+            ggplot2::geom_bar() + 
+            ggplot2::geom_point() + 
+            ggplot2::geom_line())[c(2, 3)]
+    b <- ggpacket() + 
+            ggplot2::geom_point() + 
+            ggplot2::geom_line()
+    a == b
+  })
 })
 
-test_that("ggpacket can be indexed using [[ primitive.", {
-  expect_equal(
-    (ggpacket() + ggplot2::geom_bar() + ggplot2::geom_point() + ggplot2::geom_line())[[2]],
-    ggpacket() + ggplot2::geom_point()
-  )
+test_that("ggpacket can be indexed using [ primitive.", {
+  expect_true({
+    a <- (ggpacket() + 
+            ggplot2::geom_bar() + 
+            ggplot2::geom_point() + 
+            ggplot2::geom_line())[2]
+    b <- ggpacket() + 
+            ggplot2::geom_point()
+    a == b
+  })
+})
+
+test_that("ggpacked layers can be indexed using [[ primitive.", {
+  expect_true({
+    a <- (ggpacket() + ggplot2::geom_bar() + ggplot2::geom_point() + ggplot2::geom_line())[[2]]
+    b <- (ggpacket() + ggplot2::geom_point())[[1]]
+    a == b
+  })
 })
 
 
@@ -44,8 +66,15 @@ context("Class Structure => ggpacket => global methods")
 
 test_that("ggpacket names method functioning properly", {
   expect_equal(
-    names(ggpacket(list(ggplot2::geom_bar(), ggplot2::geom_point()), c('bar', 'point'))),
-    c('bar', 'point')
+    names(setNames(ggpacket() + ggplot2::geom_bar() + ggplot2::geom_point(), 
+      list(list('bar'), list('point')))),
+    list(list('bar'), list('point'))
+  )
+  
+  expect_equal(
+    names(setNames(ggpacket() + ggplot2::geom_bar() + ggplot2::geom_point(), 
+      c('bar', 'point'))),
+    list(list('bar'), list('point'))
   )
 })
 
@@ -60,8 +89,9 @@ test_that("Ensure show method produces error for insufficient data.", {
 })
 
 test_that("Ensure show method outputs errors from ggplot", {
-  expect_output(show(ggpacket() + ggplot2::geom_point(aes(x = c(1, 2)))), 
-               ".*requires the following missing aesthetics:.*")
+  expect_output(
+    show(ggpacket() + ggplot2::geom_point(ggplot2::aes(x = c(1, 2)))), 
+    ".*requires the following missing aesthetics:.*")
 })
 
 
@@ -69,10 +99,11 @@ test_that("Ensure show method outputs errors from ggplot", {
 context("Class Structure => ggpacket => arithmetic operators")
 
 test_that("Check ggpacket + NULL", {
-  expect_equal(
-    ggpacket() + NULL + ggplot2::geom_line() + ggpack(NULL),
-    ggpack(ggplot2::geom_line)
-  )
+  expect_true({
+    a <- ggpacket() + NULL + ggplot2::geom_line() + ggpack(NULL)
+    b <- ggpack(ggplot2::geom_line)
+    a == b
+  })
 })
 
 test_that("ggpacket can be plotted with ggplot", {
@@ -100,19 +131,37 @@ test_that("ggpacket objects can be nested", {
   x <- ggpacket() + ggplot2::geom_line() + ggplot2::geom_point()
   y <- function() { ggpacket() + ggplot2::geom_line() + ggplot2::geom_point() }
   
-  expect_equal(ggpack(x)[[1]], x)
-  expect_equal(ggpack(y)[[1]], y())
+  expect_true({
+    a <- ggpack(x)[[1]]@calldf@call
+    b <- x
+    a == b
+  })
   
-  expect_equal((ggpack(x) + ggplot2::geom_point())[[2]], ggpacket() + ggplot2::geom_point())
-  expect_equal((ggpack(y) + ggplot2::geom_point())[[2]], ggpacket() + ggplot2::geom_point())
+  expect_true({
+    a <- drop_envs(ggpack(y)[[1]]@calldf@call())
+    b <- drop_envs(y())
+    a == b
+  })
+  
+  expect_true({
+    a <- (ggpack(x) + ggplot2::geom_point())[2]
+    b <- ggpacket() + ggplot2::geom_point()
+    a == b
+  })
+  
+  expect_true({
+    a <- (ggpack(y) + ggplot2::geom_point())[2]
+    b <- ggpacket() + ggplot2::geom_point()
+    a == b
+  })
   
   expect_equal(
-    (ggplot(mtcars) + aes(x = carb, y = mpg) + 
-       (ggpack(x) + ggplot2::geom_point()))$layers,
-    list(ggplot2::geom_line(), ggplot2::geom_point(), ggplot2::geom_point()))
+    (ggplot(mtcars) + (ggpack(x) + ggplot2::geom_point()))$layers,
+    list(ggplot2::geom_line(), ggplot2::geom_point(), ggplot2::geom_point())
+  )
+
   expect_equal(
-    (ggplot(mtcars) + aes(x = carb, y = mpg) + 
-      (ggpack(y) + ggplot2::geom_point()))$layers,
+    (ggplot(mtcars) + (ggpack(y) + ggplot2::geom_point()))$layers,
     list(ggplot2::geom_line(), ggplot2::geom_point(), ggplot2::geom_point()))
 })
 

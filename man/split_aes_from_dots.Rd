@@ -9,10 +9,9 @@ split_aes_from_dots(..., geom = NULL)
 \arguments{
 \item{...}{arguments containing aesthetics mapping}
 
-\item{geom}{if specified, a
-\href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-\code{\link[ggplot2]{Geom}} object can be passed to filter aesthetics for
-only a specified \code{\link[ggplot2]{Geom}}.}
+\item{geom}{if specified, a ggplot2 \code{\link[ggplot2]{Geom}} object can be
+passed to filter aesthetics for only a specified
+\code{\link[ggplot2]{Geom}}.}
 }
 \value{
 a list containing two named elements: 'aes' which contains the

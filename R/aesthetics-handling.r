@@ -121,6 +121,7 @@ filter_aesthetics <- function(geom, mapping) {
 
 #' Filter arguments for given Geom and Stat objects
 #' 
+#' @param call a function call whose formals should be used to filter args
 #' @param geom Geom object for which argument should be filtered
 #' @param stat Stat object for which argument should be filtered
 #' @param args argument list to be filtered

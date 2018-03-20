@@ -4,8 +4,8 @@
 \alias{ggpack}
 \title{Handling of argument passing to ggplots}
 \usage{
-ggpack(.call = NULL, ..., id = NULL, dots = NULL, warn = "...",
-  auto_remove_aes = (!is.null(id) && any(sapply(id, is.null))),
+ggpack(.call = NULL, ..., id = NULL, dots = NULL,
+  auto_remove_aes = is.null(id) || any(sapply(id, is.null)),
   null_empty = FALSE, envir = parent.frame())
 }
 \arguments{
@@ -17,14 +17,10 @@ ggpack(.call = NULL, ..., id = NULL, dots = NULL, warn = "...",
 
 \item{dots}{arguments to subset}
 
-\item{warn}{a character vector of argument names that should yield a warning
-when parameters passed via that argument are overwritten. Can include
-values \code{'...'} and \code{'dots'} or \code{'call'} (to warn for
-arguments explicitly defined during call construction being overwritten).}
-
 \item{auto_remove_aes}{logical indicating whether aesthetic mappings that}
 
-\item{null_empty}{return \code{NULL} if no arguments are received}
+\item{null_empty}{logical indicating whether \code{NULL} should be returned
+if no arguments are passed to call}
 
 \item{envir}{frame in which non-aesthetic arguments should be evaluated}
 }

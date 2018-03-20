@@ -84,6 +84,9 @@ setMethod("show", "ggpacket", function(object) {
 })
 
 
+#' ggpacket equivalence
+#' @param e1 lhs
+#' @param e2 rhs
 #' @rdname ggpacket-equivalence
 setMethod("==", c("ggpacket", "ggpacket"), function(e1, e2) {
   length(e1@ggcalls) == length(e2@ggcalls) && 
@@ -93,13 +96,13 @@ setMethod("==", c("ggpacket", "ggpacket"), function(e1, e2) {
 
 #' Overload names method to print ggpacket ggcall list names
 #' @param x the ggpacket object to show
+#' @param value the new values of the names of the ggpacket object
 #' @rdname names-ggpacket
 setMethod("names", "ggpacket", function(x) { 
   Map(function(ggc) ggc@id, x@ggcalls)
 })
 
 #' Overload names method to print ggpacket ggcall list names
-#' @param x the ggpacket object to show
 #' @rdname names-ggpacket
 setMethod("names<-", "ggpacket", function(x, value) {
   x@ggcalls <- Map(function(ggc, v) { 
@@ -121,12 +124,20 @@ setMethod("[", "ggpacket", function(x, i) {
   }
 })
 
+
 #' Overload [[ generic to index into ggcalls list
 #' @rdname ggpacket-indexing
 setMethod("[[", "ggpacket", function(x, i) { 
   if (is.numeric(i)) return(x@ggcalls[[i]])
   i <- head(which(sapply(x@ggcalls, function(ggc) i %in% ggc@id)), 1)
   x@ggcalls[[i]]
+})
+
+
+#' @rdname ggpacked_layer-indexing
+setMethod("$", "ggpacket", function(x, name) {
+  i <- head(which(sapply(x@ggcalls, function(ggc) name %in% ggc@id)), 1)
+  if (length(i)) x@ggcalls[[i]] else NULL
 })
 
 
@@ -144,7 +155,9 @@ setMethod("+", c("ggpacket", "ANY"), function(e1, e2) {
   else if ('list' %in% class(e2))
     e1 <- Reduce("+", init = e1, e2)
   else 
-    e1@ggcalls <- append(e1@ggcalls, do.call(ggpack, e2call)@ggcalls)
+    e1@ggcalls <- append(
+      e1@ggcalls, 
+      do.call(ggpack, c(e2call, list(envir = parent.frame())))@ggcalls)
     
   e1
 })
@@ -162,3 +175,12 @@ setOldClass("gg")
 setMethod("+", c("gg", "ggpacket"), function(e1, e2) 
   Reduce("+", e2@ggcalls, e1))
 
+#' used to help with unit testing
+#' @param ggpk ggpacket object to strip of envir slot value
+drop_envs <- function(ggpk) {
+  ggpk@ggcalls <- Map(function(ggpk_l) {
+    ggpk_l@calldf@envir <- NULL
+    ggpk_l
+  }, ggpk@ggcalls)
+  ggpk
+}

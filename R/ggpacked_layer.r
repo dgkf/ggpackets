@@ -1,6 +1,4 @@
 #' A class for storing ggpack call contents for lazy evaluation
-#'   
-#' @examples 
 #' 
 #' @slot ggcall a constructor function to produce a ggproto layer object
 #' @slot ggargs the arguments to use when calling the constructor function
@@ -12,18 +10,14 @@
 ggpacked_layer <- setClass("ggpacked_layer",
   slots = c(
     id = "list", 
-    ggcall = "ANY", 
-    ggargs = "list",
-    geom = "ANY",
-    stat = "ANY",
-    ggpackargs = "list"),
+    calldf = "ANY",
+    null_empty = "logical"
+  ),
   prototype = list(
     id = list(NULL), 
-    ggcall = NULL, 
-    ggargs = list(),
-    geom = NULL,
-    stat = NULL,
-    ggpackargs = list())
+    calldf = NULL,
+    null_empty = FALSE
+  )
 )
 
 
@@ -45,38 +39,51 @@ setMethod(f = "initialize", methods::signature(.Object = "ggpacked_layer"),
 #' @rdname initialize,ggpacked_layer,function,list,character
 #' @importFrom stats setNames
 setMethod("initialize", "ggpacked_layer", 
-  function(.Object, ggcall, ggargs = list(), id = NULL, 
-      geom = NULL, stat = NULL, ggpackargs = list()) {
+  function(.Object, id = NULL, calldf = call_df(), null_empty = FALSE) {
     .Object@id = as.list(id)
-    .Object@ggcall = ggcall
-    .Object@ggargs = ggargs
-    .Object@geom = geom
-    .Object@stat = stat
-    .Object@ggpackargs = ggpackargs
+    .Object@calldf <- calldf
+    .Object@null_empty <- null_empty
     .Object
   }
 )
 
 
+
+#' ggpacket_layer equivalence
+#' @param e1 lhs
+#' @param e2 rhs
 #' @rdname ggpacked_layer-equivalence
 setMethod("==", c("ggpacked_layer", "ggpacked_layer"), function(e1, e2) {
   do.call(all, Map(`==`, e1@id, e2@id)) &&
-  deparse(e1@ggcall) == deparse(e2@ggcall) &&
-  class(e1@geom)     == class(e2@geom) &&
-  class(e1@stat)     == class(e2@stat) &&
-  
-  # compare all ggpack args except for envir
-  do.call(all, Map(`==`, 
-  e1@ggpackargs[-which(names(e1@ggpackargs) %in% 'envir')], 
-  e2@ggpackargs[-which(names(e2@ggpackargs) %in% 'envir')])) && 
-  
-  # compare cell-wise across entire ggargs tibble
-  (!length(e1@ggargs) && !length(e2@ggargs)) || 
-  do.call(all, Map(function(e1c, e2c) {
-    (!length(e1c) && !length(e2c)) || 
-    do.call(all, Map(`==`, e1c, e2c))
-  }, e1@ggargs, e2@ggargs))
+  e1@calldf     == e2@calldf            &&
+  e1@null_empty == e2@null_empty
 })
+
+
+
+#' Index into layer arguments with vector
+#' @param x ggpacked_layer object
+#' @param i index
+#' @rdname ggpacked_layer-indexing
+setMethod("[", "ggpacked_layer", function(x, i) {
+  with(x[i], setNames(val, name))
+})
+
+
+
+#' Index into layer arguments by numeric or character
+#' @rdname ggpacked_layer-indexing
+setMethod("[[", "ggpacked_layer", function(x, i) {
+  with(x[[i]], setNames(val, name))
+})
+
+
+
+#' Index into layer arguments by name
+#' @param name index
+#' @rdname ggpacked_layer-indexing
+setMethod("$", "ggpacked_layer", function(x, name) x[[name]])
+
 
 
 #' Overload show method to show ggpacket
@@ -93,60 +100,7 @@ setMethod("show", "ggpacked_layer", function(object) {
     cat(safecrayon('darkblue', 
       'Anonymous ggpacket layer\n'))
   
-  args <- object@ggargs
-  sources <- args$source
-  args <- with(args, setNames(val, name))
-  
-  src_chr <- max(nchar(sources), 0)
-  
-  cat(safecrayon('cyan', 
-    deparse(object@ggpackargs$callname),  
-    ' (', class(object@ggcall)[[1]], ')',
-    ': \n', sep = ''))
-  
-  cat(paste0('  ', 
-    Map(function(a, an, i, s) {
-      # pretty print source info
-      src <- paste0(safecrayon('grey4', s), safecrayon('grey7', 
-        if ((pad <- src_chr - nchar(s) + 3) > 2) 
-          paste0(' ', paste0(rep('.', pad-1), collapse = ''))
-        else 
-          paste0(rep(' ', pad), collapse = '')))
-      
-      # pretty print argument info
-      if (is_uneval(a)) {
-        out <- paste0(trimws(deparse(a)), collapse = ' ')
-        if (grepl('^\\.\\..+\\.\\.$', out)) 
-          out <- paste0(
-            '..',
-            safecrayon('cyan', gsub('^\\.\\.(.+)\\.\\.$', '\\1', out)),
-            '..',
-            safecrayon('cyan', ' ⤴'))
-      } else 
-        out <- deparse(a)
-      
-      # color code argument overloading
-      if (i == tail(which(names(args) %in% an), 1)) col <- 'grey2'
-      else col <- 'grey6'
-      
-      # format unnamed arguments appropriately
-      if (is.na(an) || an == '') 
-        out <- safecrayon(col, an, out, collapse = '', sep = '')
-      else 
-        out <- safecrayon(col, an, '=', out, collapse = '')
-      
-      out <- paste(src, out)
-      
-      # limit to line length
-      if (safenchar(out) > (w <- getOption('width', default=80)))
-        out <- paste0(safesubstr(out, 0, w-3), safecrayon('grey6', '...'))
-      
-      paste0(out, '\n')
-    }, 
-    args, 
-    tsnames(args, fill = ''), 
-    seq(length.out = length(args)),
-    sources), collapse = ''))
+  show(object@calldf)
 })
 
 
@@ -168,50 +122,18 @@ setOldClass("gg")
 #' Primitive methods for adding ggpacked layers to ggplot during construction
 #' @param e1 left side argument for addition
 #' @param e2 right side argument for addition
+#' 
+#' @importFrom tibble tibble
+#' 
 #' @rdname ggpacked_layer-addition
 setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
-  # extract parameters for ggpack constructions
-  list2env(e2@ggpackargs, environment())
-  args <- e2@ggargs
-  
-  e1mappingdf <- tibble(
-      name = tsnames(e1$mapping, fill = ''), 
-      val = e1$mapping, 
-      source = 'inherited mapping')
-    
-  # flatten incoming mapping into ggplot aesthetics (also annotate their source)
-  i <- max(head(which(names(args) != ''), 1) %||% length(args)-1, 0)
-  args <- append_df(args, e1mappingdf, i)
-  
-  # unpack args tibble into argument list
-  args <- with(args, setNames(val, name))
-    
-  # evaluate reserved aesthetics 
-  # e.g. list(color = a, fill = ..color..) => list(color = a, fill = a)
-  args <- replace_reserved_aesthetic_references(args)
-  
-  # strip last and flatten args to mapping, remove extra aes
-  args <- args[last_args(names(args))]
-  args <- flatten_aes_to_mapping(args, allowed_aesthetics(e2@geom), auto_remove_aes, envir)
-  
-  if (is.function(e2@ggcall) && !'mapping' %in% names(formals(e2@ggcall)))
-    args <- args[!names(args) %in% 'mapping']
-  
   # neglect construction if empty args means empty layer
-  if (null_empty && length(args) == 0) return(e1)
+  if (e2@null_empty && length(e2@calldf) == 0) return(e1)
   
-  # remove invalid argnames and unevaluated aesthetics
-  if (auto_remove_aes)
-    args <- args[!uneval_aes(args) | names(args) %in% '']
-    args <- filter_args(e2@ggcall, e2@geom, e2@stat, args)
+  # flatten incoming mapping into ggplot aesthetics
+  e1_mapping_calldf <- call_df(e1$mapping, 'inherited mapping')
+  calldf <- e2@calldf + e1_mapping_calldf
   
-  # filter out remaining named unevaluated arguments
-  args <- Map(function(v, k)
-    if (is_uneval(v) && k != '') eval(v, envir) else v,
-    args, tsnames(args, ''))
-  
-  if (is.function(e2@ggcall)) e1 + do.call(e2@ggcall, args)
-  else                        e1 + eval(e2@ggcall)
+  if (is.function(calldf@call)) e1 + do_calldf(calldf)
+  else                          e1 + eval(calldf@call)
 })
-
-

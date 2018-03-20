@@ -16,8 +16,7 @@ an aesthetic mapping with filtered mappings removed and group mapping
 set as interaction terms of all non axial (non- x, y) terms.
 }
 \description{
-Remove specified aesthetics by name from a
-\href{[https://github.com/tidyverse/ggplot2}{ggplot2} aesthetic mapping,
+Remove specified aesthetics by name from a ggplot2 aesthetic mapping,
 returning the same mapping with the specified aesthetics removed an preserved
 as an interaction term in the group aesthetic.
 }

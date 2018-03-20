@@ -25,19 +25,19 @@ library(ggpackets)
 ```{r}
 ggpk_tukey_ribbons <- function(...) {
   # Tukey Box Edges
-  ggpack(geom_ribbon,
+  ggpack(geom_ribbon, id = list(NULL, 'box'),
     stat = 'summary',
     fun.data = function(d) c(
       y = median(d),
       ymax = quantile(d, 0.75, names = FALSE),
       ymin = quantile(d, 0.25, names = FALSE)),
     alpha = 0.15, 
-    ..., 
+    ...,
     fill = ..color..,
-    color = NA)  +
+    color = NA) +
     
   # Tukey Whiskers
-  ggpack(geom_ribbon,
+  ggpack(geom_ribbon, id = list(NULL, 'whisker'),
     stat = 'summary',
     fun.data = function(d) {
       d <- sort(d)
@@ -55,7 +55,7 @@ ggpk_tukey_ribbons <- function(...) {
     color = NA) +
 
   # Median Line
-  ggpack(geom_line,
+  ggpack(geom_line, id = list(NULL, 'line'),
     stat = 'summary',
     fun.data = function(d) c(y = median(d)),
     alpha = 0.8,
@@ -76,12 +76,40 @@ nasa <- dplyr::nasa %>%
   
 ggplot(nasa) + 
   aes(x = time, y = temperature) + 
-  ggpk_tukey_ribbons(na.rm = TRUE)
+  ggpk_tukey_ribbons(color = lat > 0, na.rm = TRUE)
 ```
 
 
 ```{r}
-x <- function(...) ggpack(geom_point, dots = list(na.rm = FALSE), ...)
-x(na.rm = TRUE)
+ggpk_cleveland <- function(...) {
+  ggpack(geom_errorbarh,
+    stat = 'summary',
+    fun.data = function(d) c(
+      y = 0, 
+      xmin = min(d, na.rm = TRUE),
+      xmax = max(d, na.rm = TRUE)), 
+    ...,
+    height = 0) #+ 
+  
+  # ggpack(geom_point, id = 'lb', 
+  #   stat = 'summary',
+  #   fun.data = function(d) c(x = min(d, na.rm = TRUE)), 
+  #   size = 3, 
+  #   ...) + 
+  #   
+  # ggpack(geom_point, id = 'ub', 
+  #   stat = 'summary',
+  #   fun.data = function(d) c(x = max(d, na.rm = TRUE)), 
+  #   size = 3, 
+  #   ...)
+  
+  #ggpack(coord_flip)
+}
+```
+
+```{r}
+ggplot(diamonds) + 
+  aes(x = carat, y = color) + 
+  ggpk_cleveland()
 ```
 

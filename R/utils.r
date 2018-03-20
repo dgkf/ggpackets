@@ -10,6 +10,8 @@
   if (missing(a) || is.null(a) || !length(a)) b else a 
 }
 
+
+
 #' Format a list of items as it would be in a sentence
 #'
 #' @param l a character vector list of strings to format
@@ -28,14 +30,28 @@ str_format_list <- function(l = NULL, oxford = FALSE) {
   paste(tail(c(rbind(junctions, l)), -1), collapse = '')
 }
 
+
+
 #' Type-safe 'names()' call, always returning a character vector
 #' (potentially containing NA's where list elements are unnamed)
+#' 
+#' @inheritParams base::names
+#' 
+#' @param l a list from which names should be pulled
+#' @param fill a value to use for padding name values to length
 #' 
 tsnames <- function(l, fill = NA) {
   names(l) %||% rep(fill, length(l))
 }
 
+
+
 #' Safe use of package:crayon exports with fallback to paste(...)
+#' 
+#' @param fname package:crayon function name to call
+#' @inheritParams base::paste
+#'
+#' @importFrom grDevices rgb
 #'
 safecrayon <- function(fname, ...) { 
   if (require(crayon, quietly = TRUE)) { 
@@ -43,12 +59,12 @@ safecrayon <- function(fname, ...) {
       getExportedValue('crayon', fname)(...)
     } else { 
       switch(fname,
-        darkblue = crayon::make_style(rgb(0/8, 0/8, 3/8))(...),
-        midred = crayon::make_style(rgb(5/8, 0/8, 0/8))(...),
-        grey2 = crayon::make_style(rgb(2/8, 2/8, 2/8))(...),
-        grey4 = crayon::make_style(rgb(4/8, 4/8, 4/8))(...),
-        grey6 = crayon::make_style(rgb(6/8, 6/8, 6/8))(...),
-        grey7 = crayon::make_style(rgb(7/8, 7/8, 7/8))(...),
+        darkblue = crayon::make_style(grDevices::rgb(0/8, 0/8, 3/8))(...),
+        midred =   crayon::make_style(grDevices::rgb(5/8, 0/8, 0/8))(...),
+        grey2 =    crayon::make_style(grDevices::rgb(2/8, 2/8, 2/8))(...),
+        grey4 =    crayon::make_style(grDevices::rgb(4/8, 4/8, 4/8))(...),
+        grey6 =    crayon::make_style(grDevices::rgb(6/8, 6/8, 6/8))(...),
+        grey7 =    crayon::make_style(grDevices::rgb(7/8, 7/8, 7/8))(...),
         paste(...))
     }
   } else { 
@@ -56,11 +72,25 @@ safecrayon <- function(fname, ...) {
   }
 }
 
+
+
+#' Safe use of crayon's col_nchar() with base nchar() fallback
+#' 
+#' @param ... passed to \code{nchar}
+#' @inheritParams base::nchar
+#' 
 safenchar <- function(...) {
   if (require(crayon, quietly = TRUE)) crayon::col_nchar(...)
   else nchar(...)
 }
 
+
+
+#' Safe use of crayon's col_substr() with base substring() fallback
+#'
+#' @param ... passed to \code{substring}
+#' @inheritParams base::substring
+#'
 safesubstr <- function(...) {
   if (require(crayon, quietly = TRUE)) crayon::col_substr(...)
   else substring(...)
