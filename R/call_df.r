@@ -280,12 +280,29 @@ setMethod("+", c("call_df", "call_df"), function(e1, e2) {
 
 
 
+#' Bind a call to a calldf
+#' 
+#' If the call produces a \code{ggplot2} \code{ggproto} object, the \code{geom}
+#' and \code{stat} of the \code{ggproto} are cached in the calldf object for use
+#' in ggplot construction.
+#' 
+#' @param x the calldf object to modify
+#' @param .call the call to bind to the calldf
+#' @param name a character vector to use for the call name
+#' @param envir the environment in which the call is to be executed
+#' @param match_args whether unnamed arguments should be matched against named
+#'   call formals
+#' 
+#' @return the calldf object with the necessary call data added
+#' 
+#' @importFrom stats setNames
+#' 
 bind_call <- function(x, .call, name, 
     envir = parent.frame(), match_args = FALSE) {
   
   args <- x@args
   ggproto_tmp <- with(args[args$name %in% c('geom', 'stat'),],
-    build_proto(.call, setNames(val, name) %||% list()))
+    build_proto(.call, stats::setNames(val, name) %||% list()))
   
   if (!missing(name)) 
     x@callname <- name
@@ -342,6 +359,14 @@ append_calldf <- function(x, values, after = nrow(x)) {
 
 
 
+#' Remove calldf arguments by name
+#' 
+#' @param calldf the calldf object to modify
+#' @param exclude a vector of argument names to remove from the calldf arugment
+#'   tibble
+#' 
+#' @return the modified calldf
+#' 
 exclude_calldf_args <- function(calldf, exclude) { 
   if (!"call_df" %in% class(calldf)) 
     stop("only valid for object of class 'call_df'")
@@ -352,6 +377,14 @@ exclude_calldf_args <- function(calldf, exclude) {
 
 
 
+#' Substitute calldf named arguments with new argument tibble
+#' 
+#' @param calldf the calldf object to substitute
+#' @param ... named arguments where the name specifies the argument to replace
+#'   and the value is a calldf to insert in that argument's place
+#' 
+#' @return the modified calldf
+#' 
 substitute_calldf_args <- function(calldf, ...) { 
   args <- list(...)
   for (i in names(args)) {
@@ -365,6 +398,30 @@ substitute_calldf_args <- function(calldf, ...) {
 
 
 
+#' Match arguments in the calldf against the formals of the call function
+#' 
+#' @description a \code{match.call} equivalent for the calldf object
+#' 
+#' @param calldf the calldf object for which arguments should be matched against
+#'   call formals
+#'
+#' @return a calldf object of the same structure, with arugment names provided
+#'   for unnamed arguments.
+#'
+#' @examples 
+#' # intended for internal ggpackets use only
+#' 
+#' my_calldf <- call_df(call = print, arglist = list("a"), source = 'ex')
+#' my_calldf
+#' #> function:
+#' #>   ex .. "a"
+#' 
+#' my_calldf <- ggpackets:::match_calldf(my_calldf)
+#' #> function:
+#' #>   ex .. x = "a"
+#' 
+#' @importFrom stats setNames
+#' 
 match_calldf <- function(calldf) { 
   if (!"call_df" %in% class(calldf)) 
     stop("only valid for object of class 'call_df'")
@@ -376,7 +433,7 @@ match_calldf <- function(calldf) {
   call_formals <- names(formals(.call))
   call_arg_l <- last_args(names(calldf)) & names(calldf) %in% c('', call_formals)
   dummy_args <- with(calldf@args[call_arg_l %||% NULL,], {
-    setNames(as.list(rep(NA, length(name))), name)
+    stats::setNames(as.list(rep(NA, length(name))), name)
   })
   
   # match args to call
@@ -393,6 +450,11 @@ match_calldf <- function(calldf) {
 
 
 
+#' do.call equivalent for calldf objects
+#' 
+#' @param what the calldf object to evaluate
+#' @param envir the environment in which to evaluate the call
+#'
 do_calldf <- function(what, envir = parent.frame()) { 
   if (!"call_df" %in% class(what)) 
     stop("only valid for object of class 'call_df'")
