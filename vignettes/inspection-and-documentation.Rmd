@@ -59,7 +59,7 @@ my_ggpack(data = mtcars)
 Finally, passing all required aesthetics allows for standalone plotting.
 
 ```{r standalone3, collapse = TRUE}
-my_ggpack(mtcars, x = wt, y = mpg)
+my_ggpack(data = mtcars, x = wt, y = mpg)
 ```
 
 # Potential for Confusion
@@ -182,7 +182,7 @@ to `NULL` or `c()`, indicating that no parameters, regardless of parameter
 source, should trigger a console warning.
 
 ```{r overwriting_params2}
-my_ggpk <- function(...) ggpack(geom_point, ..., color = 'red', warn = NULL)
+my_ggpk <- function(...) ggpack(geom_point, ..., color = 'red')
 
 ggplot(mtcars) + aes(x = wt, y = mpg) + my_ggpk(color = 'blue')
 ```
@@ -198,7 +198,7 @@ that are overwritten. This functionality can be enabled by including the string
 ```{r overwriting_params3, collapse = TRUE}
 my_ggpk <- function(c, ...) {
   dots <- list(color = switch(c, r = 'red', g = 'green', b = 'blue'))
-  ggpack(geom_point, dots = dots, ..., color = 'red', warn = 'dots')
+  ggpack(geom_point, dots = dots, ..., color = 'red')
 }
 
 ggplot(mtcars) + aes(x = wt, y = mpg) + my_ggpk('b')
@@ -211,7 +211,7 @@ calls, `warn` can also include the string `"call"` to provide warnings if a
 argument is overwritten that was passed directly to the call construction. 
 
 ```{r overwriting_params4, collapse = TRUE}
-ggpack(geom_point, color = 'red', color = 'blue', warn = 'call')
+ggpack(geom_point, color = 'red', color = 'blue')
 ```
 
 # Documenting Possible Parameters

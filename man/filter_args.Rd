@@ -4,9 +4,11 @@
 \alias{filter_args}
 \title{Filter arguments for given Geom and Stat objects}
 \usage{
-filter_args(geom, stat, args)
+filter_args(call, geom, stat, args)
 }
 \arguments{
+\item{call}{a function call whose formals should be used to filter args}
+
 \item{geom}{Geom object for which argument should be filtered}
 
 \item{stat}{Stat object for which argument should be filtered}

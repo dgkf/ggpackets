@@ -3,13 +3,20 @@
 \docType{methods}
 \name{names,ggpacket-method}
 \alias{names,ggpacket-method}
+\alias{names<-,ggpacket-method}
 \title{Overload names method to print ggpacket ggcall list names}
 \usage{
 \S4method{names}{ggpacket}(x)
+
+\S4method{names}{ggpacket}(x) <- value
 }
 \arguments{
 \item{x}{the ggpacket object to show}
+
+\item{value}{the new values of the names of the ggpacket object}
 }
 \description{
+Overload names method to print ggpacket ggcall list names
+
 Overload names method to print ggpacket ggcall list names
 }

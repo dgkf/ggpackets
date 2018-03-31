@@ -8,14 +8,17 @@
 <title>Composing Templates &amp; Functions • ggpackets</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-<!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script><script src="../pkgdown.js"></script><!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="../jquery.sticky-kit.min.js"></script><script src="../pkgdown.js"></script><meta property="og:title" content="Composing Templates &amp; Functions">
+<meta property="og:description" content="">
+<meta name="twitter:card" content="summary">
+<!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body>
-    <div class="container template-vignette">
+    <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -24,18 +27,22 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">ggpackets</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">ggpackets</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../articles/ggpackets.html">Get Started</a>
+  <a href="../articles/ggpackets.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -53,6 +60,9 @@
     <li>
       <a href="../articles/inspection-and-documentation.html">Inspection &amp; Documentation</a>
     </li>
+    <li>
+      <a href="../articles/miscellaneous-examples.html">Miscellaneous Examples</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -66,17 +76,19 @@
 
       
       </header><div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Composing Templates &amp; Functions</h1>
                         <h4 class="author">Doug Kelkhoff</h4>
             
-            <h4 class="date">2018-01-16 17:14:30</h4>
-          </div>
+            <h4 class="date">2018-03-30 21:39:59</h4>
+      
+      
+
+    </div>
 
     
     
-<div class="contents">
 <div id="overview" class="section level1">
 <h1 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h1>
@@ -114,9 +126,9 @@
 <p>In the function we declared above, all arguments passed to our wrapper function get filter down into all the internal layers. When we pass through the <code>...</code>, we pass through any unnamed arguments from the parent function.</p>
 <p>In fact, when we call the function, we can pass any arguments that would typically get passed to either of the ggplot functions wrapped inside of it, <code>geom_line</code> and <code>geom_point</code>. If we choose to pass both the <code>data</code> and <code>mapping</code> parameters (typically set using the <code><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot()</a></code> and <code><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes()</a></code> functions when constructing a ggplot object), we could even use this as a standalone function as shown below.</p>
 <blockquote>
-<p>Be aware that this usage isn’t particularly intuitive without a bit of added documentation. If you’re building a function for someone else to use or to export from a package you’re making, it’s probably worth writing up some good documentation about what paramters you expect people to use.</p>
+<p>Be aware that this usage isn’t particularly intuitive without a bit of added documentation. If you’re building a function for someone else to use or to export from a package you’re making, it’s probably worth writing up some good documentation about what parameters you expect people to use.</p>
 </blockquote>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggpk_my_template</span>(Loblolly, <span class="dt">x =</span> age, <span class="dt">y =</span> height, <span class="dt">color =</span> Seed)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggpk_my_template</span>(<span class="dt">data =</span> Loblolly, <span class="dt">x =</span> age, <span class="dt">y =</span> height, <span class="dt">color =</span> Seed)</code></pre></div>
 <p><img src="composing-functions_files/figure-html/function_ggpacket_standalone_output-1.png" width="600px" height="400px" style="display: block; margin: auto;"></p>
 </div>
 <div id="granular-parameter-passing" class="section level1">
@@ -159,14 +171,7 @@
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> age, <span class="dt">y =</span> height, <span class="dt">color =</span> Seed) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">ggpk_my_template</span>(<span class="dt">line.size =</span> <span class="fl">0.1</span>, <span class="dt">point.size =</span> <span class="dv">10</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">ggtitle</a></span>(<span class="st">'Average Growth of Loblolly Pines'</span>)</code></pre></div>
-<pre><code>## Warning: During ggpack call, some arguments were overwritten: 
-## 
-##   ggpack(geom_point, id = "point", ..., size = 3)
-## 
-##   1. argument "size" defined within "..." overwritten by last definition
-##      in call construction</code></pre>
 <p><img src="composing-functions_files/figure-html/parameters_ggpacket_output-1.png" width="600px" height="400px" style="display: block; margin: auto;"></p>
-</div>
 </div>
   </div>
 
@@ -192,11 +197,13 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
 </div>
+
+  
 
   </body>
 </html>

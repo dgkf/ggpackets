@@ -43,35 +43,13 @@ ggpacket <- setClass("ggpacket",
   prototype = list(ggcalls = list())
 )
 
+
 #' Initialize empty ggpacket
 #' @param .Object ggpacket object to be initialized
 #' @rdname initialize,ggpacket-method
 setMethod(f = "initialize", methods::signature(.Object = "ggpacket"), 
   function(.Object) { .Object })
 
-#' Initialize new object by adding ggproto to list with name label
-#' @param .Object ggpacket object to be initialized
-#' @param ggproto_obj an object of class ggproto to add to the ggpacket's
-#'   internal list
-#' @param label an optional label to be able to index this component within the
-#'   ggpacket
-#' @rdname initialize,ggpacket,ggproto,character
-#' @importFrom stats setNames
-setMethod("initialize", "ggpacket", 
-  function(.Object, ggproto_obj = NULL, label = NULL) {
-    if (is.null(ggproto_obj)) return(.Object)
-    else if (all(class(ggproto_obj) == 'list'))
-      .Object <- .Object + stats::setNames(
-        ggproto_obj, 
-        names(ggproto_obj) %||% label)
-    else
-      .Object <- .Object + stats::setNames(
-        list(ggproto_obj), 
-        label)
-    
-    .Object
-  }
-)
 
 #' Overload show method to show ggpacket
 #' @param object the ggpacket object to show
@@ -90,64 +68,98 @@ setMethod("show", "ggpacket", function(object) {
   if (length(plt_output) == 0 && all(sapply(bld$data, nrow))) 
     return(show(plt))
   
-  cat("ggpacket\nA container for multiple ggplot ggproto objects\n\n")
+  cat(safecrayon('darkblue', 'ggpacket'), '\n')
   cat('standalone plotting status: \n')
   if (length(plt_output)) 
-    cat(strwrap(
+    cat(safecrayon('midred', strwrap(
         attr(plt_output, 'condition')$message, 
-        indent = 2, exdent = 2), 
-      '\n')
+        indent = 2, exdent = 2)), '\n')
   else if (!all(sapply(bld$data, nrow))) 
-    cat(strwrap(
+    cat(safecrayon('midred', strwrap(
         'Not all layers have been passed sufficient data', 
-        indent = 2, exdent = 2),
-      '\n')
+        indent = 2, exdent = 2)), '\n')
   
   cat('\n')
-  if (length(object@ggcalls) == 0) cat("empty\n\n")
-  else
-    mapply(
-      function(n, name, ggp) cat(sprintf("[[%s]] %s\n%s\n\n", n, name, ggp)),
-      n = 1:length(object@ggcalls),
-      ggp = Map(function(ggc) 
-        paste(utils::capture.output(suppressMessages(print(ggc))), 
-              collapse = "\n", sep = "\n"), 
-        object@ggcalls),
-      name = names(object@ggcalls) %||% ""
-    )
+  print(object@ggcalls)
 })
+
+
+#' ggpacket equivalence
+#' @param e1 lhs
+#' @param e2 rhs
+#' @rdname ggpacket-equivalence
+setMethod("==", c("ggpacket", "ggpacket"), function(e1, e2) {
+  length(e1@ggcalls) == length(e2@ggcalls) && 
+      do.call(all, Map(function(e1i, e2i) e1i == e2i, e1@ggcalls, e2@ggcalls))
+})
+
 
 #' Overload names method to print ggpacket ggcall list names
 #' @param x the ggpacket object to show
+#' @param value the new values of the names of the ggpacket object
 #' @rdname names-ggpacket
-setMethod("names", "ggpacket", function(x) { names(x@ggcalls) })
+setMethod("names", "ggpacket", function(x) { 
+  Map(function(ggc) ggc@id, x@ggcalls)
+})
+
+#' Overload names method to print ggpacket ggcall list names
+#' @rdname names-ggpacket
+setMethod("names<-", "ggpacket", function(x, value) {
+  x@ggcalls <- Map(function(ggc, v) { 
+    ggc@id <- as.list(v); ggc 
+  }, x@ggcalls, value)
+  x
+})
 
 #' Overload [ generic to index into ggcalls list
 #' @param x ggpacket object
 #' @param i index of the ggcall in the ggpacket object
 #' @rdname ggpacket-indexing
 setMethod("[", "ggpacket", function(x, i) { 
-  if (any(sapply(x@ggcalls[i], function(i) 'ggproto' %in% class(i)))) 
-    ggpacket(x@ggcalls[i]) 
-  else 
-    x@ggcalls[i]
+  if (is.numeric(i))
+    ggpacket() + x@ggcalls[i]
+  else {
+    is <- which(sapply(x@ggcalls, function(ggc) any(i %in% ggc@id)))
+    ggpacket() + x@ggcalls[is]
+  }
 })
+
 
 #' Overload [[ generic to index into ggcalls list
 #' @rdname ggpacket-indexing
 setMethod("[[", "ggpacket", function(x, i) { 
-  if ('ggproto' %in% class(x@ggcalls[[i]])) ggpacket(x@ggcalls[[i]]) 
-  else x@ggcalls[[i]]
+  if (is.numeric(i)) return(x@ggcalls[[i]])
+  i <- head(which(sapply(x@ggcalls, function(ggc) i %in% ggc@id)), 1)
+  x@ggcalls[[i]]
 })
+
+
+#' @rdname ggpacked_layer-indexing
+setMethod("$", "ggpacket", function(x, name) {
+  i <- head(which(sapply(x@ggcalls, function(ggc) name %in% ggc@id)), 1)
+  if (length(i)) x@ggcalls[[i]] else NULL
+})
+
 
 #' Primitive methods for adding ggpackets to various ggplot objects
 #' @param e1 left side argument for addition
 #' @param e2 right side argument for addition
 #' @rdname ggpacket-addition
 setMethod("+", c("ggpacket", "ANY"), function(e1, e2) {
-  if      ("ggpacket" %in% class(e2)) e1@ggcalls <- append(e1@ggcalls, e2@ggcalls)
-  else if ("theme" %in% class(e2))    e1@ggcalls <- append(e1@ggcalls, list(e2))
-  else                                e1@ggcalls <- append(e1@ggcalls, e2)
+  syscall <- sys.call()
+  e2call <- as.list(as.list(syscall[-1])[[2]])
+  
+  if ('ggpacked_layer' %in% class(e2)) { 
+    e1@ggcalls <- append(e1@ggcalls, e2)
+  } else if ('ggpacket' %in% class(e2))
+    e1@ggcalls <- append(e1@ggcalls, e2@ggcalls)
+  else if ('list' %in% class(e2))
+    e1 <- Reduce("+", init = e1, e2)
+  else 
+    e1@ggcalls <- append(
+      e1@ggcalls, 
+      do.call(ggpack, c(e2call, list(envir = parent.frame())))@ggcalls)
+    
   e1
 })
 
@@ -158,6 +170,18 @@ setMethod("+", c("NULL", "ggpacket"), function(e1, e2) e2)
 # register unexported gg class from ggplot2 so signature is accepted
 setOldClass("gg")
 
-#' Combine ggpacket contents with gg call to incorporate seamlessly with ggplot calls
+#' Combine ggpacket contents with gg call to incorporate seamlessly with ggplot
+#' calls
 #' @rdname ggpacket-addition
-setMethod("+", c("gg", "ggpacket"), function(e1, e2) Reduce("+", e2@ggcalls, e1))
+setMethod("+", c("gg", "ggpacket"), function(e1, e2) 
+  Reduce("+", e2@ggcalls, e1))
+
+#' used to help with unit testing
+#' @param ggpk ggpacket object to strip of envir slot value
+drop_envs <- function(ggpk) {
+  ggpk@ggcalls <- Map(function(ggpk_l) {
+    ggpk_l@calldf@envir <- NULL
+    ggpk_l
+  }, ggpk@ggcalls)
+  ggpk
+}

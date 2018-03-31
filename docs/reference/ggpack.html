@@ -18,13 +18,23 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Handling of argument passing to ggplots — ggpack" />
+
+<meta property="og:description" content="A helper function to wrap ggplot calls, allowing for passing of a shared list
+of arguments prefixed by an id string. For example, a call to a custom ggplot
+template may allow for arguments 'line.color' and 'bar.color' to specify the
+line and bar colors separately. These arguments are parsed appropriately and
+passed to the appropriate sub-function." />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -32,6 +42,8 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -47,18 +59,22 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">ggpackets</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">ggpackets</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../articles/ggpackets.html">Get Started</a>
+  <a href="../articles/ggpackets.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -76,6 +92,9 @@
     <li>
       <a href="../articles/inspection-and-documentation.html">Inspection &amp; Documentation</a>
     </li>
+    <li>
+      <a href="../articles/miscellaneous-examples.html">Miscellaneous Examples</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -83,6 +102,7 @@
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -90,10 +110,11 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Handling of argument passing to ggplots</h1>
+    
     </div>
 
     
@@ -104,11 +125,11 @@ line and bar colors separately. These arguments are parsed appropriately and
 passed to the appropriate sub-function.</p>
     
 
-    <pre class="usage"><span class='fu'>ggpack</span>(<span class='kw'>.call</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>id</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>warn</span> <span class='kw'>=</span> <span class='st'>"..."</span>,
-  <span class='kw'>auto_remove_aes</span> <span class='kw'>=</span> (!<span class='fu'>is.null</span>(<span class='no'>id</span>) <span class='kw'>&amp;&amp;</span> <span class='fu'>any</span>(<span class='fu'>sapply</span>(<span class='no'>id</span>, <span class='no'>is.null</span>))),
+    <pre class="usage"><span class='fu'>ggpack</span>(<span class='kw'>.call</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>id</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>auto_remove_aes</span> <span class='kw'>=</span> <span class='fu'>is.null</span>(<span class='no'>id</span>) <span class='kw'>||</span> <span class='fu'>any</span>(<span class='fu'>sapply</span>(<span class='no'>id</span>, <span class='no'>is.null</span>)),
   <span class='kw'>null_empty</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'>parent.frame</span>())</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -128,19 +149,13 @@ passed to the appropriate sub-function.</p>
       <td><p>arguments to subset</p></td>
     </tr>
     <tr>
-      <th>warn</th>
-      <td><p>a character vector of argument names that should yield a warning
-when parameters passed via that argument are overwritten. Can include
-values <code>'...'</code> and <code>'dots'</code> or <code>'call'</code> (to warn for
-arguments explicitly defined during call construction being overwritten).</p></td>
-    </tr>
-    <tr>
       <th>auto_remove_aes</th>
       <td><p>logical indicating whether aesthetic mappings that</p></td>
     </tr>
     <tr>
       <th>null_empty</th>
-      <td><p>return <code>NULL</code> if no arguments are received</p></td>
+      <td><p>logical indicating whether <code>NULL</code> should be returned
+if no arguments are passed to call</p></td>
     </tr>
     <tr>
       <th>envir</th>
@@ -163,32 +178,28 @@ will overwrite previous arguments of the same name.</p>
     <pre class="examples"><div class='input'><span class='fu'>library</span>(<span class='no'>ggplot2</span>)
 
 <span class='co'># wrap layer calls in a ggpack to package them</span>
-<span class='fu'>ggpack</span>(<span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/geom_bar'>geom_bar</a></span>(<span class='kw'>na.rm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt; ggpacket
-#&gt; A container for multiple ggplot ggproto objects
-#&gt; 
+<span class='fu'>ggpack</span>(<span class='fu'><a href='http://www.rdocumentation.org/packages/ggplot2/topics/geom_bar'>geom_bar</a></span>(<span class='kw'>na.rm</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt; ggpacket 
 #&gt; standalone plotting status: 
 #&gt;   Not all layers have been passed sufficient data 
 #&gt; 
-#&gt; [[1]] 
-#&gt; geom_bar: width = NULL, na.rm = TRUE
-#&gt; stat_count: width = NULL, na.rm = TRUE
-#&gt; position_stack 
+#&gt; [[1]]
+#&gt; Anonymous ggpacket layer
+#&gt; geom_bar(na.rm = TRUE) (LayerInstance):
 #&gt; </div><div class='input'>
 <span class='co'># or more explicitly define layer properties</span>
 <span class='fu'>ggpack</span>(<span class='no'>geom_bar</span>,              <span class='co'># layer function to bundle</span>
   <span class='kw'>id</span> <span class='kw'>=</span> <span class='st'>'bar'</span>,                 <span class='co'># name of layer - used for filter listed args</span>
   <span class='kw'>fill</span> <span class='kw'>=</span> <span class='st'>'red'</span>,               <span class='co'># ...'s before 'args' used as defaults</span>
   <span class='kw'>dots</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>fill</span> <span class='kw'>=</span> <span class='st'>'blue'</span>), <span class='co'># named 'args' param will overwrite prior ...'s</span>
-  <span class='kw'>fill</span> <span class='kw'>=</span> <span class='st'>'green'</span>)             <span class='co'># ...'s after 'args' will overwrite any others</span></div><div class='output co'>#&gt; ggpacket
-#&gt; A container for multiple ggplot ggproto objects
-#&gt; 
+  <span class='kw'>fill</span> <span class='kw'>=</span> <span class='st'>'green'</span>)             <span class='co'># ...'s after 'args' will overwrite any others</span></div><div class='output co'>#&gt; ggpacket 
 #&gt; standalone plotting status: 
 #&gt;   Not all layers have been passed sufficient data 
 #&gt; 
-#&gt; [[1]] bar
-#&gt; geom_bar: width = NULL, na.rm = FALSE
-#&gt; stat_count: width = NULL, na.rm = FALSE
-#&gt; position_stack 
+#&gt; [[1]]
+#&gt; ggpacket layer with id(s): bar 
+#&gt; geom_bar (function):
+#&gt;   call .. fill = "red"
+#&gt;   call .. fill = "green"
 #&gt; </div><div class='input'>
 </div></pre>
   </div>
@@ -213,11 +224,14 @@ will overwrite previous arguments of the same name.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

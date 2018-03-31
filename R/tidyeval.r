@@ -59,10 +59,10 @@ dequos <- function(...) { Map(dequo, as.list(...)) }
 #' @param ... arguments to encapsulate as a quosure
 #' @param envir environment in which to perform forward quosure
 #' 
-# enquos <- function(..., envir = parent.frame()) { 
+# enquos <- function(..., envir = parent.frame()) {
 #   if (!requireNamespace('rlang', quietly = TRUE)) return(substitute(...()))
 #   for (dot in substitute(...())) {
-#     capture <- rlang::lang(rlang::captureArg, substitute(dot))
+#     capture <- rlang::lang(rlang:::captureArg, substitute(dot))
 #     arg <- rlang::eval_bare(capture, rlang::caller_env())
 #     expr <- rlang::expr_interp(arg$expr, arg$env)
 #     assign(as.character(dot), rlang::enquo(expr), envir)

@@ -7,25 +7,21 @@
 allowed_aesthetics(geom = NULL)
 }
 \arguments{
-\item{geom}{a \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-\code{\link[ggplot2]{Geom}} object or NULL}
+\item{geom}{a ggplot2 \code{\link[ggplot2]{Geom}} object or NULL}
 }
 \value{
 a character vector of the names of aesthetics permitted by this
 geometry object (including alternative localizations of names and base R
-equivalent names also accepted by
-\href{[https://github.com/tidyverse/ggplot2}{ggplot2}). If \code{geom} is
-\code{NULL}, returns all of
-\href{[https://github.com/tidyverse/ggplot2}{ggplot2})'s default allowed
-aesthetics.
+equivalent names also accepted by ggplot2. If \code{geom} is
+\code{NULL}, returns all of ggplot2's default allowed
+aesthetics.)
 }
 \description{
-All \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-\code{\link[ggplot2]{Geom}} objects have a set of allowable aesthetics that
-are used for generating the layer of the plot. This function returns those
-aesthetics, as well as any alternative localizations and base R equivalent
-names which can all be used as inputs to specify aesthetics to a ggplot
-object.
+All ggplot2 \code{\link[ggplot2]{Geom}} objects have a set of allowable
+aesthetics that are used for generating the layer of the plot. This function
+returns those aesthetics, as well as any alternative localizations and base R
+equivalent names which can all be used as inputs to specify aesthetics to a
+ggplot object.
 }
 \examples{
 library(ggplot2)

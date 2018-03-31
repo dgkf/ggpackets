@@ -23,5 +23,6 @@ Primitive methods for adding ggpackets to various ggplot objects
 
 Add NULL to a ggpacket to return the ggpacket
 
-Combine ggpacket contents with gg call to incorporate seamlessly with ggplot calls
+Combine ggpacket contents with gg call to incorporate seamlessly with ggplot
+calls
 }

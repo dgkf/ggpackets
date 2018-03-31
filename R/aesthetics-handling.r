@@ -38,7 +38,7 @@ allowed_aesthetics <- function(geom = NULL) {
 #' @export
 #'
 allowed_params <- function(geom = NULL) {
-  c(allowed_aesthetics(geom), geom$parameters())
+    c(allowed_aesthetics(geom), geom$parameters())
 }
 
 
@@ -80,11 +80,10 @@ add_eqv_aes <- function(aes_names) {
 #'
 #' @return the list with aesthetic names remapped to ggplot equivalents
 #'   
-rename_to_ggplot <- function(args) {
-  names(args) <- ifelse(names(args) %in% names(.base_to_ggplot), 
-    .base_to_ggplot[names(args)], 
-    names(args))
-  args
+to_ggplot <- function(args) {
+  ifelse(args %in% names(.base_to_ggplot), 
+    unlist(.base_to_ggplot[args], use.names = FALSE), 
+    args)
 }
 
 
@@ -114,29 +113,33 @@ rename_to_ggplot <- function(args) {
 #' @export
 filter_aesthetics <- function(geom, mapping) {
   allowed_aes <- allowed_aesthetics(geom)
-  mapping_aes_names <- names(rename_to_ggplot(mapping))
+  mapping_aes_names <- to_ggplot(names(mapping))
   disallowed_aes <- setdiff(mapping_aes_names, allowed_aes)
   do.call(remove_aesthetics, c(list(mapping), disallowed_aes))
 }
 
 
-
 #' Filter arguments for given Geom and Stat objects
 #' 
+#' @param call a function call whose formals should be used to filter args
 #' @param geom Geom object for which argument should be filtered
 #' @param stat Stat object for which argument should be filtered
 #' @param args argument list to be filtered
 #' 
 #' @importFrom ggplot2 layer
 #' 
-filter_args <- function(geom, stat, args) {
-  allowed_args <- c(
-    names(formals(ggplot2::layer)), 
-    allowed_params(geom), 
-    allowed_params(stat)
-  )
+filter_args <- function(call, geom, stat, args) {
+  if (any(c(class(geom), class(stat)) %in% 'ggproto')) {
+    allowed_args <- c('',
+      names(formals(ggplot2::layer)), 
+      allowed_params(geom), 
+      allowed_params(stat))
+  } else if (is.function(call))
+    allowed_args <- c('', names(formals(call)))
+  else 
+    allowed_args <- c()
   
-  args[names(args) %in% allowed_args]
+  args[tsnames(args, '') %in% allowed_args]
 }
 
 

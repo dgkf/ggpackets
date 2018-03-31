@@ -10,12 +10,9 @@
 #' @param ... additional arguments to use when calling the provided function
 #' @param id the prefix string to subset arguments by
 #' @param dots arguments to subset
-#' @param warn a character vector of argument names that should yield a warning
-#'   when parameters passed via that argument are overwritten. Can include
-#'   values \code{'...'} and \code{'dots'} or \code{'call'} (to warn for
-#'   arguments explicitly defined during call construction being overwritten).
+#' @param null_empty logical indicating whether \code{NULL} should be returned
+#'   if no arguments are passed to call
 #' @param auto_remove_aes logical indicating whether aesthetic mappings that
-#' @param null_empty return \code{NULL} if no arguments are received
 #' @param envir frame in which non-aesthetic arguments should be evaluated
 #'
 #' @return a call to the specified function with arguments subset for only those
@@ -38,181 +35,113 @@
 #'   fill = 'green')             # ...'s after 'args' will overwrite any others
 #'
 #' @importFrom utils head tail
+#' @importFrom tibble tibble
+#'
 #' @export
-ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, warn = '...', 
-    auto_remove_aes = (!is.null(id) && any(sapply(id, is.null))),
-    null_empty = FALSE, envir = parent.frame()) {
+ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL, 
+     # warn = '...', (parameter relinquished to ... arg to allow multiple args)
+     auto_remove_aes = is.null(id) || any(sapply(id, is.null)),
+     null_empty = FALSE, envir = parent.frame()) {
+  
+  ## This function's principle purpose is to preprocess the arguments being
+  ## passed to the ggplot call and store them for easier construction when the
+  ## plot is being built. Outwardly, it's meant to appear like a ggplot call,
+  ## but in actuality it only serves as an API to the ggpacked_layer constructor
   
   if (is.null(.call) && length(list(...)) == 0) return(ggpacket())
   
-  warn <- match.arg(warn, c('call', '...', 'dots'), several.ok = TRUE)
-  callfname <- deparse(as.list(match.call())$'.call')
-  expand <- list('...' = NULL, 'dots' = as.list(dots))
+  expand <- list('...' = NULL, 'dots' = NULL)
+  callname <- deparse(as.list(match.call())$'.call')
+  excluded_args <- setdiff(names(formals()), names(expand))
   
   # get all call-specific args
-  args <- as.list(sys.call()[-1])[-1]
-  names(args)[args %in% '...'] <- rep('...', length(args[args %in% '...']))
-  excluded_args <- setdiff(names(formals()), names(expand))
-  if (!is.null(names(args))) args <- args[!names(args) %in% excluded_args]
+  syscall <- sys.call()
+  args <- as.list(syscall[-1])[-1]
+  
+  calldf <- call_df(args, source = 'call', auto_remove_aes = auto_remove_aes)
+  calldf <- exclude_calldf_args(calldf, excluded_args)
   
   # filter args passed as ellipses in parent frame from all ellipses arguments
-  e_1 <- args[!names(args) %in% names(expand)]      # parent ellipses args
-  e_all <- if (requireNamespace('rlang', quietly = TRUE)) dequos(rlang::quos(...))
-    else as.list(substitute(...()))                 # all ellipses args
-  expand$'...' <- if (is.null(names(e_all))) e_all  # all except parent
-    else e_all[!(names(e_all) %in% names(e_1) & !duplicated(names(e_all)))]
+  e_1 <- calldf@args[!names(calldf) %in% names(expand),]$val # parent ... args
+  e_all <- safedequos(...)                                   # parent & grandparent+ ... args
   
-  # remove any arguments from ellipses or dots that don't begin with id
+  # prep lists of arguments that need to be added in
+  expand$...  <- list_diff(e_1, e_all)                       # grandparent+ ... args
+  expand$dots <- as.list(dots)
   expand <- lapply(expand, remove_by_prefix, id = id)
   
-  # substitute ellipses args and dots args in place, record origin and indices
-  sources <- rep('call', length(args))
-  for (i in length(args) - which(names(args) %in% names(expand))) {
-    i <- length(args) - i
-    args <- append(args[-i], e <- expand[[a <- names(args[i])]], i-1)
-    sources <- append(sources[-i], rep(a, length(e)), i-1)
+  # substitute ellipses args and dots args in place
+  calldf <- do.call(substitute_calldf_args, c(calldf, expand))
+  calldf <- bind_call(calldf, .call, callname, envir, match_args = TRUE)
+  
+  # unpack mapping aesthetics
+  for (rows_from_end in length(calldf) - which(names(calldf) %in% 'mapping')) { 
+    i <- length(calldf) - rows_from_end
+    mapping <- eval(calldf@args[[i,'val']])
+    if ('uneval' %in% class(mapping))
+      arg_mapping <- call_df(mapping, paste(calldf@args[i,'source'], 'mapping'))
+    else 
+      arg_mapping <- calldf@args[i,]
+    calldf <- append_calldf(calldf[-i,], arg_mapping, i-1)
   }
   
-  # strip args list of duplicate args, optionally warning during removal
-  args <- rename_to_ggplot(args)
-  args <- last_args(args, sources, warn, call = sys.call(),
-    desc = list('...' = '"..."', dots = '"dots"', call = 'call construction'))
-  if (null_empty && length(args) == 0) return(ggpacket(NULL))
-  
-  # call ggproto construction with stripped args to determine geom
-  # might cause issue if aesthetics are dependent on additional arguments
-  ggproto_tmp <- tryCatch({
-      do.call(.call, args[names(args) %in% c('geom', 'stat')])
-    }, error = function(e) NULL)
-  geom <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$geom else NULL
-  stat <- if ('ggproto' %in% class(ggproto_tmp)) ggproto_tmp$stat else NULL
-  
-  # flatten args to mapping, remove extra aes
-  args <- flatten_aes_to_mapping(args, allowed_aesthetics(geom), auto_remove_aes, envir)
-  
-  if (auto_remove_aes) # remove invalid argnames and unevaluated aesthetics
-    args <- filter_args(geom, stat, args[!uneval_aes(args)])
-  args <- Map(function(v) if (is_uneval(v)) eval(v, envir) else v, args)
-  
-  # ring ring, time to make a call!
-  ggpacket_name <- if (is.null(id)) NULL else paste(id, collapse = '.')
-  if (any(class(.call) == 'function'))
-    ggpacket(tryCatch(withCallingHandlers(do.call(.call, args),
-      warning = function(w) if (!auto_remove_aes) {
-        message("In ggpack of call to ", callfname, ": \n", w$message, "\n")
-        invokeRestart("muffleWarning")
-      }),
-      error = function(e) {
-        message(sprintf('Error during call to "%s" with id%s %s: \n',
-          callfname,
-          if (length(id) > 1) 's' else '',
-          paste0('"', id %||% 'NULL', '"', collapse = ', ')),
-          e$message, '\n')
-      }), ggpacket_name)
-  else
-    ggpacket(.call, ggpacket_name)
+  names(calldf) <- to_ggplot(names(calldf))
+  ggpacket() + ggpacked_layer(id, calldf, null_empty)
 }
 
 
-#' Filter argument list for only unnamed items and the last instance of each
-#' named item
+
+#' Capture all ellipses arguments using rlang::quos() with substitute() fallback
 #'
-#' @param args a list of arguments to filter
-#' @param sources an optional list of names used to indicate the origin of each
-#'   of the arguments
-#' @param warn an optional character vector of sources for which a warning
-#'   should be produced, should an argument from that source be overwritten
-#' @param desc an optional named character vector of more verbose descriptions
-#'   to use for each of the sources. (e.g. \code{c("..." = "ellipses
-#'   arguments")})
-#' @param call an optional object of type call to include with the warning if a
-#'   statement associated with the arguments is desired to be included with the
-#'   warning message.
+#' @param ... arguments from a parent function to extract
 #'
-#' @return a named list of arguments with duplicated names omitted, leaving only
-#'   the last occurence of each named value
+#' @return either an rlang list of quosures if rlang is installed or a named
+#'   list of values otherwise
 #'   
-last_args <- function(args, sources = list(), warn = c(), desc = c(), 
-    call = NULL) {
-  
-  if (is.null(names(args))) args
-  desc <- as.list(desc)
-  
-  # provide warning for overriden arguments
-  dup_args <- unique(names(args[duplicated(names(args))]))
-  dup_indx <- Map(function(a) which(names(args) %in% a), dup_args)
-  msg <- Filter(Negate(is.null), Map(function(arg, i, arg_src = sources[i]) {
-    if (any(arg_src[-length(arg_src)] %in% warn)) { 
-      arg_src <- Map(function(i) desc[[i]] %||% i, arg_src)
-      sprintf('argument "%s" defined within %s overwritten by last definition in %s', 
-        arg, str_format_list(unique(arg_src[-length(arg_src)])),
-        arg_src[length(arg_src)])
-    }
-  }, dup_args, dup_indx))
-
-  # print warning if a warning message was produced
-  if (length(msg)) {
-    msg <- paste0(1:length(msg), '. ', msg)
-    if (!is.null(call))
-      msg <- c('', paste0(deparse(call), collapse = ''), '', msg)
-    warning(call. = FALSE, immediate. = TRUE,
-      'During ggpack call, some arguments were overwritten: \n',
-      paste0(strwrap(msg, indent = 2, exdent = 5, width = getOption('width')), 
-        collapse = '\n'), '\n\n')
-  }
-  
-  args[names(args) == '' | !duplicated(names(args), fromLast = TRUE)]
+safedequos <- function(...) { 
+  if (requireNamespace('rlang', quietly = TRUE)) {
+    dequos(rlang::quos(...))
+  } else 
+    as.list(substitute(...()))
 }
 
 
-#' Move items in args to 'mapping' key if found in aes_list
+
+#' Attempt to identify which values were added in the transition from a to b
 #'
-#' @param args a list of arguments to parse for aesthetic arguments
-#' @param aes_list a list of aesthetic names to consider
-#' @param filter_mapping whether mapping key should be filtered for only those
-#'   in the aes_list terms
-#' @param envir environment in which to attempt evaluation of mapping term
-#'
-#' @importFrom utils tail modifyList
-#' @importFrom ggplot2 aes_string
-#'
-#' @return a list of arguments with aesthetics matching values in
-#'   \code{aes_list} flattened into a list stored within the mapping value
+#' @note This can cause issues if ambiguous terms are in b, making it impossible
+#'   to distinguish which arguments were added. For example:
 #'   
-flatten_aes_to_mapping <- function(args, 
-    aes_list = add_eqv_aes(.all_aesthetics), 
-    filter_mapping = FALSE, envir = parent.frame()) { 
+#'   \code{a = c('a', 'b', 'b', 'b', 'a')}
+#'   \code{b = c('a', 'b', 'b', 'c', 'b', 'b', 'a')}
+#'   
+#'   makes it impossible to know whether c('b', 'c') was inserted after position
+#'   2, or whether c('c', 'b') was inserted after position 3.
+#'   
+#' @param a a list of values
+#' @param b another list of values
+#'
+#' @return the values that were added to a to arrive at b
+#'   
+list_diff <- function(a, b) { 
+  # This function could possibly cause issues with regions of a list that have
+  # ambiguity of arguments. Those situations are fairly rare, though can occur.
   
-  # get 'mapping' arg position and any args position whose name in aes_list
-  map_idx <- utils::tail(which(names(args) == 'mapping'), 1) %||% Inf
-  aes_idx <- which(names(args) %in% aes_list)
+  if (!length(a)) return(b)
+  if (length(a) > length(b)) return(list_diff(b, a))
+  bm <- b[1:length(a)]
   
-  # split args into those pre- and post- mapping arugment
-  aes_pre_idx <- Filter(function(i) i < map_idx, aes_idx)
-  aes_pre_args <- Map(deparse, Filter(is_uneval, args[aes_pre_idx]))
-  aes_pst_idx <- Filter(function(i) i > map_idx, aes_idx)
-  aes_pst_args <- Map(deparse, Filter(is_uneval, args[aes_pst_idx]))
+  # find first location of a difference in the list
+  fstdiff <- min(head(which(
+    unlist(Map(Negate(identical), a, bm)) | 
+    tsnames(a) != tsnames(bm)), 1), length(a)+1)
   
-  # strip preceeding free aes vars if they appear in mapping
-  mapped_aes <- if (is_uneval(args$mapping)) names(eval(args$mapping, envir))
-                else names(args$mapping)
-  mapped_aes <- add_eqv_aes(mapped_aes)
-  preceeding_aes <- which(names(head(args, map_idx)) %in% mapped_aes)
-  if (length(preceeding_aes)) args <- args[-preceeding_aes]
-  
-  # build mapping from unevaluated args before and after mapping param
-  if (!is.null(names(args)))
-    args <- args[!names(args) %in% names(c(aes_pre_args, aes_pst_args))]
-  
-  if (filter_mapping) mapped_aes <- mapped_aes[mapped_aes %in% aes_list]
-  args$mapping <- Reduce(utils::modifyList, list(
-    do.call(ggplot2::aes_string, aes_pre_args),
-    as.list(eval(args$mapping))[mapped_aes],
-    do.call(ggplot2::aes_string, aes_pst_args)
-  )) %||% NULL
-  
-  args
+  # put my thing down flip it and reverse it (and take a list_diff on that)
+  rev(list_diff(
+    rev(a[seq(length(a)) >= fstdiff]), 
+    rev(b[seq(length(b)) >= fstdiff])))
 }
+
 
 
 #' Filter arguments based on a prefix id
@@ -231,7 +160,7 @@ flatten_aes_to_mapping <- function(args,
 remove_by_prefix <- function(id, args, sep = '\\.') {
   if (is.null(args)) return(list())
   
-  # args same as id e.g. "xlab" in ggpack(xlab, id = 'xlab', xlab = 'x axis') 
+  # args same as id e.g. "xlab" in ggpack(xlab, id = 'xlab', xlab = 'x axis')
   id_idx <- which(names(args) %in% id)
   names(args)[id_idx] <- ''
   
@@ -242,67 +171,4 @@ remove_by_prefix <- function(id, args, sep = '\\.') {
   
   if (is.null(id) || 'NULL' %in% id) return(args)
   args[sort(union(id_idx, ided_idx))]
-}
-
-
-#' Indices of unevaluated aesthetics not in aes_list
-#'
-#' @param args a list of arguments which may contain unevaluated values
-#' @param expr a regular expression exclude unevaluated values with. default is
-#'   NULL and will remove all unevaluated values that match aesthetic names
-#' @param aes_list a list of aesthetic names to consider for removal
-#'
-#' @return a logical vector, with unevaluated values set as TRUE if the regex
-#'   match matches an aesthetic name from aes_list, otherwise FALSE
-#'   
-invalid_uneval_aes_match <- function(args, expr = NULL, 
-    aes_list = add_eqv_aes(.all_aesthetics)) { 
-  
-  excluded_args <- Map(function(k, v) {
-    if (is.null(expr)) m <- k
-    else m <- regmatches(k, regexpr(expr, k, perl = TRUE))
-    length(m) && is_uneval(v) && m %in% aes_list
-  }, names(args), args)
-  as.logical(unlist(excluded_args))
-}
-
-
-#' Indices of any unevaluated aesthetics with a prefix
-#'
-#' @description A prefix comes in the form 'prefix.aesthetic_name'
-#'
-#' @param args a list of arguments which may contain unevaluated values
-#' @param aes_list a list of aesthetic names to consider for removal
-#'
-#' @return a logical vector, with unevaluated values set as TRUE if aesthetic
-#'   name from aes_list, otherwise FALSE
-#'   
-named_uneval_aes <- function(args, aes_list = add_eqv_aes(.all_aesthetics)) {
-  invalid_uneval_aes_match(args, expr = '(?<=\\.)[^.]+$', aes_list)
-}
-
-
-#' Indices of any unevaluated aesthetics with no prefix
-#'
-#' @param args a list of arguments which may contain unevaluated values
-#' @param aes_list a list of aesthetic names to consider for removal
-#'
-#' @return a logical vector, with unevaluated values set as TRUE if aesthetic
-#'   name from aes_list, otherwise FALSE
-#'   
-unnamed_uneval_aes <- function(args, aes_list = add_eqv_aes(.all_aesthetics)) {
-  invalid_uneval_aes_match(args, expr = '^[^.]+$', aes_list)
-}
-
-
-#' Indices of any unevaluated aesthetics with with or without prefix
-#'
-#' @param args a list of arguments which may contain unevaluated values
-#' @param aes_list a list of aesthetic names to consider for removal
-#'
-#' @return a logical vector, with unevaluated values set as TRUE if aesthetic
-#'   name from aes_list, otherwise FALSE
-#'   
-uneval_aes <- function(args, aes_list = add_eqv_aes(.all_aesthetics)) {
-  invalid_uneval_aes_match(args, expr = '((?<=\\.)[^.]+$|^[^.]+$)', aes_list)
 }

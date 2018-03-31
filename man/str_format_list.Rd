@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.r
 \name{str_format_list}
 \alias{str_format_list}
-\title{Format a list of items as it would be in a sentance}
+\title{Format a list of items as it would be in a sentence}
 \usage{
 str_format_list(l = NULL, oxford = FALSE)
 }
@@ -16,7 +16,7 @@ the items of the input list, formatted as an articulation of a list
 in speech (e.g. 'a, b, c and d')
 }
 \description{
-Format a list of items as it would be in a sentance
+Format a list of items as it would be in a sentence
 }
 \examples{
 str_format_list(c('a', 'b', 'c'))

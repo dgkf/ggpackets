@@ -7,11 +7,9 @@
 filter_aesthetics(geom, mapping)
 }
 \arguments{
-\item{geom}{a \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-\code{\link[ggplot2]{Geom}} object}
+\item{geom}{a ggplot2 \code{\link[ggplot2]{Geom}} object}
 
-\item{mapping}{a \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-aesthetic mapping}
+\item{mapping}{a ggplot2 aesthetic mapping}
 }
 \value{
 the provided aesthetic mapping, filtered by accepted aesthetics for

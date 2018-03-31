@@ -43,6 +43,7 @@ context("Tidyeval => bquote fallback")
 test_that("ensure bquote still works if rlang isn't loaded", {
   expect_equal({
     test = 'red'
-    eval(bquote(ggpack(ggplot2::geom_point, color = .(test))))@ggcalls[[1]]$aes_params$colour
+    with(eval(bquote(ggpack(ggplot2::geom_point, color = .(test))))@ggcalls[[1]]@calldf@args, 
+      val[[name == 'colour']])
   }, 'red')
 })

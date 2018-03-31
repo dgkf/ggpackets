@@ -7,8 +7,7 @@
 flatten_aesthetics_to_group(mapping, ...)
 }
 \arguments{
-\item{mapping}{a \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-aesthetic mapping}
+\item{mapping}{a ggplot2 aesthetic mapping}
 
 \item{...}{aesthetic handles to flatten into the group aesthetic as
 interaction terms}

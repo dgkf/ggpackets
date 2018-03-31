@@ -11,15 +11,13 @@ add_eqv_aes(aes_names)
 }
 \value{
 a character vector of aesthetic names including any localized or base
-R equivalent argument names accepted by
-\href{[https://github.com/tidyverse/ggplot2}{ggplot2}.
+R equivalent argument names accepted by ggplot2.
 }
 \description{
-Many \href{[https://github.com/tidyverse/ggplot2}{ggplot2}
-\code{\link[ggplot2]{Geom}} objects will accept a number of alternative
-spellings and base R equivalent arguments as aesthetic parameters. This
-function adds those equivalent values to a character vector of aesthetic
-names.
+Many ggplot2 \code{\link[ggplot2]{Geom}} objects will accept a number of
+alternative spellings and base R equivalent arguments as aesthetic
+parameters. This function adds those equivalent values to a character vector
+of aesthetic names.
 }
 \examples{
 ggpackets:::add_eqv_aes(c('color', 'fill'))

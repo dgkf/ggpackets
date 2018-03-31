@@ -18,13 +18,16 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Function reference" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -32,6 +35,8 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -47,18 +52,22 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">ggpackets</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">ggpackets</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../articles/ggpackets.html">Get Started</a>
+  <a href="../articles/ggpackets.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -76,6 +85,9 @@
     <li>
       <a href="../articles/inspection-and-documentation.html">Inspection &amp; Documentation</a>
     </li>
+    <li>
+      <a href="../articles/miscellaneous-examples.html">Miscellaneous Examples</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -83,6 +95,7 @@
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -90,156 +103,151 @@
       
       </header>
 
-      <div class="row">
-  <div class="col-md-9">
+<div class="row">
+  <div class="contents col-md-9">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;1.0.0</small>
-      </h1>
+      <h1>Reference</h1>
     </div>
 
-    <div class="contents">
-      <table class="ref-index">
+    <table class="ref-index">
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <colgroup>
+      <col class="alias" />
+      <col class="title" />
+    </colgroup>
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-ggpack" class="hasAnchor"><a href="#section-ggpack" class="anchor"></a>ggpack</h2>
-            <p class="section-desc"><p>The ggpack function provides the foundation of ggpackets, allowing the packing of ggplot layers into a list within the ggpacket class and handling argument passing with a familiar syntax.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ggpack.html">ggpack</a></code> </p>
-          </td>
-          <td><p>Handling of argument passing to ggplots</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-argument-handling" class="hasAnchor"><a href="#section-argument-handling" class="anchor"></a>Argument Handling</h2>
-            <p class="section-desc"><p>ggpackets handles much of the difficulty of passing arguments to specific layers within a collection of ggplot layers. To accomplish this, a set of aiding functions help to handle the way in which arguments are processed.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="remove_by_prefix.html">remove_by_prefix</a></code> </p>
-          </td>
-          <td><p>Filter arguments based on a prefix id</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-the-ggpacket-class" class="hasAnchor"><a href="#section-the-ggpacket-class" class="anchor"></a>The ggpacket class</h2>
-            <p class="section-desc"><p>The ggpackets class handles the collection of ggplot layers as a list as well as provides methods for handling arithmetic with standard ggplot objects to seamlessly integrate with ggplot syntax.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ggpacket-class.html">ggpacket-class</a></code> </p>
-          </td>
-          <td><p>A class for wrapping ggplot layers.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ggpacket-addition.html">+,ggpacket,ANY-method</a></code> </p>
-          </td>
-          <td><p>Primitive methods for adding ggpackets to various ggplot objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ggpacket-indexing.html">[,ggpacket-method</a></code> </p>
-          </td>
-          <td><p>Overload [ generic to index into ggcalls list</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="show-ggpacket.html">show</a></code> </p>
-          </td>
-          <td><p>Overload show method to show ggpacket</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="names-ggpacket.html">names</a></code> </p>
-          </td>
-          <td><p>Overload names method to print ggpacket ggcall list names</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-included-ggpackets" class="hasAnchor"><a href="#section-included-ggpackets" class="anchor"></a>Included ggpackets</h2>
-            <p class="section-desc"><p>Prebuilt ggpackets for common functionality.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ggpk_decorators.html">ggpk_decorators</a></code> </p>
-          </td>
-          <td><p>Wrapper for common decorators to package</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-manipulating-ggplot-aesthetics" class="hasAnchor"><a href="#section-manipulating-ggplot-aesthetics" class="anchor"></a>Manipulating ggplot2 Aesthetics</h2>
-            <p class="section-desc"><p>ggpackets relies heavily on intercepting arguments passed through ggplot elements and handling the filtering of those arguments into the packed components. A large subset of the parameters can be aesthetic arguments to specify plot elements which require special attention and handling to ensure they are properly distributed to the packed ggplot layers.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="allowed_aesthetics.html">allowed_aesthetics</a></code> </p>
-          </td>
-          <td><p>Get Geom allowed aesthetics</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="filter_aesthetics.html">filter_aesthetics</a></code> </p>
-          </td>
-          <td><p>Filter aesthetics for Geom</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="remove_aesthetics.html">remove_aesthetics</a></code> </p>
-          </td>
-          <td><p>Remove specific aesthetics from mapping</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="flatten_aesthetics_to_group.html">flatten_aesthetics_to_group</a></code> </p>
-          </td>
-          <td><p>Flatten aesthetics into group</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="add_eqv_aes.html">add_eqv_aes</a></code> </p>
-          </td>
-          <td><p>Add equivalent aesthetics to vector</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="split_aes_from_dots.html">split_aes_from_dots</a></code> </p>
-          </td>
-          <td><p>Filter arguments into aesthetic and non-aesthetic</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="is_uneval.html">is_uneval</a></code> </p>
-          </td>
-          <td><p>Determine if an argument is an unevaluated expression</p></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
+    <tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-ggpack" class="hasAnchor"><a href="#section-ggpack" class="anchor"></a>ggpack</h2>
+          <p class="section-desc"><p>The ggpack function provides the foundation of ggpackets, allowing the packing of ggplot layers into a list within the ggpacket class and handling argument passing with a familiar syntax.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="ggpack.html">ggpack()</a></code> </p>
+        </td>
+        <td><p>Handling of argument passing to ggplots</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-argument-handling" class="hasAnchor"><a href="#section-argument-handling" class="anchor"></a>Argument Handling</h2>
+          <p class="section-desc"><p>ggpackets handles much of the difficulty of passing arguments to specific layers within a collection of ggplot layers. To accomplish this, a set of aiding functions help to handle the way in which arguments are processed.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="remove_by_prefix.html">remove_by_prefix()</a></code> </p>
+        </td>
+        <td><p>Filter arguments based on a prefix id</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-the-ggpacket-class" class="hasAnchor"><a href="#section-the-ggpacket-class" class="anchor"></a>The ggpacket class</h2>
+          <p class="section-desc"><p>The ggpackets class handles the collection of ggplot layers as a list as well as provides methods for handling arithmetic with standard ggplot objects to seamlessly integrate with ggplot syntax.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="ggpacket-class.html">ggpacket-class</a></code> </p>
+        </td>
+        <td><p>A class for wrapping ggplot layers.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="ggpacket-addition.html">`+`(<i>&lt;ggpacket&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="ggpacket-addition.html">`+`(<i>&lt;NULL&gt;</i>,<i>&lt;ggpacket&gt;</i>)</a></code> <code><a href="ggpacket-addition.html">`+`(<i>&lt;gg&gt;</i>,<i>&lt;ggpacket&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Primitive methods for adding ggpackets to various ggplot objects</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="ggpacket-indexing.html">`[`(<i>&lt;ggpacket&gt;</i>)</a></code> <code><a href="ggpacket-indexing.html">`[[`(<i>&lt;ggpacket&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Overload [ generic to index into ggcalls list</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="show-ggpacket.html">show(<i>&lt;ggpacket&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Overload show method to show ggpacket</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="names-ggpacket.html">names(<i>&lt;ggpacket&gt;</i>)</a></code> <code><a href="names-ggpacket.html">`names<-`(<i>&lt;ggpacket&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Overload names method to print ggpacket ggcall list names</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-included-ggpackets" class="hasAnchor"><a href="#section-included-ggpackets" class="anchor"></a>Included ggpackets</h2>
+          <p class="section-desc"><p>Prebuilt ggpackets for common functionality.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="ggpk_decorators.html">ggpk_decorators()</a></code> </p>
+        </td>
+        <td><p>Wrapper for common decorators to package</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-manipulating-ggplot-aesthetics" class="hasAnchor"><a href="#section-manipulating-ggplot-aesthetics" class="anchor"></a>Manipulating ggplot2 Aesthetics</h2>
+          <p class="section-desc"><p>ggpackets relies heavily on intercepting arguments passed through ggplot elements and handling the filtering of those arguments into the packed components. A large subset of the parameters can be aesthetic arguments to specify plot elements which require special attention and handling to ensure they are properly distributed to the packed ggplot layers.</p></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="allowed_aesthetics.html">allowed_aesthetics()</a></code> </p>
+        </td>
+        <td><p>Get Geom allowed aesthetics</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="filter_aesthetics.html">filter_aesthetics()</a></code> </p>
+        </td>
+        <td><p>Filter aesthetics for Geom</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="remove_aesthetics.html">remove_aesthetics()</a></code> </p>
+        </td>
+        <td><p>Remove specific aesthetics from mapping</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="flatten_aesthetics_to_group.html">flatten_aesthetics_to_group()</a></code> </p>
+        </td>
+        <td><p>Flatten aesthetics into group</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="add_eqv_aes.html">add_eqv_aes()</a></code> </p>
+        </td>
+        <td><p>Add equivalent aesthetics to vector</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="split_aes_from_dots.html">split_aes_from_dots()</a></code> </p>
+        </td>
+        <td><p>Filter arguments into aesthetic and non-aesthetic</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="is_uneval.html">is_uneval()</a></code> </p>
+        </td>
+        <td><p>Determine if an argument is an unevaluated expression</p></td>
+      </tr>
+    </tbody>
+    </table>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -260,11 +268,14 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+
