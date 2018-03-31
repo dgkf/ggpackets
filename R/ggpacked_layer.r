@@ -132,7 +132,7 @@ setMethod("+", c("gg", "ggpacked_layer"), function(e1, e2) {
   
   # flatten incoming mapping into ggplot aesthetics
   e1_mapping_calldf <- call_df(e1$mapping, 'inherited mapping')
-  calldf <- e2@calldf + e1_mapping_calldf
+  calldf <- append_calldf(e2@calldf, e1_mapping_calldf, after = 0)
   
   if (is.function(calldf@call)) e1 + do_calldf(calldf)
   else                          e1 + eval(calldf@call)

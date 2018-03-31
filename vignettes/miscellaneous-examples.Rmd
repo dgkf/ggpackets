@@ -20,6 +20,30 @@ knitr::opts_chunk$set(
 library(ggpackets)
 ```
 
+
+```{r}
+ggpk_dot_matrix <- function(width = 10, ...) {
+  ggpack(geom_point,
+    data = . %>% mutate(
+      xvar = (1:nrow(.)-1) %%  width, 
+      yvar = (1:nrow(.)-1) %/% width),
+    x = xvar, 
+    y = yvar, 
+    ...) + 
+  ggpack(theme_void) + 
+  ggpack(coord_fixed)
+}
+```
+
+```{r}
+diamonds %>% 
+  sample_frac(0.01) %>%
+  arrange(cut) %>%
+  ggplot() + 
+    aes(color = cut) + 
+    ggpk_dot_matrix(width = 30, size = 3)
+```
+
 # Tukey Ribbons
 
 ```{r}
@@ -65,51 +89,10 @@ ggpk_tukey_ribbons <- function(...) {
 ```
 
 ```{r}
-library(Hmisc)
-library(ggplot2)
-library(dplyr)
-library(lubridate)
-
-nasa <- dplyr::nasa %>% 
-  as.data.frame %>%
-  mutate(time = as_date(years(year-1970) + months(month)))
-  
-ggplot(nasa) + 
-  aes(x = time, y = temperature) + 
-  ggpk_tukey_ribbons(color = lat > 0, na.rm = TRUE)
+economics_long %>% 
+  filter(variable %in% c('pop', 'unemploy')) %>%
+  mutate(year = as.integer(format(as.Date(date, format="%Y-%m-%d"),"%Y"))) %>%
+  ggplot() + aes(x = year, y = value, color = variable) + 
+    ggpk_tukey_ribbons() +
+    scale_y_log10()
 ```
-
-
-```{r}
-ggpk_cleveland <- function(...) {
-  ggpack(geom_errorbarh,
-    stat = 'summary',
-    fun.data = function(d) c(
-      y = 0, 
-      xmin = min(d, na.rm = TRUE),
-      xmax = max(d, na.rm = TRUE)), 
-    ...,
-    height = 0) #+ 
-  
-  # ggpack(geom_point, id = 'lb', 
-  #   stat = 'summary',
-  #   fun.data = function(d) c(x = min(d, na.rm = TRUE)), 
-  #   size = 3, 
-  #   ...) + 
-  #   
-  # ggpack(geom_point, id = 'ub', 
-  #   stat = 'summary',
-  #   fun.data = function(d) c(x = max(d, na.rm = TRUE)), 
-  #   size = 3, 
-  #   ...)
-  
-  #ggpack(coord_flip)
-}
-```
-
-```{r}
-ggplot(diamonds) + 
-  aes(x = carat, y = color) + 
-  ggpk_cleveland()
-```
-
