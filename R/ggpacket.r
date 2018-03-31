@@ -146,7 +146,8 @@ setMethod("$", "ggpacket", function(x, name) {
 #' @param e2 right side argument for addition
 #' @rdname ggpacket-addition
 setMethod("+", c("ggpacket", "ANY"), function(e1, e2) {
-  e2call <- as.list(as.list(sys.call()[-1])[[2]])
+  syscall <- sys.call()
+  e2call <- as.list(as.list(syscall[-1])[[2]])
   
   if ('ggpacked_layer' %in% class(e2)) { 
     e1@ggcalls <- append(e1@ggcalls, e2)

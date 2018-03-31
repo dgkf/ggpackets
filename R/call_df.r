@@ -161,7 +161,7 @@ setMethod("show", "call_df",
           
           # pretty print argument info
           if (is_uneval(a)) {
-           out <- paste0(trimws(deparse(a)), collapse = ' ')
+           out <- paste0(gsub('^\\s+|\\s+$', '', (deparse(a))), collapse = ' ')
            if (grepl('^\\.\\..+\\.\\.$', out)) 
              out <- paste0(
                '..',
@@ -428,8 +428,8 @@ last_args <- function(args) args == '' | !duplicated(args, fromLast = TRUE)
 #'   \code{aes_list} flattened into a list stored within the mapping value
 #'   
 flatten_aes_to_mapping <- function(args, 
-                                   aes_list = add_eqv_aes(.all_aesthetics), 
-                                   filter_mapping = FALSE, envir = parent.frame()) { 
+    aes_list = add_eqv_aes(.all_aesthetics), 
+    filter_mapping = FALSE, envir = parent.frame()) { 
   
   # get 'mapping' arg position and any args position whose name in aes_list
   map_idx <- utils::tail(which(names(args) == 'mapping'), 1) %||% Inf
@@ -478,7 +478,9 @@ flatten_aes_to_mapping <- function(args,
 #'   the name of the element if one occurs before the reserved value or removed
 #'   otherwise
 #'   
-replace_reserved_aesthetic_references <- function(args, re = '^\\.\\.(.+)\\.\\.$') { 
+replace_reserved_aesthetic_references <- function(args, 
+    re = '^\\.\\.(.+)\\.\\.$') { 
+  
   argsd <- Map(deparse, args)
   Filter(Negate(is.null), Map(function(arg, argd, argn, i) { 
     if (length(m <- regmatches(argd, regexec(re, argd))[[1]])) {

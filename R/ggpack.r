@@ -55,8 +55,10 @@ ggpack <- function(.call = NULL, ..., id = NULL, dots = NULL,
   excluded_args <- setdiff(names(formals()), names(expand))
   
   # get all call-specific args
-  args <- as.list(sys.call()[-1])[-1]
-  calldf <- call_df(args, source = 'call', auto_remove_aes)
+  syscall <- sys.call()
+  args <- as.list(syscall[-1])[-1]
+  
+  calldf <- call_df(args, source = 'call', auto_remove_aes = auto_remove_aes)
   calldf <- exclude_calldf_args(calldf, excluded_args)
   
   # filter args passed as ellipses in parent frame from all ellipses arguments
