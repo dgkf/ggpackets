@@ -3,24 +3,27 @@ Title: Package multiple ggplot layers for easier portability and modularization
 Version: 1.0.0
 Authors@R: person("Doug", "Kelkhoff", email = "kelkhoff.douglas@gene.com", role = c("aut", "cre"))
 Description: Create groups of ggplot layers that can be easily migrated from
-    one plot to another, reducing redundant code and improving the ability to format
-    many plots that draw from the same source ggpk layers.
+  one plot to another, reducing redundant code and improving the ability to format
+  many plots that draw from the same source ggpk layers.
 Depends:
-    R (>= 3.1.0)
+  R (>= 3.1.0)
 LazyData: true
 License: GPL-3
 Imports:
-    methods,
-    stats,
-    utils,
-    tibble,
-    ggplot2
+  methods,
+  stats,
+  utils,
+  grDevices,
+  tibble,
+  ggplot2
 Suggests:
-    rlang,
-    crayon,
-    testthat,
-    knitr,
-    rmarkdown
+  rlang,
+  dplyr,
+  testthat,
+  knitr,
+  rmarkdown
+Enhances:
+  crayon
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

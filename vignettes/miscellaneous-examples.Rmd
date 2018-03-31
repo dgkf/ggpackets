@@ -17,9 +17,17 @@ knitr::opts_chunk$set(
   fig.height = 4,
   out.width = '600px', 
   out.height = '400px') 
+
 library(ggpackets)
 ```
 
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+
+# Dot Matrix Plots
 
 ```{r}
 ggpk_dot_matrix <- function(width = 10, ...) {
@@ -39,6 +47,7 @@ ggpk_dot_matrix <- function(width = 10, ...) {
 diamonds %>% 
   sample_frac(0.01) %>%
   arrange(cut) %>%
+  
   ggplot() + 
     aes(color = cut) + 
     ggpk_dot_matrix(width = 30, size = 3)
@@ -92,6 +101,7 @@ ggpk_tukey_ribbons <- function(...) {
 economics_long %>% 
   filter(variable %in% c('pop', 'unemploy')) %>%
   mutate(year = as.integer(format(as.Date(date, format="%Y-%m-%d"),"%Y"))) %>%
+  
   ggplot() + aes(x = year, y = value, color = variable) + 
     ggpk_tukey_ribbons() +
     scale_y_log10()

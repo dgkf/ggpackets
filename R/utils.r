@@ -54,17 +54,18 @@ tsnames <- function(l, fill = NA) {
 #' @importFrom grDevices rgb
 #'
 safecrayon <- function(fname, ...) { 
-  if (require(crayon, quietly = TRUE)) { 
+  if (requireNamespace('crayon', quietly = TRUE)) { 
     if (fname %in% getNamespaceExports('crayon')) { 
       getExportedValue('crayon', fname)(...)
     } else { 
+      make_style <- getExportedValue('crayon', 'make_style')
       switch(fname,
-        darkblue = crayon::make_style(grDevices::rgb(0/8, 0/8, 3/8))(...),
-        midred =   crayon::make_style(grDevices::rgb(5/8, 0/8, 0/8))(...),
-        grey2 =    crayon::make_style(grDevices::rgb(2/8, 2/8, 2/8))(...),
-        grey4 =    crayon::make_style(grDevices::rgb(4/8, 4/8, 4/8))(...),
-        grey6 =    crayon::make_style(grDevices::rgb(6/8, 6/8, 6/8))(...),
-        grey7 =    crayon::make_style(grDevices::rgb(7/8, 7/8, 7/8))(...),
+        darkblue = make_style(grDevices::rgb(0/8, 0/8, 3/8))(...),
+        midred =   make_style(grDevices::rgb(5/8, 0/8, 0/8))(...),
+        grey2 =    make_style(grDevices::rgb(2/8, 2/8, 2/8))(...),
+        grey4 =    make_style(grDevices::rgb(4/8, 4/8, 4/8))(...),
+        grey6 =    make_style(grDevices::rgb(6/8, 6/8, 6/8))(...),
+        grey7 =    make_style(grDevices::rgb(7/8, 7/8, 7/8))(...),
         paste(...))
     }
   } else { 
@@ -80,7 +81,8 @@ safecrayon <- function(fname, ...) {
 #' @inheritParams base::nchar
 #' 
 safenchar <- function(...) {
-  if (require(crayon, quietly = TRUE)) crayon::col_nchar(...)
+  if (requireNamespace('crayon', quietly = TRUE)) 
+    getExportedValue('crayon', 'col_nchar')(...)
   else nchar(...)
 }
 
@@ -92,6 +94,7 @@ safenchar <- function(...) {
 #' @inheritParams base::substring
 #'
 safesubstr <- function(...) {
-  if (require(crayon, quietly = TRUE)) crayon::col_substr(...)
+  if (requireNamespace('crayon', quietly = TRUE)) 
+    getExportedValue('crayon', 'col_substr')(...)
   else substring(...)
 }

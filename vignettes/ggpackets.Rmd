@@ -37,7 +37,6 @@ and the counts in each bar labelled at the base of the bar. We'll start by
 building this plot using standard `ggplot`.
 
 ```{r libraries, message = FALSE, warning = FALSE}
-library(Hmisc) # for ggplot stat summary functions
 library(ggplot2)
 ```
 
