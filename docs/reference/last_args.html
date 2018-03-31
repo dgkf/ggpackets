@@ -19,13 +19,21 @@ named item — last_args • ggpackets</title>
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Filter argument list for only unnamed items and the last instance of each
+named item — last_args" />
+
+<meta property="og:description" content="Filter argument list for only unnamed items and the last instance of each
+named item" />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -33,6 +41,8 @@ named item — last_args • ggpackets</title>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -48,18 +58,22 @@ named item — last_args • ggpackets</title>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">ggpackets</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">ggpackets</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../articles/ggpackets.html">Get Started</a>
+  <a href="../articles/ggpackets.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -77,6 +91,9 @@ named item — last_args • ggpackets</title>
     <li>
       <a href="../articles/inspection-and-documentation.html">Inspection &amp; Documentation</a>
     </li>
+    <li>
+      <a href="../articles/miscellaneous-examples.html">Miscellaneous Examples</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -84,6 +101,7 @@ named item — last_args • ggpackets</title>
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -91,11 +109,12 @@ named item — last_args • ggpackets</title>
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Filter argument list for only unnamed items and the last instance of each
 named item</h1>
+    
     </div>
 
     
@@ -103,43 +122,21 @@ named item</h1>
 named item</p>
     
 
-    <pre class="usage"><span class='fu'>last_args</span>(<span class='no'>args</span>, <span class='kw'>sources</span> <span class='kw'>=</span> <span class='fu'>list</span>(), <span class='kw'>warn</span> <span class='kw'>=</span> <span class='fu'>c</span>(), <span class='kw'>desc</span> <span class='kw'>=</span> <span class='fu'>c</span>(), <span class='kw'>call</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>last_args</span>(<span class='no'>args</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>args</th>
-      <td><p>a list of arguments to filter</p></td>
-    </tr>
-    <tr>
-      <th>sources</th>
-      <td><p>an optional list of names used to indicate the origin of each
-of the arguments</p></td>
-    </tr>
-    <tr>
-      <th>warn</th>
-      <td><p>an optional character vector of sources for which a warning
-should be produced, should an argument from that source be overwritten</p></td>
-    </tr>
-    <tr>
-      <th>desc</th>
-      <td><p>an optional named character vector of more verbose descriptions
-to use for each of the sources. (e.g. <code>c("..." = "ellipses
-  arguments")</code>)</p></td>
-    </tr>
-    <tr>
-      <th>call</th>
-      <td><p>an optional object of type call to include with the warning if a
-statment associated with the arguments is desired to be included with the
-warning message.</p></td>
+      <td><p>a character vector of values</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a named list of arguments with duplicated names omitted, leaving only
-the last occurance of each named value</p>
+    <p>a filtered vector of values with only the last instance of non-empty
+strings as well as any empty strings ('') remaining</p>
     
 
   </div>
@@ -160,11 +157,14 @@ the last occurance of each named value</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

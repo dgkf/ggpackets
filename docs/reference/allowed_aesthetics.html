@@ -18,13 +18,23 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Get Geom allowed aesthetics — allowed_aesthetics" />
+
+<meta property="og:description" content="All ggplot2 Geom objects have a set of allowable
+aesthetics that are used for generating the layer of the plot. This function
+returns those aesthetics, as well as any alternative localizations and base R
+equivalent names which can all be used as inputs to specify aesthetics to a
+ggplot object." />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -32,6 +42,8 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
 
 
   </head>
@@ -47,18 +59,22 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">ggpackets</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">ggpackets</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="..//index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="../articles/ggpackets.html">Get Started</a>
+  <a href="../articles/ggpackets.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -76,6 +92,9 @@
     <li>
       <a href="../articles/inspection-and-documentation.html">Inspection &amp; Documentation</a>
     </li>
+    <li>
+      <a href="../articles/miscellaneous-examples.html">Miscellaneous Examples</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -83,6 +102,7 @@
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -90,30 +110,29 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get Geom allowed aesthetics</h1>
+    
     </div>
 
     
-    <p>All <a href='[https://github.com/tidyverse/ggplot2'>ggplot2</a>
-<code><a href='http://www.rdocumentation.org/packages/ggplot2/topics/ggplot2-ggproto'>Geom</a></code> objects have a set of allowable aesthetics that
-are used for generating the layer of the plot. This function returns those
-aesthetics, as well as any alternative localizations and base R equivalent
-names which can all be used as inputs to specify aesthetics to a ggplot
-object.</p>
+    <p>All ggplot2 <code><a href='http://www.rdocumentation.org/packages/ggplot2/topics/ggplot2-ggproto'>Geom</a></code> objects have a set of allowable
+aesthetics that are used for generating the layer of the plot. This function
+returns those aesthetics, as well as any alternative localizations and base R
+equivalent names which can all be used as inputs to specify aesthetics to a
+ggplot object.</p>
     
 
     <pre class="usage"><span class='fu'>allowed_aesthetics</span>(<span class='kw'>geom</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>geom</th>
-      <td><p>a <a href='[https://github.com/tidyverse/ggplot2'>ggplot2</a>
-<code><a href='http://www.rdocumentation.org/packages/ggplot2/topics/ggplot2-ggproto'>Geom</a></code> object or NULL</p></td>
+      <td><p>a ggplot2 <code><a href='http://www.rdocumentation.org/packages/ggplot2/topics/ggplot2-ggproto'>Geom</a></code> object or NULL</p></td>
     </tr>
     </table>
     
@@ -121,17 +140,15 @@ object.</p>
 
     <p>a character vector of the names of aesthetics permitted by this
 geometry object (including alternative localizations of names and base R
-equivalent names also accepted by
-<a href='[https://github.com/tidyverse/ggplot2'>ggplot2</a>). If <code>geom</code> is
-<code>NULL</code>, returns all of
-<a href='[https://github.com/tidyverse/ggplot2'>ggplot2</a>)'s default allowed
-aesthetics.</p>
+equivalent names also accepted by ggplot2. If <code>geom</code> is
+<code>NULL</code>, returns all of ggplot2's default allowed
+aesthetics.)</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='filter_aesthetics.html'>filter_aesthetics()</a></code>, <code><a href='remove_aesthetics.html'>remove_aesthetics()</a></code>,
+    <div class='dont-index'><p><code><a href='filter_aesthetics.html'>filter_aesthetics()</a></code>, <code><a href='remove_aesthetics.html'>remove_aesthetics()</a></code>,
 <code><a href='flatten_aesthetics_to_group.html'>flatten_aesthetics_to_group()</a></code>, <code><a href='add_eqv_aes.html'>add_eqv_aes()</a></code>, <code><a href='split_aes_from_dots.html'>split_aes_from_dots()</a></code>,
-<code><a href='is_uneval.html'>is_uneval()</a></code></p>
+<code><a href='is_uneval.html'>is_uneval()</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -162,11 +179,14 @@ aesthetics.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

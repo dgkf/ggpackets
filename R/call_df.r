@@ -167,7 +167,7 @@ setMethod("show", "call_df",
                '..',
                safecrayon('cyan', gsub('^\\.\\.(.+)\\.\\.$', '\\1', out)),
                '..',
-               safecrayon('cyan', ' ^')) # ' ⤴'
+               safecrayon('cyan', ' ^'))
           } else 
            out <- deparse(a)
           
