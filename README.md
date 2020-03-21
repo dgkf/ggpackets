@@ -83,22 +83,44 @@ ggplot(diamonds, aes(x = cut, y = price, color = carat)) +
 
 ## Handle custom arguments & parameter propegation
 
-Parameters flow through a hierarchy of packets,
+In addition to simply wrapping multiple `ggplot2` layers, `ggpackets`
+can streamline a number of complicated plotting scenarios such as
+passing arguments to sets of layers, setting default argument values
+with scoped overrides, routing aesthetic mappings to be reused within
+specific layers for other aesthetics and scoping data usage over a set
+of layers.
 
 ``` r
 ggpk_labelled_heatmap <- function(...) {
   ggpacket(...) %+%
-      geom_tile(.id = 'tile', color = NA, ...) %+% 
-      geom_text(.id = 'text1', color = 'white', vjust = -0.3, 
-        fontface = 'bold', ...) %+%
-      geom_text(.id = 'text2', aes(label = sprintf("(%.1f)", ..fill..)), 
-        color = 'white', vjust = 1.1, ...) %+%
-      theme_void()
+    geom_tile(.id = 'tile', color = NA, ...) %+% 
+    geom_text(.id = 'text1', color = 'white', vjust = -0.3, 
+      fontface = 'bold', ...) %+%
+    geom_text(.id = 'text2', aes(label = sprintf("(%.1f)", ..fill..)), 
+      color = 'white', vjust = 1.1, ...) %+%
+    theme_void()
 } 
 ```
 
-We can specify an aesthetic for a subset of the layers using the layer
-`id`.
+In this function we make use of a number of these specialized behaviors.
+
+1.  `.id` parameters are set to tag specific layers with an identifier,
+    which can be used to prefix arguments to route them to a subset of
+    the `ggpacket` layers.
+2.  Ellipsis are first passed to `ggpacket(...)`, which will pass them
+    on as default values to all `ggpacket` layers.
+3.  Ellipsis are also passed at the tail end of each layer call,
+    allowing arguments to mask default values. The placement of the
+    ellipsis determines whether arguments will override or be overridden
+    by the existing parameters. After expanding the ellipsis, the last
+    instance of each argument is used to build the call.
+4.  Aesthetics are rerouted using the specialized `..<aesthetic>..`
+    syntax.
+5.  We use `%+%` instead of the commonly-used `+` to add layers
+    together, which allows `ggpackets` to accept non-standard arguments
+    before ggplot sends us warnings about them
+
+<!-- end list -->
 
 ``` r
 ggplot(as.data.frame(OrchardSprays)) + 
