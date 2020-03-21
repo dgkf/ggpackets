@@ -42,15 +42,22 @@ gg_plus_ggpacket <- function(e1, e2) {
     ggcallargs <- lapply(ggcallargs, rlang::eval_tidy)
     ggpk_i <- with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
 
-    # apply data and mapping scoping
-    ggpk_i$data <- update_data(e1$data, e2@data, ggpk_i$data)
-    if (!isFALSE(ggpk_i$inherit.aes)) {
-      ggpk_i$mapping <- update_mapping(ggpk_mapping, ggpk_i$mapping)
-      ggpk_i$inherit.aes <- FALSE
+    # handle data and aesthetic propegation for geometry layers
+    if (inherits(ggpk_i, "ggproto") && "data" %in% names(formals(ggcallf))) {
+      # apply data scoping
+      ggpk_i$data <- update_data(e1$data, e2@data, ggpk_i$data)
     }
 
-    # unset any aesthetics that should be "reset"
-    ggpk_i$mapping <- handle_reset_mapping(ggpk_i$mapping)
+    if (inherits(ggpk_i, "ggproto") && "mapping" %in% names(formals(ggcallf))) {
+      # apply mapping scoping 
+      if (!isFALSE(ggpk_i$inherit.aes)) {
+        ggpk_i$mapping <- update_mapping(ggpk_mapping, ggpk_i$mapping)
+        ggpk_i$inherit.aes <- FALSE
+      }
+
+      # unset any aesthetics that should be "reset"
+      ggpk_i$mapping <- handle_reset_mapping(ggpk_i$mapping)
+    }
 
     # add to gg plot construction
     gg + ggpk_i

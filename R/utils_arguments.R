@@ -13,9 +13,12 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
 
 filter_by_ggcall_id <- function(args, id, ids) {
   names(args) <- gsub(sprintf("^%s\\.(.+)", id), "\\1", names(args))
-  argmatches <- as.matrix(apply(as.matrix(ids), 1L, function(id, names) {
-    grepl(sprintf("^%s\\..+", id), names)
-  }, names(args)))
+  argmatches <- matrix(apply(as.matrix(ids), 1L, function(id, names) {
+      grepl(sprintf("^%s\\..+", id), names)
+    }, names(args)), 
+    nrow = length(args), 
+    ncol = length(ids), 
+    dimnames = list(names(args), ids))
   args[!apply(argmatches, 1L, any)]
 }
 
