@@ -38,6 +38,7 @@ gg_plus_ggpacket <- function(e1, e2) {
 
     # build gg call
     ggcallf <- rlang::eval_tidy(ggcall[[1]])
+    # TODO: ensure e2@dots positional args come after ggcall positional args
     ggcallargs <- append(e2@dots, as.list(ggcall)[-1])
     ggcallargs <- filter_by_ggcall_ids(ggcallargs, ggcall_ids, all_ids)
     ggcallargs <- deduplicate_params(ggcallargs)

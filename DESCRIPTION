@@ -10,6 +10,7 @@ Depends:
 Imports:
   utils,
   ggplot2,
+  tibble,
   rlang
 LazyData: true
 License: GPL-3
