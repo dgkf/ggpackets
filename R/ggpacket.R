@@ -19,16 +19,18 @@ setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
 })
 
 
+
 #' Add a gg object to a ggpacket object
 #'
 #' @importFrom rlang eval_tidy
 #'
 gg_plus_ggpacket <- function(e1, e2) {
   e2@data <- update_data(e1$data, e2@data)
+  all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))
 
   Reduce(function(gg, ggcall) {
-    ggcallid <- names(ggcall)
     ggcall <- ggcall[[1]]
+    ggcall_ids <- attr(ggcall, "ids")
 
     # apply substitutions
     ggpk_mapping <- update_mapping(e1$mapping, e2@mapping)
@@ -37,7 +39,7 @@ gg_plus_ggpacket <- function(e1, e2) {
     # build gg call
     ggcallf <- rlang::eval_tidy(ggcall[[1]])
     ggcallargs <- append(e2@dots, as.list(ggcall)[-1])
-    ggcallargs <- filter_by_ggcall_id(ggcallargs, ggcallid, names(e2@ggcalls))
+    ggcallargs <- filter_by_ggcall_ids(ggcallargs, ggcall_ids, all_ids)
     ggcallargs <- deduplicate_params(ggcallargs)
     ggcallargs <- lapply(ggcallargs, rlang::eval_tidy)
     ggpk_i <- with_ignore_unknown_params(do.call(ggcallf, ggcallargs))

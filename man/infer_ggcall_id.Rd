@@ -2,10 +2,10 @@
 % Please edit documentation in R/ggcall.R
 \name{infer_ggcall_id}
 \alias{infer_ggcall_id}
-\title{Infer a ggpacket layer id from the call object}
+\title{convert ggplot geom layers to friendly names}
 \usage{
-infer_ggcall_id(expr)
+infer_ggcall_id(x)
 }
 \description{
-Infer a ggpacket layer id from the call object
+convert ggplot geom layers to friendly names
 }

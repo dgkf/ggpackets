@@ -11,14 +11,20 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
   match.call(fobj, as.call(append(f, fargs)), envir = envir)
 }
 
-filter_by_ggcall_id <- function(args, id, ids) {
-  names(args) <- gsub(sprintf("^%s\\.(.+)", id), "\\1", names(args))
-  argmatches <- matrix(apply(as.matrix(ids), 1L, function(id, names) {
-      grepl(sprintf("^%s\\..+", id), names)
-    }, names(args)), 
+filter_by_ggcall_ids <- function(args, call_ids, all_ids) {
+  names(args) <- gsub(
+    sprintf("^(%s)\\.(.+)", 
+    paste0(call_ids, collapse = "|")), "\\2", 
+    names(args))
+  
+  argmatches <- matrix(
+    apply(as.matrix(all_ids), 1L, function(id, argnames) {
+        grepl(sprintf("^%s\\..+", id), argnames)
+      }, names(args)), 
     nrow = length(args), 
-    ncol = length(ids), 
-    dimnames = list(names(args), ids))
+    ncol = length(all_ids), 
+    dimnames = list(names(args), all_ids))
+
   args[!apply(argmatches, 1L, any)]
 }
 
