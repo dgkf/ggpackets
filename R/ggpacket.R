@@ -196,11 +196,24 @@ update_mapping <- function(...) {
 
 
 #' Reduce data parameters, iteratively applying functions or masking datasets
-update_data <- function(...) {
-  # TODO: handle function application
-  Reduce(function(d1, d2) {
-    d <- if (!is.null(d1) && (is.null(d2) || inherits(d2, "waiver"))) d1 else d2
-    if (inherits(d, "waiver")) NULL else d
-  }, list(...))
+update_data <- function(d1, d2, ...) {
+  UseMethod("update_data", d2)
 }
 
+update_data.default <- function(d1, d2, ...) {
+  d <- update_data(d2, ...)
+  if (inherits(d, "waiver")) NULL else d
+}
+
+update_data.NULL <- function(d1, d2, ...) {
+  d <- update_data(d1, ...)
+  if (inherits(d, "waiver")) NULL else d
+}
+
+update_data.waiver <- update_data.NULL
+
+update_data.function <- function(d1, d2, ...) {
+  d <- if (is.function(d1)) update_data(function(...) d2(d1(...)), ...)
+  else update_data(d2(d1), ...)
+  if (inherits(d, "waiver")) NULL else d
+}
