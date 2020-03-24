@@ -4,7 +4,7 @@
 \alias{update_data}
 \title{Reduce data parameters, iteratively applying functions or masking datasets}
 \usage{
-update_data(...)
+update_data(d1, d2, ...)
 }
 \description{
 Reduce data parameters, iteratively applying functions or masking datasets

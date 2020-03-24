@@ -197,6 +197,7 @@ update_mapping <- function(...) {
 
 #' Reduce data parameters, iteratively applying functions or masking datasets
 update_data <- function(d1, d2, ...) {
+  if (missing(d2)) return(d1)
   UseMethod("update_data", d2)
 }
 

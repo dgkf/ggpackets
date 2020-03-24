@@ -1,14 +1,12 @@
-# ggpacket() %+% geom_bar(test = x + 7, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3, test = 3) + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar() + geom_bar()
-
-
+#' @importFrom ggplot2 ggplot ggplot_build
 #' @export
 setMethod("show", "ggpacket", function(object) {
-  ggbuilt <- tryCatch(
+  ggout <<- tryCatch(
     ggplot2::ggplot_build(ggplot2::ggplot() + object), 
-    error = function(e) NULL)
-  
-  if (length(ggbuilt$data) && nrow(ggbuilt$data[[1]])) {
-    show(ggbuilt)
+    error = function(e) e)
+
+  if (!inherits(ggout, "error") && length(ggout$data)) {
+    show(ggplot2::ggplot() + object)
     return(invisible(object))
   }
 
