@@ -5,7 +5,9 @@ setMethod("show", "ggpacket", function(object) {
     ggplot2::ggplot_build(ggplot2::ggplot() + object), 
     error = function(e) e)
 
-  if (!inherits(ggout, "error") && length(ggout$data)) {
+  
+
+  if (!inherits(ggout, "error") && length(ggout$data) && nrow(ggout$data[[1]])) {
     show(ggplot2::ggplot() + object)
     return(invisible(object))
   }
@@ -143,6 +145,7 @@ format_ggpacket_ggcall_arg <- function(x,
 format_ggpacket_ggcall_arg.quosure <- function(x, 
     width = getOption("width", 80) * 0.9) {
   xsq <- rlang::quo_squash(x)
+  if (is.atomic(xsq)) return(deparse(xsq))
   tryCatch(format(xsq), error = function(e) as.character(xsq))
 }
 

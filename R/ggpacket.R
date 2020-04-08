@@ -28,12 +28,14 @@ gg_plus_ggpacket <- function(e1, e2) {
   e2@data <- update_data(e1$data, e2@data)
   all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))
 
+  # aesthetic mapping for ggpacket scope
+  ggpk_mapping <- update_mapping(e1$mapping, e2@mapping)
+
   Reduce(function(gg, ggcall) {
     ggcall <- ggcall[[1]]
     ggcall_ids <- attr(ggcall, "ids")
 
-    # apply substitutions
-    ggpk_mapping <- update_mapping(e1$mapping, e2@mapping)
+    # apply substitutions for ..dot.. names
     ggcall <- substitute_ggcall_dot_aes(ggpk_mapping, ggcall)
 
     # build gg call
