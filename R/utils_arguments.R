@@ -28,6 +28,16 @@ filter_by_ggcall_ids <- function(args, call_ids, all_ids) {
   args[!apply(argmatches, 1L, any)]
 }
 
+smart_swap_mapping_data <- function(args) {
+  if ("mapping" %in% names(args) && !inherits(args$mapping, "uneval")) {
+    arg_mapping_in <- args$mapping
+    args$mapping <- args$data
+    args$data <- arg_mapping_in
+  }
+
+  args
+}
+
 deduplicate_params <- function(args) {
   args[!duplicated(names(args), fromLast = TRUE)]
 }

@@ -17,21 +17,25 @@ knitr::opts_chunk$set(
   fig.height = 4,
   out.width = '600px', 
   out.height = '400px') 
+
+library(ggplot2)
 library(ggpackets)
 ```
 
 # Overview
 
-`ggpackets` is most powerful when it's being used to build template functions. 
-By using it as a framework for packaging components of a ggplot into a single 
+`ggpackets` is most powerful when it's being used to build template functions.
+By using it as a framework for packaging components of a ggplot into a single
 object, it provides a simple framework for constructing full featured ggplot
 wrappers. Most importantly, this will handle a wealth of ggplot-naitive
-parameters, exposing complete control over the components of a plot with minimal
-added syntax. That's not to say there is no work to be done - to elegantly
-handle parameters intuitively and with minimal syntactic burden on the end user,
-there might be some amount of argument handling in order to satisfy the ideal
-user interface. The goal is to allow the programmer to focus on building around
-the usability of their function instead of the nuances of constructing plots and handling interactivity with the extensible ggplot ecosystem.
+parameters, exposing complete control over the components of a plot with
+minimal added syntax. That's not to say there is no work to be done - to
+elegantly handle parameters intuitively and with minimal syntactic burden on
+the end user, there might be some amount of argument handling in order to
+satisfy the ideal user interface. The goal is to allow the programmer to focus
+on building around the usability of their function instead of the nuances of
+constructing plots and handling interactivity with the extensible ggplot
+ecosystem.
 
 # Composing a template
 
@@ -40,10 +44,12 @@ components from `ggplot2`. Let's get that loaded.
 
 ```{r libraries, message = FALSE, warning = FALSE}
 library(ggplot2)
+library(ggpackets)
 ```
 
-To build our first template, we'll simply add a few layers to a `ggpacket` 
-object. We'll specify some aesthetic parameters - the size the line layer (`geom_line()`) and the point layer (`geom_point()`).
+To build our first template, we'll simply add a few layers to a `ggpacket`
+object. We'll specify some aesthetic parameters - the size the line layer
+(`geom_line()`) and the point layer (`geom_point()`).
 
 ```{r simple_ggpacket}
 ggpk_my_template <- ggpacket() + 
@@ -54,7 +60,7 @@ ggpk_my_template <- ggpacket() +
 ```{r simple_ggpacket_output}
 ggplot(Loblolly) + 
   aes(x = age, y = height, color = Seed) + 
-  ggpk_my_template + 
+  ggpk_my_template() + 
   ggtitle('Growth of Loblolly Pines')
 ```
 
@@ -75,15 +81,20 @@ paramaters passed to our function.
 
 ```{r function_ggpacket}
 ggpk_my_template <- function(...) {
-  ggpack(geom_line, size = 1, ...) +
-  ggpack(geom_point, size = 3, ...)
+  ggpacket(...) %+%
+    geom_line(size = 1, ...) %+%
+    geom_point(size = 3, ..., alpha = 1)
 }
 ```
 
 ```{r function_ggpacket_output}
 ggplot(Loblolly) + 
   aes(x = age, y = height) + 
-  ggpk_my_template(stat = 'summary', color = age, fun.data = mean_se, size = 5, alpha = 0.5) + 
+  ggpk_my_template(aes(color = age), 
+    stat = 'summary', 
+    fun.data = mean_se, 
+    size = 10, 
+    alpha = 0.5) + 
   ggtitle('Average Growth of Loblolly Pines')
 ```
 
@@ -104,7 +115,7 @@ export from a package you're making, it's probably worth writing up some good
 documentation about what parameters you expect people to use.
 
 ```{r function_ggpacket_standalone_output}
-ggpk_my_template(data = Loblolly, x = age, y = height, color = Seed)
+ggpk_my_template(Loblolly, aes(x = age, y = height, color = Seed))
 ```
 
 
@@ -128,8 +139,9 @@ others.
 
 ```{r granular_ggpacket}
 ggpk_my_template <- function(...) {
-  ggpack(geom_line, id = 'line', size = 1, ...) + 
-  ggpack(geom_point, id = 'point', size = 3, ...)
+  ggpacket(...) %+%
+    geom_line(.id = 'line', size = 1, ...) %+% 
+    geom_point(.id = 'point', size = 3, ...)
 }
 ```
 
@@ -145,8 +157,9 @@ different prefixes to capture arguments for a particular layer.
 
 ```{r granular_ggpacket2}
 ggpk_my_template <- function(...) {
-  ggpack(geom_line, id = c('all', 'line'), size = 1, ...) + 
-  ggpack(geom_point, id = c('all', 'point'), size = 3, ...)
+  ggpacket(...) %+%
+    geom_line(.id = c('all', 'line'), size = 1, ...) %+% 
+    geom_point(.id = c('all', 'point'), size = 3, ...)
 }
 ```
 

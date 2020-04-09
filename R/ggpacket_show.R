@@ -5,19 +5,28 @@ setMethod("show", "ggpacket", function(object) {
     ggplot2::ggplot_build(ggplot2::ggplot() + object), 
     error = function(e) e)
 
-  
-
   if (!inherits(ggout, "error") && length(ggout$data) && nrow(ggout$data[[1]])) {
     show(ggplot2::ggplot() + object)
-    return(invisible(object))
+  } else {
+    print(object)
   }
 
-  width <- getOption("width", 80) - 3L
-  data_strs <- format_ggpacket_data(object@data, width)
-  aes_strs <- format_ggpacket_mapping(object@mapping, width)
-  layers_strs <- format_ggpacket_ggcalls(object@ggcalls)
 
-  cat(sprintf(multistr("
+})
+
+#' @export
+print.ggpacket <- function(x, ...) {
+  cat(format(x, ...))
+  invisible(x)
+}
+
+format.ggpacket <- function(x, ...) {
+  width <- getOption("width", 80) - 3L
+  data_strs <- format_ggpacket_data(x@data, width)
+  aes_strs <- format_ggpacket_mapping(x@mapping, width)
+  layers_strs <- format_ggpacket_ggcalls(x@ggcalls)
+  
+  sprintf(multistr("
     <ggpacket>
     Data: 
     %s 
@@ -29,10 +38,8 @@ setMethod("show", "ggpacket", function(object) {
     "),
     paste0("  ", data_strs, collapse = "\n"),
     paste0("  ", aes_strs, collapse = "\n"),
-    paste0("  ", layers_strs, collapse = "\n")))
-
-  invisible(object)
-})
+    paste0("  ", layers_strs, collapse = "\n"))
+}
 
 number_strings <- function(strs, width = getOption("width", 80) * 0.9) {
   sprintf("%s[%d] %s",

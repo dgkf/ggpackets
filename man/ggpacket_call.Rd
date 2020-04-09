@@ -4,17 +4,17 @@
 \alias{ggpacket_call}
 \title{The function used when a \code{ggpacket} is called as a function}
 \usage{
-ggpacket_call(data = NULL, mapping = NULL, ...)
+ggpacket_call(mapping = NULL, data = NULL, ...)
 }
 \arguments{
-\item{data}{The data argument to use for all layers within the
-\code{ggpacket}}
-
 \item{mapping}{The aesthetic mapping to use as a basis for all layers within
 the \code{ggpacket}. Layer-specific mappings will update the value of the
 mapping, and assigning \code{..reset..} to any aesthetic field will return
 the propegated aesthetic mapping to a default, unmapped state for that
 layer.}
+
+\item{data}{The data argument to use for all layers within the
+\code{ggpacket}}
 
 \item{...}{additional arguments passed to all bundled \code{ggplot} layers,
 and will be overwritten by layer-specific arguments if provided.}

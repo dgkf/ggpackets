@@ -45,6 +45,7 @@ gg_plus_ggpacket <- function(e1, e2) {
     ggcallargs <- filter_by_ggcall_ids(ggcallargs, ggcall_ids, all_ids)
     ggcallargs <- deduplicate_params(ggcallargs)
     ggcallargs <- lapply(ggcallargs, rlang::eval_tidy)
+    ggcallargs <- smart_swap_mapping_data(ggcallargs)
     ggpk_i <- with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
 
     # handle data and aesthetic propegation for geometry layers
@@ -155,12 +156,13 @@ ggpacket <- function(...) {
 #' @importFrom rlang enquos
 #' @importFrom ggplot2 standardise_aes_names
 #' 
-ggpacket_call <- function(data = NULL, mapping = NULL, ...) {
+ggpacket_call <- function(mapping = NULL, data = NULL, ...) {
   calling_ggpk <- self()
 
-  if (inherits(data, "uneval")) {
+  if (!inherits(mapping, "uneval")) {
+    mapping_in <- mapping
     mapping <- data
-    data <- NULL
+    data <- mapping_in
   }
 
   dots <- as.list(rlang::enquos(...))
