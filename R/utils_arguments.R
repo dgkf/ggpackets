@@ -5,10 +5,11 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
   fargs <- as.list(expr)[-1]
   dots <- eval(quote(substitute(...())), envir = envir)
   dots_idx <- utils::tail(which(fargs == quote(...)), 1)
-  if (!length(dots_idx)) return(expr)
-  fargs <- append(fargs, dots, after = dots_idx)
-  fargs <- fargs[fargs != quote(...)]
-  match.call(fobj, as.call(append(f, fargs)), envir = envir)
+  if (length(dots_idx)) {
+    fargs <- append(fargs, dots, after = dots_idx)
+    fargs <- fargs[fargs != quote(...)]
+  }
+  match.call(fobj, as.call(append(f, fargs)), expand.dots = TRUE, envir = envir)
 }
 
 filter_by_ggcall_ids <- function(args, call_ids, all_ids) {

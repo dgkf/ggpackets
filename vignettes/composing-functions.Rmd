@@ -187,8 +187,9 @@ declared before the parameters passed in by the user, whereas the second has
 
 ```{r parameters_ggpacket}
 ggpk_my_template <- function(...) {
-  ggpack(geom_line, id = 'line', size = 3, ...) + 
-  ggpack(geom_point, id = 'point', ..., size = 3)
+  ggpacket(...) %+%
+    geom_line(.id = 'line', size = 3, ...) %+% 
+    geom_point(.id = 'point', ..., size = 3)
 }
 ```
 

@@ -32,7 +32,6 @@ gg_plus_ggpacket <- function(e1, e2) {
   ggpk_mapping <- update_mapping(e1$mapping, e2@mapping)
 
   Reduce(function(gg, ggcall) {
-    ggcall <- ggcall[[1]]
     ggcall_ids <- attr(ggcall, "ids")
 
     # apply substitutions for ..dot.. names
@@ -68,7 +67,7 @@ gg_plus_ggpacket <- function(e1, e2) {
     # add to gg plot construction
     gg + ggpk_i
 
-  }, lapply(seq_along(e2@ggcalls), function(i) e2@ggcalls[i]), init = e1)
+  }, e2@ggcalls, init = e1)
 }
 
 
