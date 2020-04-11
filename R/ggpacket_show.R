@@ -38,7 +38,9 @@ format.ggpacket <- function(x, ...) {
     paste0("  ", layers_strs, collapse = "\n"))
 }
 
-number_strings <- function(strs, width = getOption("width", 80) * 0.9, wrap = FALSE, ...) {
+number_strings <- function(strs, width = getOption("width", 80) * 0.9, 
+    wrap = FALSE, ...) {
+
   if (!length(strs)) return(strs)
   nchars <- nchar(length(strs)) + 2 + 1
 
@@ -118,9 +120,7 @@ format_ggpacket_ggcalls <- function(x,
 format_ggpacket_ggcalls.default <- function(x,
     width = getOption("width", 80) * 0.9) {
   number_strings(
-    vapply(x, 
-      function(...) format_ggpacket_ggcall(...), 
-      character(1L)), 
+    vapply(x, function(...) format_ggpacket_ggcall(...), character(1L)), 
     width = width - nchar(length(x)) - 2, 
     wrap = TRUE, 
     exdent = 2L)
@@ -135,7 +135,10 @@ format_ggpacket_ggcall.default <- function(x,
     width = getOption("width", 80) * 0.9) {
 
   if (!grepl("\\w", rlang::quo_get_expr(x[[1]])))
-    return(format(as.call(lapply(x, rlang::quo_get_expr))))
+    return(paste(
+      gsub("(^\\s*|\\s*$)", "", 
+        format(as.call(lapply(x, rlang::quo_get_expr)))), 
+      collapse = " "))
 
   non_breaking_space <- "\u00A0"
   id_str <- if (length(attr(x, "ids")))
@@ -147,10 +150,9 @@ format_ggpacket_ggcall.default <- function(x,
   sprintf("%s%s(%s)\n", 
     id_str,
     args[[1]], 
-    paste(sprintf("%s%s=%s%s", 
-        names(args[-1]), 
-        non_breaking_space,
-        non_breaking_space,
+    paste(sprintf("%s%s", 
+        ifelse(names(args[-1]) == "", "", 
+          paste0(names(args[-1]), non_breaking_space, "=", non_breaking_space)), 
         args[-1]), 
       collapse = ", "))
 }

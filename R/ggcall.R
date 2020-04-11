@@ -11,7 +11,6 @@ as_gg_call <- function(x, which = -3L) {
   xids <- c()
   if (is.call(xexpr)) {
     xexpr <- expand_dots(xexpr, parent.frame(-which))
-    print(xexpr)
     xcall <- do.call(rlang::quos, as.list(xexpr), envir = parent.frame(-which))
     names(xcall)[-1] <- ggplot2::standardise_aes_names(names(xcall)[-1])
     if (".id" %in% names(xcall)[-1]) {

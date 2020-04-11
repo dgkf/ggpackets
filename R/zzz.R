@@ -1,4 +1,6 @@
 .onLoad <- function(libname, pkgname) {
+  require("ggplot2")
+
   setHook(packageEvent("ggplot2", "onLoad"), action = "append", function(...) {
     message(
       "\nIt looks like you're loading `ggplot2` after `ggpackets`. ",

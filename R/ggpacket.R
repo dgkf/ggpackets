@@ -25,10 +25,10 @@ setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
 #' @importFrom rlang eval_tidy
 #'
 gg_plus_ggpacket <- function(e1, e2) {
-  e2@data <- update_data(e1$data, e2@data)
   all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))
 
-  # aesthetic mapping for ggpacket scope
+  # aesthetic mapping and data for ggpacket scope
+  ggpk_data <- update_data(e1$data, e2@data)
   ggpk_mapping <- update_mapping(e1$mapping, e2@mapping)
 
   Reduce(function(gg, ggcall) {
@@ -39,7 +39,6 @@ gg_plus_ggpacket <- function(e1, e2) {
 
     # build gg call
     ggcallf <- rlang::eval_tidy(ggcall[[1]])
-    # TODO: ensure e2@dots positional args come after ggcall positional args
     ggcallargs <- append(e2@dots, as.list(ggcall)[-1])
     ggcallargs <- filter_by_ggcall_ids(ggcallargs, ggcall_ids, all_ids)
     ggcallargs <- deduplicate_params(ggcallargs)
@@ -47,13 +46,13 @@ gg_plus_ggpacket <- function(e1, e2) {
     ggcallargs <- smart_swap_mapping_data(ggcallargs)
     ggpk_i <- with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
 
-    # handle data and aesthetic propegation for geometry layers
-    if (inherits(ggpk_i, "ggproto") && "data" %in% names(formals(ggcallf))) {
+    if (inherits(ggpk_i, "ggpacket")) {
+      ggpk_i@data <- update_data(ggpk_data, ggpk_i@data)
+      ggpk_i@mapping <- update_mapping(ggpk_mapping, ggpk_i@mapping)
+    } else if (inherits(ggpk_i, "ggproto")) {
       # apply data scoping
-      ggpk_i$data <- update_data(e1$data, e2@data, ggpk_i$data)
-    }
+      ggpk_i$data <- update_data(ggpk_data, ggpk_i$data)
 
-    if (inherits(ggpk_i, "ggproto") && "mapping" %in% names(formals(ggcallf))) {
       # apply mapping scoping 
       if (!isFALSE(ggpk_i$inherit.aes)) {
         ggpk_i$mapping <- update_mapping(ggpk_mapping, ggpk_i$mapping)
@@ -158,7 +157,7 @@ ggpacket <- function(...) {
 ggpacket_call <- function(mapping = NULL, data = NULL, ...) {
   calling_ggpk <- self()
 
-  if (!inherits(mapping, "uneval")) {
+  if (!is.null(mapping) && !inherits(mapping, "uneval")) {
     mapping_in <- mapping
     mapping <- data
     data <- mapping_in
@@ -193,7 +192,7 @@ update_mapping <- function(...) {
     m2 <- as.list(m2)
     m2 <- lapply(m2, substitute_ggcall_dot_aes, mapping = m1)
     m1[names(m2)] <- m2
-    do.call(ggplot2::aes, m1)
+    handle_reset_mapping(do.call(ggplot2::aes, m1))
   }, Filter(Negate(is.null), list(...)))
 }
 
@@ -218,6 +217,12 @@ update_data.waiver <- update_data.NULL
 
 update_data.function <- function(d1, d2, ...) {
   d <- if (is.function(d1)) update_data(function(...) d2(d1(...)), ...)
-  else update_data(d2(d1), ...)
+       else if (is.null(d1) || inherits(d1, "waiver")) update_data(d2, ...)
+       else update_data(d2(d1), ...)
   if (inherits(d, "waiver")) NULL else d
 }
+
+update_data.formula <- function(d1, d2, ...) {
+  update_data(d1, rlang::as_function(d2), ...)
+}
+
