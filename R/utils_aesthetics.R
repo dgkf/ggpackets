@@ -12,8 +12,8 @@
   })
 
 handle_reset_mapping <- function(mapping) {
-  mapping[vapply(mapping, function(ai) {
-    rlang::quo_get_expr(ai) != quote(..reset..)
+  mapping[!vapply(mapping, function(ai) {
+    rlang::is_quosure(ai) && rlang::quo_get_expr(ai) == quote(..reset..)
   }, logical(1L))]
 }
 

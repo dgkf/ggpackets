@@ -17,8 +17,6 @@ knitr::opts_chunk$set(
   fig.height = 4,
   out.width = '600px', 
   out.height = '400px') 
-
-library(ggplot2)
 library(ggpackets)
 ```
 
@@ -44,7 +42,6 @@ components from `ggplot2`. Let's get that loaded.
 
 ```{r libraries, message = FALSE, warning = FALSE}
 library(ggplot2)
-library(ggpackets)
 ```
 
 To build our first template, we'll simply add a few layers to a `ggpacket`
@@ -83,18 +80,14 @@ paramaters passed to our function.
 ggpk_my_template <- function(...) {
   ggpacket(...) %+%
     geom_line(size = 1, ...) %+%
-    geom_point(size = 3, ..., alpha = 1)
+    geom_point(size = 3, ...)
 }
 ```
 
 ```{r function_ggpacket_output}
 ggplot(Loblolly) + 
   aes(x = age, y = height) + 
-  ggpk_my_template(aes(color = age), 
-    stat = 'summary', 
-    fun.data = mean_se, 
-    size = 10, 
-    alpha = 0.5) + 
+  ggpk_my_template(aes(color = age), stat = 'summary', fun.data = mean_se, size = 5, alpha = 0.5) + 
   ggtitle('Average Growth of Loblolly Pines')
 ```
 
@@ -115,7 +108,9 @@ export from a package you're making, it's probably worth writing up some good
 documentation about what parameters you expect people to use.
 
 ```{r function_ggpacket_standalone_output}
-ggpk_my_template(Loblolly, aes(x = age, y = height, color = Seed))
+ggpk_my_template(
+  data = Loblolly,
+  mapping = aes(x = age, y = height, color = Seed))
 ```
 
 
@@ -139,9 +134,9 @@ others.
 
 ```{r granular_ggpacket}
 ggpk_my_template <- function(...) {
-  ggpacket(...) %+%
-    geom_line(.id = 'line', size = 1, ...) %+% 
-    geom_point(.id = 'point', size = 3, ...)
+  ggpacket() %+%
+  geom_line(.id = 'line', size = 1, ...) %+% 
+  geom_point(.id = 'point', size = 3, ...)
 }
 ```
 
@@ -157,16 +152,16 @@ different prefixes to capture arguments for a particular layer.
 
 ```{r granular_ggpacket2}
 ggpk_my_template <- function(...) {
-  ggpacket(...) %+%
-    geom_line(.id = c('all', 'line'), size = 1, ...) %+% 
-    geom_point(.id = c('all', 'point'), size = 3, ...)
+  ggpacket() %+%
+  geom_line(.id = c('all', 'line'), size = 1, ...) %+%
+  geom_point(.id = c('all', 'point'), size = 3, ...)
 }
 ```
 
 ```{r granular_ggpacket_output2}
 ggplot(Loblolly) + 
   aes(x = age, y = height) + 
-  ggpk_my_template(all.stat = 'summary', all.fun.data = mean_se,
+  ggpk_my_template(stat = 'summary', fun.data = mean_se,
     point.size = 5, line.size = 0.5) + 
   ggtitle('Average Growth of Loblolly Pines')
 ```
@@ -187,9 +182,9 @@ declared before the parameters passed in by the user, whereas the second has
 
 ```{r parameters_ggpacket}
 ggpk_my_template <- function(...) {
-  ggpacket(...) %+%
-    geom_line(.id = 'line', size = 3, ...) %+% 
-    geom_point(.id = 'point', ..., size = 3)
+  ggpacket() %+%
+  geom_line(.id = 'line', size = 3, ...) %+%
+  geom_point(.id = 'point', ..., size = 3)
 }
 ```
 

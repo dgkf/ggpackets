@@ -16,9 +16,7 @@ test_that("ggpackets nest", {
     class(p1$layers[[1]]$geom)
   }, {
     p2 <- ggplot(mtcars) + aes(x = wt, y = mpg) + 
-      (ggpacket() + 
-        (ggpacket() + geom_line())
-      )
+      (ggpacket() + (ggpacket() + geom_line()))
     class(p2$layers[[1]]$geom)
   })
 })

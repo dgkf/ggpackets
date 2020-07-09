@@ -23,6 +23,7 @@ setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
 #' Add a gg object to a ggpacket object
 #'
 #' @importFrom rlang eval_tidy
+#' @importFrom ggplot2 waiver
 #'
 gg_plus_ggpacket <- function(e1, e2) {
   all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))
@@ -36,22 +37,30 @@ gg_plus_ggpacket <- function(e1, e2) {
 
     # apply substitutions for ..dot.. names
     ggcall <- substitute_ggcall_dot_aes(ggpk_mapping, ggcall)
-
-    # build gg call
     ggcallf <- rlang::eval_tidy(ggcall[[1]])
     ggcallargs <- append(e2@dots, as.list(ggcall)[-1])
+
+    # build gg call
     ggcallargs <- filter_by_ggcall_ids(ggcallargs, ggcall_ids, all_ids)
-    ggcallargs <- deduplicate_params(ggcallargs)
     ggcallargs <- lapply(ggcallargs, rlang::eval_tidy)
-    ggcallargs <- smart_swap_mapping_data(ggcallargs)
+
+    if (!identical(ggcallf, .Primitive("("))) {
+      ggcallargs <- match_unnamed_args(ggcallf, ggcallargs)
+      ggcallargs <- smart_swap_mapping_data(ggcallargs)
+      ggcallargs <- deduplicate_params(ggcallargs)
+      ggcallargs <- only_formals_and_dots(ggcallf, ggcallargs)
+    } 
+
     ggpk_i <- with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
 
     if (inherits(ggpk_i, "ggpacket")) {
       ggpk_i@data <- update_data(ggpk_data, ggpk_i@data)
       ggpk_i@mapping <- update_mapping(ggpk_mapping, ggpk_i@mapping)
+
     } else if (inherits(ggpk_i, "ggproto")) {
       # apply data scoping
       ggpk_i$data <- update_data(ggpk_data, ggpk_i$data)
+      if (is.null(ggpk_i$data)) ggpk_i$data <- ggplot2::waiver()
 
       # apply mapping scoping 
       if (!isFALSE(ggpk_i$inherit.aes)) {
@@ -68,6 +77,7 @@ gg_plus_ggpacket <- function(e1, e2) {
 
   }, e2@ggcalls, init = e1)
 }
+
 
 
 #' A container for lazy ggplot layers

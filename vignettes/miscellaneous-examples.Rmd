@@ -30,16 +30,16 @@ library(ggplot2)
 # Dot Matrix Plots
 
 ```{r}
-ggpk_dot_matrix <- function(width = 10, ...) {
-  ggpack(geom_point,
+ggpk_dot_matrix <- function(..., width = 10) {
+  ggpacket(...) %+%
+  geom_point(
     data = . %>% mutate(
       xvar = (1:nrow(.)-1) %%  width, 
       yvar = (1:nrow(.)-1) %/% width),
-    x = xvar, 
-    y = yvar, 
-    ...) + 
-  ggpack(theme_void) + 
-  ggpack(coord_fixed)
+    mapping = aes(x = xvar, y = yvar), 
+    ...) %+% 
+  theme_void() %+% 
+  coord_fixed()
 }
 ```
 
@@ -50,15 +50,17 @@ diamonds %>%
   
   ggplot() + 
     aes(color = cut) + 
-    ggpk_dot_matrix(width = 30, size = 3)
+    ggpk_dot_matrix(size = 3, width = 30)
 ```
 
 # Tukey Ribbons
 
 ```{r}
 ggpk_tukey_ribbons <- function(...) {
+  ggpacket(...) %+%
+
   # Tukey Box Edges
-  ggpack(geom_ribbon, id = list(NULL, 'box'),
+  geom_ribbon(.id = "box",
     stat = 'summary',
     fun.data = function(d) c(
       y = median(d),
@@ -67,10 +69,11 @@ ggpk_tukey_ribbons <- function(...) {
     alpha = 0.15, 
     ...,
     fill = ..color..,
-    color = NA) +
+    color = NA) %+%
     
   # Tukey Whiskers
-  ggpack(geom_ribbon, id = list(NULL, 'whisker'),
+  geom_ribbon(.id = "whisker",
+    mapping = aes(fill = ..color..), 
     stat = 'summary',
     fun.data = function(d) {
       d <- sort(d)
@@ -84,7 +87,6 @@ ggpk_tukey_ribbons <- function(...) {
     },
     alpha = 0.15,
     ...,
-    fill = ..color..,
     color = NA) +
 
   # Median Line
