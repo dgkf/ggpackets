@@ -14,6 +14,7 @@ Imports:
     rlang
 Suggests:
     testthat,
+    covr,
     knitr
 LazyData: true
 License: GPL-3
