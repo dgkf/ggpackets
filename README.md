@@ -94,10 +94,11 @@ of layers.
 ggpk_labelled_heatmap <- function(...) {
   ggpacket(...) %+%
     geom_tile(.id = 'tile', color = NA, ...) %+% 
-    geom_text(.id = 'text1', color = 'white', vjust = -0.3, 
-      fontface = 'bold', ...) %+%
-    geom_text(.id = 'text2', aes(label = sprintf("(%.1f)", ..fill..)), 
-      color = 'white', vjust = 1.1, ...) %+%
+    geom_text(.id = c("text", "text1"), color = "black", vjust = -0.3, 
+      fontface = "bold", ...) %+%
+    geom_text(.id = c("text", "text2"), 
+      aes(label = sprintf("(%.1f)", ..fill..)), 
+      color = "black", vjust = 1.1, ...) %+%
     theme_void()
 } 
 ```
@@ -106,7 +107,8 @@ In this function we make use of a number of these specialized behaviors.
 
 1.  `.id` parameters are set to tag specific layers with an identifier,
     which can be used to prefix arguments to route them to a subset of
-    the `ggpacket` layers.
+    the `ggpacket` layers. Multiple IDs can be used, and arguments will
+    filter down into that layer if they match any of the provided IDs.
 2.  Ellipsis are first passed to `ggpacket(...)`, which will pass them
     on as default values to all `ggpacket` layers.
 3.  Ellipsis are also passed at the tail end of each layer call,
@@ -118,14 +120,14 @@ In this function we make use of a number of these specialized behaviors.
     syntax.
 5.  We use `%+%` instead of the commonly-used `+` to add layers
     together, which allows `ggpackets` to accept non-standard arguments
-    before ggplot sends us warnings about them
+    before ggplot sends us warnings about them.
 
 <!-- end list -->
 
 ``` r
 ggplot(as.data.frame(OrchardSprays)) + 
   aes(x = rowpos, y = colpos, label = treatment, fill = decrease) + 
-  ggpk_labelled_heatmap(text2.alpha = 0.5) + 
+  ggpk_labelled_heatmap(text.color = "white", text2.alpha = 0.5) + 
   ggtitle('Honeybee population decline in repellent trial grid')
 ```
 
