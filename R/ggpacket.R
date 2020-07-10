@@ -1,3 +1,15 @@
+#' A ggpacket object
+#'
+#' @slot data A dataset or waiver to use within the ggpacket ggcalls.
+#' @slot mapping A ggplot aesthetic mapping to use within the ggpacket ggcalls.
+#' @slot dots Arguments which should be passed before prespecified arguments to
+#'   each ggcall.
+#' @slot ggcalls A list of lazily evaluated ggplot layer construction
+#'   expressions.
+#' 
+#' @docType methods
+#' @rdname helloworld-methods 
+#' 
 setClass("ggpacket",
   contains = "function",
   slots = list(
@@ -8,12 +20,24 @@ setClass("ggpacket",
 
 
 #' Swallow calls when a ggpacket is added to any expression
+#'
+#' @param e1 A ggpacket object
+#' @param e2 Any object
+#' 
 ggpacket_plus_ANY <- function(e1, e2) {
   e1@ggcalls <- append(e1@ggcalls, as_gg_call(e2))
   e1
 }
 
 
+#' Add a ggpacket object to another, arbitrary object
+#' 
+#' @param e1 A ggpacket object.
+#' @param e2 Any object.
+#' 
+#' @rdname ggpacket-methods
+#' @aliases +,ggpacket,ANY-method
+#' 
 setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
   ggpacket_plus_ANY(e1, e2)
 })
@@ -22,6 +46,9 @@ setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
 
 #' Add a gg object to a ggpacket object
 #'
+#' @param e1 A ggplot ggproto object
+#' @param e2 A ggpacket object
+#' 
 #' @importFrom rlang eval_tidy
 #' @importFrom ggplot2 waiver
 #'
@@ -117,6 +144,7 @@ gg_plus_ggpacket <- function(e1, e2) {
 #' @slot ggcalls A list containing the layers stored within the \code{ggpacket}
 #' 
 #' @examples
+#' \dontrun{
 #' library(ggplot2)
 #'
 #' # create a ggpacket directly, setting some fixed argument settings
@@ -138,11 +166,13 @@ gg_plus_ggpacket <- function(e1, e2) {
 #' 
 #' ggplot(mtcars, aes(x = wt, y = mpg)) + 
 #'   ggpk_func(color = "purple", size = 2, point.size = 4)
-#'
+#' }
+#' 
+#' @importFrom methods new
 #' @export
 #' 
 ggpacket <- function(...) {
-  new_ggpacket <- new("ggpacket", ggpacket_call)
+  new_ggpacket <- methods::new("ggpacket", ggpacket_call)
   new_ggpacket(...)
 }
 
@@ -162,6 +192,7 @@ ggpacket <- function(...) {
 #' @return A new \code{ggpacket} object with the new defaults applied
 #' 
 #' @importFrom rlang enquos
+#' @importFrom methods new
 #' @importFrom ggplot2 standardise_aes_names
 #' 
 ggpacket_call <- function(mapping = NULL, data = NULL, ...) {
@@ -176,7 +207,7 @@ ggpacket_call <- function(mapping = NULL, data = NULL, ...) {
   dots <- as.list(rlang::enquos(...))
   names(dots) <- ggplot2::standardise_aes_names(names(dots))
 
-  new("ggpacket",
+  methods::new("ggpacket",
     ggpacket_call,
     data = update_data(calling_ggpk@data, data),
     mapping = update_mapping(calling_ggpk@mapping, mapping),
@@ -186,6 +217,12 @@ ggpacket_call <- function(mapping = NULL, data = NULL, ...) {
 
 
 #' Returning the calling object from within a function
+#' 
+#' Used for retreiving an S4 object being called as though it is a function
+#' 
+#' @param which A relative environment offset in which to search for an object
+#'   with a name of the calling expression.
+#' 
 self <- function(which = -1L) {
   calling_expr <- sys.call(which = which)
   eval(calling_expr[[1]], envir = parent.frame(-which + 1))
@@ -194,6 +231,8 @@ self <- function(which = -1L) {
 
 #' Reduce a list of mappings, iteratively routing aesthetics 
 #'
+#' @param ... A series of mappings to be sequentially collapsed
+#' 
 #' @importFrom ggplot2 aes
 #' 
 update_mapping <- function(...) {
@@ -207,7 +246,12 @@ update_mapping <- function(...) {
 }
 
 
-#' Reduce data parameters, iteratively applying functions or masking datasets
+#' Reduce data parameters, iteratively applying functions or masking 
+#' 
+#' @param d1 A plot data object to update
+#' @param d2 A second plot data object with which to update \code{d1}
+#' @param ... Additional objects to sequentially collapse.
+#' 
 update_data <- function(d1, d2, ...) {
   if (missing(d2)) return(d1)
   UseMethod("update_data", d2)

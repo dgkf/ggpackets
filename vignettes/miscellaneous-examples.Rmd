@@ -4,7 +4,7 @@ author: "Doug Kelkhoff"
 date: "`r Sys.time()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Composing Functions}
+  %\VignetteIndexEntry{Miscellaneous Examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -61,6 +61,7 @@ ggpk_tukey_ribbons <- function(...) {
 
   # Tukey Box Edges
   geom_ribbon(.id = "box",
+    mapping = aes(fill = ..color..),
     stat = 'summary',
     fun.data = function(d) c(
       y = median(d),
@@ -68,7 +69,6 @@ ggpk_tukey_ribbons <- function(...) {
       ymin = quantile(d, 0.25, names = FALSE)),
     alpha = 0.15, 
     ...,
-    fill = ..color..,
     color = NA) %+%
     
   # Tukey Whiskers
@@ -87,10 +87,10 @@ ggpk_tukey_ribbons <- function(...) {
     },
     alpha = 0.15,
     ...,
-    color = NA) +
+    color = NA) %+%
 
   # Median Line
-  ggpack(geom_line, id = list(NULL, 'line'),
+  geom_line(.id = list(NULL, 'line'),
     stat = 'summary',
     fun.data = function(d) c(y = median(d)),
     alpha = 0.8,

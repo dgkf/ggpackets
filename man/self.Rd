@@ -6,6 +6,10 @@
 \usage{
 self(which = -1L)
 }
+\arguments{
+\item{which}{A relative environment offset in which to search for an object
+with a name of the calling expression.}
+}
 \description{
-Returning the calling object from within a function
+Used for retreiving an S4 object being called as though it is a function
 }

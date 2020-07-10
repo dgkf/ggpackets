@@ -4,7 +4,7 @@ author: "Doug Kelkhoff"
 date: "`r Sys.time()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ggpackets}
+  %\VignetteIndexEntry{Getting Started with `ggpackets`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

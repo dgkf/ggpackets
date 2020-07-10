@@ -1,3 +1,4 @@
+#' Extracted .all_aesthetics from internal ggplot2 with hardcoded fallback
 .all_aesthetics <- tryCatch({
     # attempt to stay current with ggplot .all_aesthetics upstream
     get('.all_aesthetics', asNamespace('ggplot2'), inherits = FALSE)
@@ -11,12 +12,26 @@
       "xintercept", "y", "yend", "ymax", "ymin", "yintercept", "z")
   })
 
+
+
+#' Specific handling of ..reset.. aesthetic
+#' 
+#' @param mapping A ggplot2 aesthetic mapping.
+#' 
 handle_reset_mapping <- function(mapping) {
   mapping[!vapply(mapping, function(ai) {
     rlang::is_quosure(ai) && rlang::quo_get_expr(ai) == quote(..reset..)
   }, logical(1L))]
 }
 
+
+
+#' Substitute a ggcall's dot aesthetics with their redirected values
+#'
+#' @param mapping A ggplot2 aesthetic mapping.
+#' @param ggcall A ggcall list of expressions.
+#' @param envir An environment in which the dot aesthetics should be evaluated.
+#'
 substitute_ggcall_dot_aes <- function(mapping, ggcall, envir = parent.frame()) {
   aess <- .all_aesthetics
   names(aess) <- ggplot2::standardise_aes_names(aess)
@@ -29,6 +44,13 @@ substitute_ggcall_dot_aes <- function(mapping, ggcall, envir = parent.frame()) {
   substitute_quote(ggcall, env = mapping)
 }
 
+
+
+#' Substitute a quoted expression in a given environmment
+#'
+#' @param q A quote to evaluate.
+#' @param env An environment in which the quote should be evaluated. 
+#' 
 substitute_quote <- function(q, env = parent.frame()) {
   UseMethod("substitute_quote")
 }

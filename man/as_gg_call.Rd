@@ -6,6 +6,12 @@
 \usage{
 as_gg_call(x, which = -3L)
 }
+\arguments{
+\item{x}{An expression to convert to a ggcall.}
+
+\item{which}{The relative frame offset in which the expression should be
+eventually evaluated.}
+}
 \description{
 Convert an expression into a call as a list of quosure components
 }

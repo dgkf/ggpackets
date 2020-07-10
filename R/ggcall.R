@@ -1,5 +1,9 @@
 #' Convert an expression into a call as a list of quosure components
 #' 
+#' @param x An expression to convert to a ggcall.
+#' @param which The relative frame offset in which the expression should be
+#'    eventually evaluated.
+#' 
 #' @importFrom rlang quos enquo quo_get_expr quo_set_env
 #' @importFrom ggplot2 standardise_aes_names
 #'
@@ -31,7 +35,10 @@ as_gg_call <- function(x, which = -3L) {
 
 
 
-#' label ggcall with function name if it can be deduced
+#' Label ggcall with function name if it can be deduced
+#' 
+#' @param expr An expression from which a call name should be inferred.
+#' 
 infer_ggcall_name <- function(expr) {
   # TODO: prohibit names ambiguous with gg args with dots 
   #       (inherit.aes, na.rm, show.legend, fun.data, label.r)
@@ -41,7 +48,10 @@ infer_ggcall_name <- function(expr) {
 
 
 
-#' convert ggplot geom layers to friendly names
+#' Convert ggplot geom layers to friendly names
+#' 
+#' @param x A function name from which an id should be inferred.
+#' 
 infer_ggcall_id <- function(x) {
   gsub("^(geom|stat)_", "", x)
 }

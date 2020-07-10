@@ -1,4 +1,12 @@
+#' Display contents of a ggpacket
+#'
+#' @param object A ggpacket object to show.
+#' 
+#' @rdname ggpacket-methods
+#' @aliases show,ggpacket-method
+#' 
 #' @importFrom ggplot2 ggplot ggplot_build
+#' @importFrom methods show
 #' @export
 setMethod("show", "ggpacket", function(object) {
   ggout <- tryCatch(
@@ -72,20 +80,22 @@ format_ggpacket_data.waiver <- function(x,
   "awaiting data"
 }
 
+#' @importFrom utils capture.output
 format_ggpacket_data.default <- function(x, 
     width = getOption("width", 80) * 0.9) {
-  capture.output(print(x, width = width))
+  utils::capture.output(print(x, width = width))
 }
 
+#' @importFrom utils head
 format_ggpacket_data.data.frame <- function(x,
     width = getOption("width", 80) * 0.9) {
   n <- 3L
-  dfout <- format_ggpacket_data.default(head(x, n), width = width)
+  dfout <- format_ggpacket_data.default(utils::head(x, n), width = width)
   nr_omit <- nrow(x) - n
   c_omit <- length(dfout) - (n + 1L)
   c(dfout[1:(n + 1)],
     if (nr_omit > 0L || c_omit > 0L)
-      sprintf("# … with %s%s%s",
+      sprintf("# \u2026 with %s%s%s",
         if (nr_omit) sprintf("%d more rows", nr_omit) else "", 
         if (nr_omit && c_omit) ", " else "",
         if (c_omit) "columns omitted" else ""))
@@ -106,9 +116,10 @@ format_ggpacket_mapping.NULL <- function(x,
   "awaiting aesthetics"
 }
 
+#' @importFrom utils capture.output
 format_ggpacket_mapping.default <- function(x, 
     width = getOption("width", 80) * 0.9) {
-  capture.output(print(x, width = width))[-1]
+  utils::capture.output(print(x, width = width))[-1]
 }
 
 format_ggpacket_ggcalls <- function(x,

@@ -2,10 +2,13 @@
 % Please edit documentation in R/ggcall.R
 \name{infer_ggcall_name}
 \alias{infer_ggcall_name}
-\title{label ggcall with function name if it can be deduced}
+\title{Label ggcall with function name if it can be deduced}
 \usage{
 infer_ggcall_name(expr)
 }
+\arguments{
+\item{expr}{An expression from which a call name should be inferred.}
+}
 \description{
-label ggcall with function name if it can be deduced
+Label ggcall with function name if it can be deduced
 }

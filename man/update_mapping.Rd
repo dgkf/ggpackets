@@ -6,6 +6,9 @@
 \usage{
 update_mapping(...)
 }
+\arguments{
+\item{...}{A series of mappings to be sequentially collapsed}
+}
 \description{
 Reduce a list of mappings, iteratively routing aesthetics
 }

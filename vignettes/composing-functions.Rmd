@@ -4,7 +4,7 @@ author: "Doug Kelkhoff"
 date: "`r Sys.time()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Composing Functions}
+  %\VignetteIndexEntry{Composing Templates & Functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

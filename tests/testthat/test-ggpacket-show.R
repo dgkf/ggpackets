@@ -25,7 +25,7 @@ test_that("ggpackets print as expected", {
 
   expect_output({
     print(ggpacket(mtcars, aes(x = wt)))
-  }, capture.output(aes(x = wt))[-1], fixed = TRUE)
+  }, utils::capture.output(aes(x = wt))[-1], fixed = TRUE)
 
   expect_output({
     print(ggpacket())

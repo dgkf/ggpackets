@@ -2,10 +2,13 @@
 % Please edit documentation in R/ggcall.R
 \name{infer_ggcall_id}
 \alias{infer_ggcall_id}
-\title{convert ggplot geom layers to friendly names}
+\title{Convert ggplot geom layers to friendly names}
 \usage{
 infer_ggcall_id(x)
 }
+\arguments{
+\item{x}{A function name from which an id should be inferred.}
+}
 \description{
-convert ggplot geom layers to friendly names
+Convert ggplot geom layers to friendly names
 }

@@ -1,5 +1,7 @@
+^.*\.sw.$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github
 ^\.travis\.yml$
 ^_pkgdown\.yml$
 ^README\.Rmd$

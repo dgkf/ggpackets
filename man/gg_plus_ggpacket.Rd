@@ -6,6 +6,11 @@
 \usage{
 gg_plus_ggpacket(e1, e2)
 }
+\arguments{
+\item{e1}{A ggplot ggproto object}
+
+\item{e2}{A ggpacket object}
+}
 \description{
 Add a gg object to a ggpacket object
 }
