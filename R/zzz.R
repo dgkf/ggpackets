@@ -1,6 +1,4 @@
 .onLoad <- function(libname, pkgname) {
-  requireNamespace("ggplot2", quietly = TRUE)
-
   setHook(packageEvent("ggplot2", "onLoad"), action = "append", function(...) {
     packageStartupMessage(
       "\nIt looks like you're loading `ggplot2` after `ggpackets`. ",
@@ -9,4 +7,12 @@
       "    detach(\"package:ggpackets\", unload = TRUE)\n",
       "    library(ggpackets)")
   })
+
+  # Some current base functions are used which are not included in older
+  # versions of R. These are provided through an 'Enhances' pacakge,
+  # "backports" but this dependency is unnecessary otherwise. 
+  if (package_version(R.Version()) < package_version("3.5") && 
+      requireNamespace("backports")) {
+    backports::import(pkgname, "isFALSE")
+  }
 } 

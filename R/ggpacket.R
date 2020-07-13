@@ -8,7 +8,7 @@
 #'   expressions.
 #' 
 #' @docType methods
-#' @rdname helloworld-methods 
+#' @rdname ggpacket-methods
 #' 
 setClass("ggpacket",
   contains = "function",
@@ -20,9 +20,9 @@ setClass("ggpacket",
 
 
 #' Swallow calls when a ggpacket is added to any expression
-#'
-#' @param e1 A ggpacket object
-#' @param e2 Any object
+#' 
+#' @param e1 A ggpacket object.
+#' @param e2 Any object.
 #' 
 ggpacket_plus_ANY <- function(e1, e2) {
   e1@ggcalls <- append(e1@ggcalls, as_gg_call(e2))
@@ -46,8 +46,8 @@ setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
 
 #' Add a gg object to a ggpacket object
 #'
-#' @param e1 A ggplot ggproto object
-#' @param e2 A ggpacket object
+#' @param e1 A ggplot ggproto object.
+#' @param e2 A ggpacket object.
 #' 
 #' @importFrom rlang eval_tidy
 #' @importFrom ggplot2 waiver

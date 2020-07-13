@@ -19,6 +19,7 @@ Imports:
 Suggests:
     testthat,
     dplyr,
+    backports,
     knitr
 LazyData: true
 License: GPL-3
