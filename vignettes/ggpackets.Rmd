@@ -4,7 +4,7 @@ author: "Doug Kelkhoff"
 date: "`r Sys.time()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ggpackets}
+  %\VignetteIndexEntry{Getting Started with `ggpackets`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -29,7 +29,7 @@ template plots which still interact nicely with the ggplot syntax. To illustrate
 this functionality, let's start with a trivial example.
 
 
-## First, the classical ggplot
+## First, our trusted ggplot
 
 To start, let's take a look at what it might take to build a bar plot showing 
 the mean value of some group with some errorbars to represent standard deviation
@@ -78,9 +78,9 @@ the function `ggplot()`), the `ggpacket` will add its layers to the ggplot.
 
 ```{r ex1.ggpackets.ex0}
 my_ggpk_layers <- ggpacket() + 
-  geom_bar(stat = 'summary', aes(y = mpg), 
+  geom_bar(stat = 'summary', 
     fun.data = function(c) c(y = mean(c))) + 
-  geom_errorbar(stat = 'summary', aes(y = mpg), width = 0.2,
+  geom_errorbar(stat = 'summary', width = 0.2,
     fun.data = function(c) c(
       y = mean(c),
       ymin = mean(c) - sd(c),
@@ -93,7 +93,7 @@ my_ggpk_layers <- ggpacket() +
 ```{r, warning = FALSE}
 ggplot(mtcars) + 
   aes(x = carb, y = mpg, fill = as.factor(am)) + 
-  my_ggpk_layers + 
+  my_ggpk_layers() + 
   facet_grid(. ~ am, scales = 'free')
 ```
 
@@ -151,50 +151,59 @@ growing quickly out of hand. Alternatively, you could wrap your ggplot layers in
 a list and use those in a ggplot, but you'd be constrained to the parameters
 initially defined in the list.
 
-## Building Functions with `ggpack`
+## Building Functions with `ggpackets`
 
-`ggpacket` aims to reduce this inevitable issue by making it as simple as
+`ggpackets` aims to reduce this inevitable issue by making it as simple as
 possible to build out these types of reusable code snippets.
 
 ```{r ex1.ggpackets2}
 my_ggpk <- function(...) {
-  ggpack(geom_bar, id = list(NULL, 'bar'),
+  ggpacket(...) %+%
+
+  geom_bar(.id = 'bar',
     fun.data = mean_se,
     position = position_dodge(width = 1.0),
     ...,
-    stat= 'summary') +
+    stat= 'summary') %+%
     
-  ggpack(geom_errorbar, id = list(NULL, 'errorbar'),
+  geom_errorbar(.id = 'errorbar',
     fun.data = mean_se,
     position = position_dodge(width = 1.0),
     width = 0.2,
     ...,
-    stat = 'summary') +
+    stat = 'summary') %+%
 
-  ggpack(geom_label, id = list(NULL, 'label'),
+  geom_label(.id = 'label',
     position = position_dodge(width = 1.0),
     vjust = -0.5, color = 'white',
     alpha = 0.3, label.size = NA,
     ...,
     stat = 'summary',
-    fun.data = function(c) c(label = length(c), y = 0))
+    fun.data = function(d) c(label = length(d), y = 0))
 }
 ```
 
 ```{r, warning = FALSE}
 ggplot(mtcars) + 
   aes(x = carb, y = mpg) + 
-  my_ggpk(fun.data = mean_se, bar.fill = carb)
+  my_ggpk(fun.data = mean_se, bar.mapping = aes(fill = carb))
 ```
 
 > **Tip:**
 > 
-> When multiple arguments are passed to `ggpack()` with the same name, only the
-last will be used.
+> Use `ggplot2`'s lesser-used `%+%` operator to compose `ggpacket`s in order 
+> to handle duplicate arguments without throwing warnings. `ggpackets` will
+> use the last-enterred argument to build the plot, allowing a comfortable 
+> syntax to intuitively set a default value while allowing user-flexibility.
 >
->  * `ggpack(geom_bar, fill = 'red') # will be red`
->  * `ggpack(geom_bar, fill = 'red', dots = list(fill = 'blue')) # blue`
->  * `ggpack(geom_bar, fill = 'red', dots = list(fill = 'blue'), fill = 'green') # green`
+> ````r
+> my_ggpk <- function(...) {
+>   ggpacket(...) %+%              # all ... used as default for all layers
+>     geom_bar(fill = "red") %+%   # overwrites any fill from ...
+>     geom_bar(fill = "red", ...)  # allows ... to now mask the default
+> }
+> ````
+>
 
 This format, with only a bit of extra syntax, exposes quite a lot of new
 functionality. We can use additional geometries by adding them to our plot in
@@ -204,17 +213,9 @@ take a look at what we can do with this new function:
 
 ## Gallery
 
-### Retains freedom to make a truly hideous plot!
-
-```{r ex1.ggpackets.ex1, warning = FALSE}
-ggplot(mtcars) + 
-  aes(x = carb, y = wt, fill = as.factor(am), group = am) + 
-  my_ggpk(color = as.factor(carb), size = 2, label.color = 'green')
-```
-
 ### Composes well with `ggplot` elements
 
-```{r ex1.ggpackets.ex2, warning = FALSE}
+```{r ggpackets.ex2, warning = FALSE}
 ggplot(mtcars) + 
   aes(x = carb, y = wt, fill = vs) + 
   my_ggpk() + 
@@ -223,7 +224,7 @@ ggplot(mtcars) +
 
 ### Multiple `ggpackets` can be used together
 
-```{r ex1.ggpackets.ex3, warning = FALSE}
+```{r ggpackets.ex3, warning = FALSE}
 my_ggpk2 <- ggpacket() + 
   geom_ribbon(stat = 'summary', fun.data = mean_se, alpha = 0.2) + 
   geom_line(stat = 'summary', fun.data = mean_se, alpha = 0.3, size = 2)
@@ -236,7 +237,7 @@ ggplot(mtcars) +
 
 ### Composing with `ggplot` annotations and themes
 
-```{r ex1.ggpackets.ex4, warning = FALSE}
+```{r ggpackets.ex4, warning = FALSE}
 ggplot(mtcars) + 
   aes(x = carb, y = wt, fill = carb) + 
   my_ggpk() + 

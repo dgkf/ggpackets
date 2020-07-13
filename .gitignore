@@ -1,7 +1,9 @@
 *.Rproj
+*.sw*
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.README.html
 .DS_Store
 inst/doc
