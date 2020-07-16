@@ -1,9 +1,10 @@
 
 # ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="134px"/>
 
-[![CRAN](https://img.shields.io/cran/v/ggpackets.svg?style=flat-square)](https://cran.r-project.org/package=ggpackets)
-[![Travis](https://img.shields.io/travis/dgkf/ggpackets/master.svg?style=flat-square)](https://travis-ci.org/dgkf/ggpackets)
-[![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg?style=flat-square)](https://codecov.io/gh/dgkf/ggpackets)
+[![CRAN](https://img.shields.io/cran/v/ggpackets.svg)](https://cran.r-project.org/package=ggpackets)
+[![R CMD
+check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https://github.com/dgkf/ggpackets/actions?query=workflow%3AR-CMD-check)
+[![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg)](https://codecov.io/gh/dgkf/ggpackets)
 
 ## Overview
 
