@@ -20,21 +20,23 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
   as.call(append(f, fargs))
 }
 
-filter_by_ggcall_ids <- function(args, call_ids, all_ids) {
-  names(args) <- gsub(
-    sprintf("^(%s)\\.(.+)", 
-    paste0(call_ids, collapse = "|")), "\\2", 
-    names(args))
-  
-  argmatches <- matrix(
-    apply(as.matrix(all_ids), 1L, function(id, argnames) {
-        grepl(sprintf("^%s\\..+", id), argnames)
-      }, names(args)), 
-    nrow = length(args), 
-    ncol = length(all_ids), 
-    dimnames = list(names(args), all_ids))
+filter_by_ggcall_ids <- function(x, call_ids, all_ids) {
+  if (is.null(x)) return(x)
 
-  args[!apply(argmatches, 1L, any)]
+  names(x) <- gsub(
+    sprintf("^(%s)\\.(.+)", paste0(call_ids, collapse = "|")), 
+    "\\2", 
+    names(x))
+
+  x_name_matches <- matrix(
+    apply(as.matrix(all_ids), 1L, function(id, xnames) {
+        grepl(sprintf("^%s\\..+", id), xnames)
+      }, names(x)), 
+    nrow = length(x), 
+    ncol = length(all_ids), 
+    dimnames = list(names(x), all_ids))
+
+  x[!apply(x_name_matches, 1L, any)]
 }
 
 collapse_mappings <- function(args) { 
@@ -46,7 +48,7 @@ collapse_mappings <- function(args) {
 }
 
 collapse_data <- function(args) { 
-  data_args <- args[names(args) %in% "dataa"]
+  data_args <- args[names(args) %in% "data"]
   if (!length(data_args)) return(args)
   args <- args[!names(args) %in% "data"]
   args$data <- do.call(update_data, data_args)

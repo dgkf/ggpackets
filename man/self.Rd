@@ -11,5 +11,5 @@ self(which = -1L)
 with a name of the calling expression.}
 }
 \description{
-Used for retreiving an S4 object being called as though it is a function
+Used for retrieving an S4 object being called as though it is a function
 }

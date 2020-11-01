@@ -1,22 +1,32 @@
 #' Display contents of a ggpacket
 #'
 #' @param object A ggpacket object to show.
-#' 
+#'
 #' @rdname ggpacket-methods
-#' @aliases show,ggpacket-method
-#' 
+#' @aliases show, ggpacket-method
+#'
 #' @importFrom ggplot2 ggplot ggplot_build
 #' @importFrom methods show
 #' @export
 setMethod("show", "ggpacket", function(object) {
-  ggout <- tryCatch(
-    ggplot2::ggplot_build(ggplot2::ggplot() + object), 
-    error = function(e) e)
+  warnings <- list()
+  ggout <- tryCatch(withCallingHandlers(
+    ggplot2::ggplot_build(ggobj <- ggplot2::ggplot() + object),
+    warning = function(w) {
+      append(warnings, w)
+      invokeRestart("muffleWarning")
+    }),
+    error = function(e) {
+      e
+    })
 
-  if (!inherits(ggout, "error") && length(ggout$data) && nrow(ggout$data[[1]]))
-    show(ggplot2::ggplot() + object)
-  else
+  if (!inherits(ggout, "error") && length(ggout$data) && nrow(ggout$data[[1]])) {
+    for (w in warnings) warning(w)
+    print(ggobj)
+  } else {
+    if (getOption("ggpackets.debug", FALSE)) stop(ggout)
     print(object)
+  }
 })
 
 #' @export
@@ -26,27 +36,30 @@ print.ggpacket <- function(x, ...) {
 }
 
 format.ggpacket <- function(x, ...) {
+  req_aes <- required_aesthetics(x)
+  missing_aes <- setdiff(req_aes, names(x@mapping))
+
   width <- getOption("width", 80) - 3L
   data_strs <- format_ggpacket_data(x@data, width)
-  aes_strs <- format_ggpacket_mapping(x@mapping, width)
+  aes_strs <- format_ggpacket_mapping(x@mapping, width, missing_aes = missing_aes)
   layers_strs <- format_ggpacket_ggcalls(x@ggcalls)
-  
+
   sprintf(multistr("
     <ggpacket>
-    Data: 
-    %s 
+    Data:
+    %s
     Aesthetic Mapping:
-    %s 
+    %s
     Layers:
     %s
-    
+
     "),
     paste0("  ", data_strs, collapse = "\n"),
     paste0("  ", aes_strs, collapse = "\n"),
     paste0("  ", layers_strs, collapse = "\n"))
 }
 
-number_strings <- function(strs, width = getOption("width", 80) * 0.9, 
+number_strings <- function(strs, width = getOption("width", 80) * 0.9,
     wrap = FALSE, ...) {
 
   if (!length(strs)) return(strs)
@@ -81,7 +94,7 @@ format_ggpacket_data.waiver <- function(x,
 }
 
 #' @importFrom utils capture.output
-format_ggpacket_data.default <- function(x, 
+format_ggpacket_data.default <- function(x,
     width = getOption("width", 80) * 0.9) {
   utils::capture.output(print(x, width = width))
 }
@@ -96,30 +109,32 @@ format_ggpacket_data.data.frame <- function(x,
   c(dfout[1:(n + 1)],
     if (nr_omit > 0L || c_omit > 0L)
       sprintf("# \u2026 with %s%s%s",
-        if (nr_omit) sprintf("%d more rows", nr_omit) else "", 
+        if (nr_omit) sprintf("%d more rows", nr_omit) else "",
         if (nr_omit && c_omit) ", " else "",
         if (c_omit) "columns omitted" else ""))
 }
 
-format_ggpacket_data.tbl <- function(x, 
+format_ggpacket_data.tbl <- function(x,
     width = getOption("width", 80) * 0.9) {
   format(x, n = 3L, width = width)
 }
 
-format_ggpacket_mapping <- function(x, 
-    width = getOption("width", 80) * 0.9) {
+format_ggpacket_mapping <- function(x,
+    width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
   UseMethod("format_ggpacket_mapping")
 }
 
-format_ggpacket_mapping.NULL <- function(x, 
-    width = getOption("width", 80) * 0.9) {
-  "awaiting aesthetics"
+format_ggpacket_mapping.NULL <- function(x,
+    width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
+  format_ggpacket_mapping(aes(), width = width, missing_aes = missing_aes)
 }
 
 #' @importFrom utils capture.output
-format_ggpacket_mapping.default <- function(x, 
-    width = getOption("width", 80) * 0.9) {
-  utils::capture.output(print(x, width = width))[-1]
+format_ggpacket_mapping.default <- function(x,
+    width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
+
+  x[missing_aes] <- " MISSING "
+  gsub("\" MISSING \"", crayon::red("<missing>"), utils::capture.output(x)[-1])
 }
 
 format_ggpacket_ggcalls <- function(x,
@@ -131,9 +146,9 @@ format_ggpacket_ggcalls <- function(x,
 format_ggpacket_ggcalls.default <- function(x,
     width = getOption("width", 80) * 0.9) {
   number_strings(
-    vapply(x, function(...) format_ggpacket_ggcall(...), character(1L)), 
-    width = width - nchar(length(x)) - 2, 
-    wrap = TRUE, 
+    vapply(x, function(...) format_ggpacket_ggcall(...), character(1L)),
+    width = width - nchar(length(x)) - 2,
+    wrap = TRUE,
     exdent = 2L)
 }
 
@@ -147,8 +162,8 @@ format_ggpacket_ggcall.default <- function(x,
 
   if (!grepl("\\w", rlang::quo_get_expr(x[[1]])))
     return(paste(
-      gsub("(^\\s*|\\s*$)", "", 
-        format(as.call(lapply(x, rlang::quo_get_expr)))), 
+      gsub("(^\\s*|\\s*$)", "",
+        format(as.call(lapply(x, rlang::quo_get_expr)))),
       collapse = " "))
 
   non_breaking_space <- "\u00A0"
@@ -157,38 +172,53 @@ format_ggpacket_ggcall.default <- function(x,
     else
       character(0L)
 
-  args <- lapply(x, function(x) format_ggpacket_ggcall_arg(x, width = width))
-  sprintf("%s%s(%s)\n", 
+  args <- mapply(
+    function(...) format_ggpacket_ggcall_arg(...),
+    x,
+    name = names(x),
+    MoreArgs = list(width = width))
+
+  sprintf("%s%s(%s)\n",
     id_str,
-    args[[1]], 
-    paste(sprintf("%s%s", 
-        ifelse(names(args[-1]) == "", "", 
-          paste0(names(args[-1]), non_breaking_space, "=", non_breaking_space)), 
-        args[-1]), 
+    args[[1]],
+    paste(sprintf("%s%s",
+        ifelse(names(args[-1]) == "", "",
+          paste0(names(args[-1]), non_breaking_space, "=", non_breaking_space)),
+        args[-1]),
       collapse = ", "))
 }
 
 format_ggpacket_ggcall_arg <- function(x,
-    width = getOption("width", 80) * 0.9) {
-  UseMethod("format_ggpacket_ggcall_arg")
+    width = getOption("width", 80) * 0.9, name = NULL) {
+  UseMethod("format_ggpacket_ggcall_arg", x)
 }
 
-format_ggpacket_ggcall_arg.quosure <- function(x, 
-    width = getOption("width", 80) * 0.9) {
+format_ggpacket_ggcall_arg.quosure <- function(x,
+    width = getOption("width", 80) * 0.9, name = NULL) {
+  if (!is.null(name) && name == "mapping")
+    return(format_ggpacket_ggcall_arg(rlang::eval_tidy(x)))
   xsq <- rlang::quo_squash(x)
   if (is.atomic(xsq)) return(deparse(xsq))
   tryCatch(format(xsq), error = function(e) as.character(xsq))
 }
 
 format_ggpacket_ggcall_arg.default <- function(x,
-    width = getOption("width", 80) * 0.9) {
+    width = getOption("width", 80) * 0.9, name = NULL) {
   format(x)
+}
+
+format_ggpacket_ggcall_arg.uneval <- function(x,
+    width = getOption("width", 80) * 0.9, name = NULL) {
+  sprintf("aes(%s)",
+    paste0(
+      sprintf("%s = %s", names(x), sapply(x, rlang::quo_squash)),
+      collapse = ", "))
 }
 
 multistr <- function(s) {
   lines <- strsplit(s, "\n")[[1]]
   if (!length(lines)) return(s)
   if (!grepl("\\w", lines[[1]])) lines <- lines[-1]
-  nchar_leader <- min(nchar(gsub("^(\\W*).*", "\\1", lines)))
+  nchar_leader <- min(nchar(gsub("^(\\W*).*", "\\1", lines[grepl("\\w", lines)])))
   paste0(substring(lines, nchar_leader + 1L), collapse = "\n")
 }

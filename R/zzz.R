@@ -1,9 +1,11 @@
 .onLoad <- function(libname, pkgname) {
-  setHook(packageEvent("ggplot2", "onLoad"), action = "append", function(...) {
-    packageStartupMessage(
-      "\nIt looks like you're loading `ggplot2` after `ggpackets`. ",
-      "For `ggpackets` to work properly, it must be loaded after `ggplot2`. ",
-      "You can correct this by running:\n\n",
+  setHook(packageEvent("ggplot2", "attach"), action = "append", function(...) {
+    packageStartupMessage("\n",
+      paste(collapse = "\n", strwrap(indent = 2L, paste0(
+        "It looks like you're attaching `ggplot2` after `ggpackets`. ",
+        "For `ggpackets` to work properly, it must be attached after `ggplot2`. ",
+        "You can correct this by running:"))),
+      "\n\n",
       "    detach(\"package:ggpackets\", unload = TRUE)\n",
       "    library(ggpackets)")
   })

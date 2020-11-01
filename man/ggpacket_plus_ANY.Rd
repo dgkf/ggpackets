@@ -7,9 +7,9 @@
 ggpacket_plus_ANY(e1, e2)
 }
 \arguments{
-\item{e1}{A ggpacket object}
+\item{e1}{A ggpacket object.}
 
-\item{e2}{Any object}
+\item{e2}{Any object.}
 }
 \description{
 Swallow calls when a ggpacket is added to any expression

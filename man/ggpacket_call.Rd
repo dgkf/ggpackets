@@ -4,7 +4,7 @@
 \alias{ggpacket_call}
 \title{The function used when a \code{ggpacket} is called as a function}
 \usage{
-ggpacket_call(mapping = NULL, data = NULL, ...)
+ggpacket_call(mapping = NULL, data = NULL, ..., .id = character(0L))
 }
 \arguments{
 \item{mapping}{The aesthetic mapping to use as a basis for all layers within

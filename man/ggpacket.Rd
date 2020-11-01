@@ -81,7 +81,7 @@ ggpk_func <- function(...) {
     geom_point(color = "red", ...)
 }
 
-ggplot(mtcars, aes(x = wt, y = mpg)) + 
+ggplot(mtcars, aes(x = wt, y = mpg)) +
   ggpk_func(color = "purple", size = 2, point.size = 4)
 }
 
