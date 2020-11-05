@@ -21,7 +21,7 @@ test_that("ggpackets print as expected", {
 
   expect_output({
     print(ggpacket())
-  }, "awaiting aesthetics")
+  }, trimws(capture.output(aes())[-1]))
 
   expect_output({
     print(ggpacket(mtcars, aes(x = wt)))

@@ -35,9 +35,9 @@ test_that("ggpackets aesthetic propegate through nested ggpackets", {
   expect_equal({
     p2 <- ggplot(mtcars) + aes(x = wt, y = mpg) + 
       (ggpacket(aes(x = ..y.., y = ..x..)) + geom_line())
-    p2$layers[[1]]$mapping
+    lapply(p2$layers[[1]]$mapping, rlang::quo_squash)
   }, {
-    aes(x = mpg, y = wt)
+    lapply(aes(x = mpg, y = wt), rlang::quo_squash)
   })
 
   # expect that nested ggpacket call can reroute aesthetics
@@ -45,9 +45,9 @@ test_that("ggpackets aesthetic propegate through nested ggpackets", {
     p2 <- ggplot(mtcars) + aes(x = wt, y = mpg) + 
       (ggpacket() + 
         (ggpacket(aes(x = ..y.., y = ..x..)) + geom_line()))
-    p2$layers[[1]]$mapping
+    lapply(p2$layers[[1]]$mapping, rlang::quo_squash)
   }, {
-    aes(x = mpg, y = wt)
+    lapply(aes(x = mpg, y = wt), rlang::quo_squash)
   })
 
   expect_equal({
@@ -55,9 +55,9 @@ test_that("ggpackets aesthetic propegate through nested ggpackets", {
       (ggpacket(aes(colour = ..y..)) + 
         (ggpacket(aes(fill = ..color..)) + 
            geom_line(aes(x = ..fill.., y = ..x..))))
-    p2$layers[[1]]$mapping
+    lapply(p2$layers[[1]]$mapping, rlang::quo_squash)
   }, {
-    aes(x = mpg, y = wt, colour = mpg, fill = mpg)
+    lapply(aes(x = mpg, y = wt, colour = mpg, fill = mpg), rlang::quo_squash)
   })
 })
 

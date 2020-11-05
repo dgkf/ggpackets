@@ -20,7 +20,7 @@
 #'
 handle_reset_mapping <- function(mapping) {
   mapping[!vapply(mapping, function(ai) {
-    rlang::is_quosure(ai) && rlang::quo_get_expr(ai) == quote(..reset..)
+    rlang::is_quosure(ai) && rlang::quo_squash(ai) == quote(..reset..)
   }, logical(1L))]
 }
 
@@ -67,11 +67,11 @@ substitute_quote.default <- function(q, env = parent.frame()) {
 }
 
 substitute_quote.quosures <- function(q, env = parent.frame()) {
-  lapply(q, function(...) substitute_quote(...), env = env)
+  rlang::as_quosures(lapply(q, function(...) substitute_quote(...), env = env))
 }
 
 substitute_quote.quosure <- function(q, env = parent.frame()) {
   # TODO: handle mixed quosure environments instead of retaining original
-  eval(bquote(substitute(.(rlang::quo_get_expr(q)), env)))
+  rlang::quo_set_expr(q, do.call(substitute, list(rlang::quo_squash(q), env)))
 }
 

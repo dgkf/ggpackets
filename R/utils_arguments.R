@@ -40,7 +40,7 @@ filter_by_ggcall_ids <- function(x, call_ids, all_ids) {
 }
 
 collapse_mappings <- function(args) { 
-  aes_args <- args[names(args) %in% "mapping"]
+  aes_args <- unname(args[names(args) %in% "mapping"])
   if (!length(aes_args)) return(args)
   args <- args[!names(args) %in% "mapping"]
   args$mapping <- do.call(update_mapping, aes_args)
@@ -48,7 +48,7 @@ collapse_mappings <- function(args) {
 }
 
 collapse_data <- function(args) { 
-  data_args <- args[names(args) %in% "data"]
+  data_args <- unname(args[names(args) %in% "data"])
   if (!length(data_args)) return(args)
   args <- args[!names(args) %in% "data"]
   args$data <- do.call(update_data, data_args)
