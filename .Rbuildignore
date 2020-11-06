@@ -2,10 +2,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github
+^\.githooks
 ^\.travis\.yml$
 ^_pkgdown\.yml$
 ^README\.Rmd$
 ^README[-_].*\.png$
 ^Jenkinsfile$
-^githooks*
 ^docs$
