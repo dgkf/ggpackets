@@ -39,4 +39,18 @@ test_that("<ggpacket> + <ggpacket> adds ggpacket as nested ggcall", {
   })
 })
 
+test_that("<ggpacket> %+% <call> captures expressions, even if error prone", {
+  expect_silent({
+    ggpacket() %+% geom_line(fake_param = 1 + "a")
+  })
+})
+
+test_that("%+% and + are equal aside from avoiding initial evaluation", {
+  expect_equal({
+    ggpacket() %+% geom_line(color = "red")
+  }, {
+    ggpacket() + geom_line(color = "red")
+  })
+})
+
 
