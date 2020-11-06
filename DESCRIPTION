@@ -15,7 +15,8 @@ Imports:
     methods,
     ggplot2,
     tibble,
-    rlang
+    rlang,
+    crayon
 Suggests:
     testthat,
     dplyr,

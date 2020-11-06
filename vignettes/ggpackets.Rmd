@@ -197,7 +197,7 @@ ggplot(mtcars) +
 > syntax to intuitively set a default value while allowing user-flexibility.
 >
 > ````r
-> my_ggpk <- function(...) {
+> f <- function(...) {
 >   ggpacket(...) %+%              # all ... used as default for all layers
 >     geom_bar(fill = "red") %+%   # overwrites any fill from ...
 >     geom_bar(fill = "red", ...)  # allows ... to now mask the default
@@ -217,7 +217,7 @@ take a look at what we can do with this new function:
 
 ```{r ggpackets.ex2, warning = FALSE}
 ggplot(mtcars) + 
-  aes(x = carb, fill = vs) + 
+  aes(x = carb, y = wt, fill = vs) + 
   my_ggpk() + 
   facet_grid(. ~ vs, scales = 'free')
 ```
@@ -237,7 +237,7 @@ ggplot(mtcars) +
 
 ### Composing with `ggplot` annotations and themes
 
-```{r ggpackets.ex4, warning = FALSE}
+```{r ggpackets.ex4}
 ggplot(mtcars) + 
   aes(x = carb, y = wt, fill = carb) + 
   my_ggpk() + 

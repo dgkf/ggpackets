@@ -130,6 +130,7 @@ format_ggpacket_mapping.NULL <- function(x,
 }
 
 #' @importFrom utils capture.output
+#' @importFrom crayon red
 format_ggpacket_mapping.default <- function(x,
     width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
 

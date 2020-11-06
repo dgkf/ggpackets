@@ -18,6 +18,10 @@ layer.}
 
 \item{...}{additional arguments passed to all bundled \code{ggplot} layers,
 and will be overwritten by layer-specific arguments if provided.}
+
+\item{.id}{an optional identifier tag for the \code{ggpacket}, used for
+filtering arguments and aesthetics that are propegated into the contained
+\code{ggplot} layers.}
 }
 \value{
 A new \code{ggpacket} object with the new defaults applied

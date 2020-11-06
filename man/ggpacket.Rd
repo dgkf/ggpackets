@@ -17,6 +17,9 @@ the \code{ggpacket}. Layer-specific mappings will update the value of the
 mapping, and assigning \code{..reset..} to any aesthetic field will return
 the propegated aesthetic mapping to a default, unmapped state for that
 layer.}
+    \item{\code{.id}}{an optional identifier tag for the \code{ggpacket}, used for
+filtering arguments and aesthetics that are propegated into the contained
+\code{ggplot} layers.}
   }}
 }
 \description{

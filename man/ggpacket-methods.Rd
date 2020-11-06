@@ -14,7 +14,7 @@
 \S4method{show}{ggpacket}(object)
 }
 \arguments{
-\item{e1}{A ggpacket object.}
+\item{e1}{A \code{ggpacket} object.}
 
 \item{e2}{Any object.}
 

@@ -76,7 +76,7 @@ names.ggpacket <- function(x) {
 
 #' Add a ggpacket object to another, arbitrary object
 #'
-#' @param e1 A ggpacket object.
+#' @param e1 A \code{ggpacket} object.
 #' @param e2 Any object.
 #'
 #' @rdname ggpacket-methods
@@ -88,18 +88,45 @@ setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
   ggpacket_plus_ANY(e1, e2)
 })
 
+#' Index into a ggpacket object
+#' 
+#' @param x A \code{ggpacket} object.
+#' @param i A \code{character} or \code{numeric} vector for indexing.
+#' @param j Unused.
+#' @param drop Unused.
+#' @param ... Unused.
+#' 
 #' @export
 setMethod("[", c("ggpacket", "ANY", "ANY"), `[.ggpacket`)
 
+#' Index into a ggpacket object
+#' 
+#' @param x A \code{ggpacket} object.
+#' @param i A \code{character} or \code{numeric} value for indexing.
+#' @param j Unused.
+#' @param ... Unused.
+#' 
 #' @export
 setMethod("[[", c("ggpacket", "ANY", "ANY"), `[[.ggpacket`)
 
+#' Get the number of ggcalls within a ggpacket
+#'
+#' @param x A \code{ggpacket} object
+#'
 #' @export
 setMethod("length", "ggpacket", length.ggpacket)
 
+#' Convert a ggpacket to a list of ggcalls
+#'
+#' @param x A \code{ggpacket} object
+#'
 #' @export
 setMethod("as.list", "ggpacket", as.list.ggpacket)
 
+#' Fetch the ids associated with each ggcall
+#'
+#' @param x A \code{ggpacket} object
+#'
 #' @export
 setMethod("names", "ggpacket", names.ggpacket)
 
@@ -259,6 +286,9 @@ ggpacket <- function(...) {
 #' layer.
 #' @param ... additional arguments passed to all bundled \code{ggplot} layers,
 #' and will be overwritten by layer-specific arguments if provided.
+#' @param .id an optional identifier tag for the \code{ggpacket}, used for
+#' filtering arguments and aesthetics that are propegated into the contained
+#' \code{ggplot} layers.
 #'
 #' @return A new \code{ggpacket} object with the new defaults applied
 #'
@@ -353,6 +383,10 @@ update_data.formula <- function(d1, d2, ...) {
 }
 
 
+#' Check a ggpacket object for required aesthetic arguments
+#' 
+#' @param x A \code{ggpacket} object or related \code{ggplot} component
+#' 
 #' @export
 required_aesthetics <- function(x) {
   UseMethod("required_aesthetics")
