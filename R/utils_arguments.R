@@ -4,6 +4,9 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
   if (!is.function(fobj) || is.primitive(fobj)) return(expr)
   fargs <- as.list(expr)[-1]
 
+  # evaluate data argument greedily
+  fargs$data <- eval(fargs$data, envir = envir)
+
   # replace dots with ellipsis args in envir
   dots <- eval(quote(substitute(...())), envir = envir)
   dots_idx <- utils::tail(which(fargs == quote(...)), 1)
@@ -11,6 +14,7 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
     fargs <- append(fargs, dots, after = dots_idx)
     fargs <- fargs[fargs != quote(...)]
   }
+
 
   fargs <- collapse_mappings(fargs)
   fargs <- collapse_data(fargs)
@@ -23,6 +27,7 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
 filter_by_ggcall_ids <- function(x, call_ids, all_ids) {
   if (is.null(x)) return(x)
 
+  in_xnames <- names(x)
   names(x) <- gsub(
     sprintf("^(%s)\\.(.+)", paste0(call_ids, collapse = "|")), 
     "\\2", 
@@ -36,7 +41,13 @@ filter_by_ggcall_ids <- function(x, call_ids, all_ids) {
     ncol = length(all_ids), 
     dimnames = list(names(x), all_ids))
 
-  x[!apply(x_name_matches, 1L, any)]
+  x <- x[!apply(x_name_matches, 1L, any)]
+
+  # prefer arguments that have been explicitly prefixed with an id
+  is_prefixed <- !in_xnames %in% names(x) 
+  x[names(is_prefixed)] <- x[is_prefixed]
+
+  x[!duplicated(names(x), fromLast = TRUE)]
 }
 
 collapse_mappings <- function(args) { 
@@ -92,7 +103,7 @@ with_ignore_unknown_params <- function(expr, envir = parent.frame()) {
   withCallingHandlers({
     eval(expr, envir = envir)
   }, warning = function(w) {
-    if (grepl("^Ignoring unknown parameters:", w$message))
+    if (grepl("^Ignoring unknown (parameters|aesthetics):", w$message))
       invokeRestart("muffleWarning")
   })
 }

@@ -11,7 +11,7 @@ as_gg_call <- function(x, which = -3L) {
   xexpr <- eval(bquote(
     substitute(.(substitute(x)))),
     envir = parent.frame(-which - 1L))
-  
+
   xids <- c()
   if (is.call(xexpr)) {
     xexpr <- expand_dots(xexpr, parent.frame(-which))

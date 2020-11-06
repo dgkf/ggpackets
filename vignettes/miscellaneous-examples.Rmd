@@ -94,7 +94,6 @@ ggpk_tukey_ribbons <- function(...) {
     stat = 'summary',
     fun.data = function(d) c(y = median(d)),
     alpha = 0.8,
-    size = 1.5,
     ...)
 }
 ```

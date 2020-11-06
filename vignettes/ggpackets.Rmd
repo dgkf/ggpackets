@@ -217,7 +217,7 @@ take a look at what we can do with this new function:
 
 ```{r ggpackets.ex2, warning = FALSE}
 ggplot(mtcars) + 
-  aes(x = carb, y = wt, fill = vs) + 
+  aes(x = carb, fill = vs) + 
   my_ggpk() + 
   facet_grid(. ~ vs, scales = 'free')
 ```
