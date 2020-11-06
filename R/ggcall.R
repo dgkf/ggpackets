@@ -2,8 +2,8 @@
 #' 
 #' @param x An expression to convert to a ggcall.
 #' @param which The relative frame offset in which the expression should be
-#'    eventually evaluated.
-#' 
+#' eventually evaluated.
+#'
 #' @importFrom rlang quos enquo quo_get_expr quo_set_env
 #' @importFrom ggplot2 standardise_aes_names
 #'

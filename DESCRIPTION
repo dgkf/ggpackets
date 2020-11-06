@@ -9,11 +9,11 @@ Description: Create groups of ggplot layers that can be easily migrated from
     one plot to another, reducing redundant code and improving the ability to
     format many plots that draw from the same source ggpacket layers.
 Depends:
-    R (>= 3.1.0)
+    R (>= 3.1.0),
+    ggplot2
 Imports:
     utils,
     methods,
-    ggplot2,
     tibble,
     rlang,
     crayon
