@@ -21,7 +21,8 @@ Suggests:
     testthat,
     dplyr,
     backports,
-    knitr
+    knitr,
+    rmarkdown
 LazyData: true
 License: MIT + file LICENSE
 RoxygenNote: 7.1.1
