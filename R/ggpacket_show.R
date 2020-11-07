@@ -7,7 +7,7 @@
 #'
 #' @importFrom ggplot2 ggplot ggplot_build
 #' @importFrom methods show
-#' @export
+#'
 setMethod("show", "ggpacket", function(object) {
   warnings <- list()
   ggout <- tryCatch(withCallingHandlers(

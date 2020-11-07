@@ -65,8 +65,6 @@ warnings when using a bare \code{+}.
 
 \examples{
 \dontrun{
-library(ggplot2)
-
 # create a ggpacket directly, setting some fixed argument settings
 ggpk_simple <- ggpacket() \%+\% geom_line(color = "red") \%+\% geom_point()
 ggplot(mtcars, aes(x = wt, y = mpg)) + ggpk_simple()

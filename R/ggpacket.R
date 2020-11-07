@@ -81,8 +81,6 @@ names.ggpacket <- function(x) {
 #'
 #' @rdname ggpacket-methods
 #' @aliases +,ggpacket,ANY-method
-#'
-#' @export
 #' 
 setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
   ggpacket_plus_ANY(e1, e2)
@@ -96,7 +94,6 @@ setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
 #' @param drop Unused.
 #' @param ... Unused.
 #' 
-#' @export
 setMethod("[", c("ggpacket", "ANY", "ANY"), `[.ggpacket`)
 
 #' Index into a ggpacket object
@@ -106,28 +103,24 @@ setMethod("[", c("ggpacket", "ANY", "ANY"), `[.ggpacket`)
 #' @param j Unused.
 #' @param ... Unused.
 #' 
-#' @export
 setMethod("[[", c("ggpacket", "ANY", "ANY"), `[[.ggpacket`)
 
 #' Get the number of ggcalls within a ggpacket
 #'
 #' @param x A \code{ggpacket} object
 #'
-#' @export
 setMethod("length", "ggpacket", length.ggpacket)
 
 #' Convert a ggpacket to a list of ggcalls
 #'
 #' @param x A \code{ggpacket} object
 #'
-#' @export
 setMethod("as.list", "ggpacket", as.list.ggpacket)
 
 #' Fetch the ids associated with each ggcall
 #'
 #' @param x A \code{ggpacket} object
 #'
-#' @export
 setMethod("names", "ggpacket", names.ggpacket)
 
 
@@ -243,8 +236,6 @@ gg_plus_ggpacket <- function(e1, e2) {
 #'
 #' @examples
 #' \dontrun{
-#' library(ggplot2)
-#'
 #' # create a ggpacket directly, setting some fixed argument settings
 #' ggpk_simple <- ggpacket() %+% geom_line(color = "red") %+% geom_point()
 #' ggplot(mtcars, aes(x = wt, y = mpg)) + ggpk_simple()
@@ -387,31 +378,26 @@ update_data.formula <- function(d1, d2, ...) {
 #' 
 #' @param x A \code{ggpacket} object or related \code{ggplot} component
 #' 
-#' @export
 required_aesthetics <- function(x) {
   UseMethod("required_aesthetics")
 }
 
-#' @export
 required_aesthetics.default <- function(x) {
   character(0L)
 }
 
-#' @export
 required_aesthetics.ggpacket <- function(x) {
   if (length(x@ggcalls) > 1L) {
-    sort(unique(unlist(lapply(as.list(x), required_aesthetics))))
+    sort(unique(unlist(lapply(as.list(x), function(i) required_aesthetics(i)))))
   } else {
     required_aesthetics(x@ggcalls)
   }
 }
 
-#' @export
 required_aesthetics.LayerInstance <- function(x) {
   x$geom$required_aes
 }
 
-#' @export
 required_aesthetics.quosures <- function(x) {
   aess <- .all_aesthetics
   names(aess) <- paste0("..", aess, "..")
@@ -443,9 +429,6 @@ required_aesthetics.quosures <- function(x) {
     c(mapped_aes, named_aes_args))
 }
 
-#' @export
 required_aesthetics.list <- function(x) {
-  sort(unique(unlist(sapply(x, required_aesthetics))))
+  sort(unique(unlist(sapply(x, function(i) required_aesthetics(i)))))
 }
-
-

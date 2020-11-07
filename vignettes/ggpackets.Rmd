@@ -46,10 +46,9 @@ ggplot(mtcars) +
   geom_bar(stat= 'summary', aes(y = mpg), 
     fun.data = function(c) c(y = mean(c))) + 
   geom_errorbar(stat = 'summary', aes(y = mpg), width = 0.2,
-    fun.data = function(c) c(
-      y = mean(c),
-      ymin = mean(c) - sd(c),
-      ymax = mean(c) + sd(c))) + 
+    fun.y = mean,
+    fun.min = ~mean(.) - sd(.),
+    fun.max = ~mean(.) + sd(.)) + 
   geom_text(stat = 'summary', vjust = -0.5, color = 'white',
     fun.data = function(c) c(
       label = length(c), 
