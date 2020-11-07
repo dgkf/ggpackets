@@ -23,7 +23,7 @@ Suggests:
     backports,
     knitr
 LazyData: true
-License: GPL-3
+License: MIT
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
