@@ -4,6 +4,7 @@
 #' plots that draw from the same source ggpacket layers.
 #'
 #' @examples
+#'
 #' # Prep a tidy data.frame to plot with
 #' airquality_long <- rbind(
 #'   data.frame(
@@ -39,10 +40,7 @@
 #'   scale_y_log10() + 
 #'   labs(x = "Week")
 #' 
-#' \dontrun{
 #' # for further examples, check out the vignettes
 #' vignette(package = "ggpackets")
-#'
-#' }
 #'
 "_PACKAGE"

@@ -5,7 +5,7 @@ Authors@R:
     person("Doug", "Kelkhoff", 
         email = "doug.kelkhoff@gmail.com", 
         role = c("aut", "cre"))
-Description: Create groups of ggplot layers that can be easily migrated from
+Description: Create groups of 'ggplot2' layers that can be easily migrated from
     one plot to another, reducing redundant code and improving the ability to
     format many plots that draw from the same source ggpacket layers.
 Depends:

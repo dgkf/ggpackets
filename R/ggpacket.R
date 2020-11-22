@@ -235,7 +235,8 @@ gg_plus_ggpacket <- function(e1, e2) {
 #' @slot ggcalls A list containing the layers stored within the \code{ggpacket}
 #'
 #' @examples
-#' \dontrun{
+#' library(ggplot2)
+#'
 #' # create a ggpacket directly, setting some fixed argument settings
 #' ggpk_simple <- ggpacket() %+% geom_line(color = "red") %+% geom_point()
 #' ggplot(mtcars, aes(x = wt, y = mpg)) + ggpk_simple()
@@ -255,7 +256,6 @@ gg_plus_ggpacket <- function(e1, e2) {
 #'
 #' ggplot(mtcars, aes(x = wt, y = mpg)) +
 #'   ggpk_func(color = "purple", size = 2, point.size = 4)
-#' }
 #'
 #' @importFrom methods new
 #' @export
