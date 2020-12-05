@@ -22,7 +22,8 @@ Suggests:
     dplyr,
     backports,
     knitr,
-    rmarkdown
+    rmarkdown,
+    stringi
 LazyData: true
 License: MIT + file LICENSE
 RoxygenNote: 7.1.1
