@@ -143,6 +143,7 @@ gg_plus_ggpacket <- function(e1, e2) {
 
   Reduce(function(gg, ggcall) {
     ggcall_ids <- attr(ggcall, "ids")
+    ggcall <- ggcall[[1]]
 
     # apply substitutions for ..dot.. names
     ggcallf <- rlang::eval_tidy(ggcall[[1]])
