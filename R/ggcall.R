@@ -27,8 +27,11 @@ as_gg_call <- function(x, which = -3L) {
     xcallname <- infer_ggcall_name(rlang::quo_get_expr(xcall))
   }
 
-  attr(xcall, "ids") <- if (length(xids)) xids else infer_ggcall_id(xcallname)
-  xcall <- list(xcall)
+  xcall <- list(structure(
+    list(xcall),
+    ids = if (length(xids)) xids else infer_ggcall_id(xcallname),
+    class = c("ggcall", "list")
+  ))
   names(xcall) <- xcallname
   xcall
 }

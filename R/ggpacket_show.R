@@ -161,6 +161,13 @@ format_ggpacket_ggcall <- function(x,
 format_ggpacket_ggcall.default <- function(x,
     width = getOption("width", 80) * 0.9) {
 
+  id_str <- if (length(attr(x, "ids"))) {
+    paste0(paste0("#", attr(x, "ids"), collapse = " "), "\n")
+  } else {
+    character(0L)
+  }
+
+  x <- x[[1]] # unpack after using outer attributes
   if (!grepl("\\w", rlang::quo_get_expr(x[[1]])))
     return(paste(
       gsub("(^\\s*|\\s*$)", "",
@@ -168,10 +175,6 @@ format_ggpacket_ggcall.default <- function(x,
       collapse = " "))
 
   non_breaking_space <- "\u00A0"
-  id_str <- if (length(attr(x, "ids")))
-      paste0(paste0("#", attr(x, "ids"), collapse = " "), "\n")
-    else
-      character(0L)
 
   args <- mapply(
     function(...) format_ggpacket_ggcall_arg(...),
