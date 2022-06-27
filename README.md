@@ -11,7 +11,7 @@ check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https
 Take a look at the **[ggpackets project
 page](https://dgkf.github.io/ggpackets/)**\!
 
-Easily build components of ggplots without sacraficing the ease of
+Easily build components of ggplots without sacrificing the ease of
 ggplot’s layer parameters and construction syntax.
 
 ### Installation
@@ -82,7 +82,7 @@ ggplot(diamonds, aes(x = cut, y = price, color = carat)) +
 
 <img src="https://user-images.githubusercontent.com/18220321/98409555-f0298b80-2027-11eb-83f9-b2d208e1c037.png" width="600px" height="400px" style="display: block; margin: auto;" />
 
-## Handle custom arguments & parameter propegation
+## Handle custom arguments & parameter propagation
 
 In addition to simply wrapping multiple `ggplot2` layers, `ggpackets`
 can streamline a number of complicated plotting scenarios such as
