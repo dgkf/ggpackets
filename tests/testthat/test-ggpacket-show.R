@@ -21,7 +21,7 @@ test_that("ggpacket with bound data prints a portion of the bound dataset", {
     print(ggpacket(mtcars))
   }, paste(colnames(mtcars)[1:5], collapse = "\\W+"))
 })
-  
+
 test_that("ggpacket prints section for bound aesthetics mapping in console output", {
   expect_output({
     print(ggpacket())
@@ -35,9 +35,10 @@ test_that("ggpacket with bound, empty aesthetic mapping prints empty aesthetics"
 })
 
 test_that("ggpacket prints bound aesthetic mapping", {
+  # useBytes to avoid non-problematic Windows-specific encoding issues
   expect_output({
     print(ggpacket(mtcars, aes(x = wt)))
-  }, utils::capture.output(aes(x = wt))[-1], fixed = TRUE)
+  }, utils::capture.output(aes(x = wt))[-1], fixed = TRUE, useBytes = TRUE)
 })
 
 test_that("ggpacket prints section for ggcall layers", {
