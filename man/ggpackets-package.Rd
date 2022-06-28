@@ -51,6 +51,13 @@ ggplot(airquality_long) +
 vignette(package = "ggpackets")
 
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://dgkf.github.io/ggpackets}
+}
+
+}
 \author{
 \strong{Maintainer}: Doug Kelkhoff \email{doug.kelkhoff@gmail.com}
 

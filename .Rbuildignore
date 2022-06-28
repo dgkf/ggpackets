@@ -4,10 +4,11 @@
 ^\.github
 ^\.githooks
 ^\.travis\.yml$
-^_pkgdown\.yml$
 ^README\.Rmd$
 ^README[-_].*\.png$
 ^Jenkinsfile$
 ^docs$
 ^codecov\.yml$
 ^\.github$
+^_pkgdown\.yml$
+^pkgdown
