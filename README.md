@@ -19,10 +19,7 @@ ggplot’s layer parameters and construction syntax.
 `ggpackets` is not yet available on CRAN. Until it is, you can install
 the most recent development version using the short script below:
 
-``` r
-if (!require(devtools, quietly = TRUE)) 
-  install.packages('devtools')
-
+```
 devtools::install_github('dgkf/ggpackets', build_vignettes = TRUE)
 ```
 
