@@ -23,10 +23,11 @@ Suggests:
     backports,
     knitr,
     rmarkdown,
-    stringi
+    stringi,
+    covr
 LazyData: true
 License: MIT + file LICENSE
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

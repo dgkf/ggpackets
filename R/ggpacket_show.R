@@ -35,6 +35,7 @@ print.ggpacket <- function(x, ...) {
   invisible(x)
 }
 
+#' @export
 format.ggpacket <- function(x, ...) {
   req_aes <- required_aesthetics(x)
   missing_aes <- setdiff(req_aes, names(x@mapping))

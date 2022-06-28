@@ -9,3 +9,5 @@
 ^README[-_].*\.png$
 ^Jenkinsfile$
 ^docs$
+^codecov\.yml$
+^\.github$
