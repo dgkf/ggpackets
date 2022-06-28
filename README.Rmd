@@ -24,7 +24,7 @@ layer parameters and construction syntax.
 `ggpackets` is not yet available on CRAN. Until it is, you can install the most
 recent development version using the short script below:
 
-```{r, eval = FALSE}
+```r
 if (!require(devtools, quietly = TRUE)) 
   install.packages('devtools')
 
