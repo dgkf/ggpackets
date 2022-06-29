@@ -6,7 +6,7 @@ output: github_document
 
 [![CRAN](https://img.shields.io/cran/v/ggpackets.svg)](https://cran.r-project.org/package=ggpackets)
 [![R CMD check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https://github.com/dgkf/ggpackets/actions?query=workflow%3AR-CMD-check)
-[![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg)](https://codecov.io/gh/dgkf/ggpackets)
+[![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg)](https://app.codecov.io/gh/dgkf/ggpackets)
 
 
 ## Overview

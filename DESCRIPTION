@@ -31,4 +31,4 @@ RoxygenNote: 7.2.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-URL: https://dgkf.github.io/ggpackets
+URL: https://dgkf.github.io/ggpackets/ 
