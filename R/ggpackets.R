@@ -8,14 +8,14 @@
 #' # Prep a tidy data.frame to plot with
 #' airquality_long <- rbind(
 #'   data.frame(
-#'     airquality[,c("Month", "Day")], 
-#'     Variable = "Temp", 
+#'     airquality[,c("Month", "Day")],
+#'     Variable = "Temp",
 #'     Measurement = airquality$Temp),
 #'   data.frame(
-#'     airquality[,c("Month", "Day")], 
+#'     airquality[,c("Month", "Day")],
 #'     Variable = "Ozone",
 #'     Measurement = airquality$Ozone))
-#' 
+#'
 #' # Build our new composite ggplot geom
 #' geom_error_line <- ggpacket() %+%
 #'   geom_ribbon(
@@ -25,21 +25,21 @@
 #'     fun = mean,
 #'     fun.min = ~mean(.) - sd(.),
 #'     fun.max = ~mean(.) + sd(.),
-#'     alpha = 0.15, 
+#'     alpha = 0.15,
 #'     color = NA) %+%
 #'   geom_line(
 #'     .id = "line",
 #'     stat = 'summary',
 #'     fun = mean,
 #'     alpha = 0.8)
-#' 
+#'
 #' # Try it out!
-#' ggplot(airquality_long) + 
-#'   aes(x = round((Month * 30 + Day) / 4), y = Measurement, color = Variable) + 
-#'   geom_error_line(na.rm = TRUE, line.size = 1.5) + 
-#'   scale_y_log10() + 
+#' ggplot(airquality_long) +
+#'   aes(x = round((Month * 30 + Day) / 4), y = Measurement, color = Variable) +
+#'   geom_error_line(na.rm = TRUE, line.size = 1.5) +
+#'   scale_y_log10() +
 #'   labs(x = "Week")
-#' 
+#'
 #' # for further examples, check out the vignettes
 #' vignette(package = "ggpackets")
 #'
