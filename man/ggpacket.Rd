@@ -22,6 +22,9 @@ filtering arguments and aesthetics that are propegated into the contained
 \code{ggplot} layers.}
   }}
 }
+\value{
+A new \code{ggpacket} object
+}
 \description{
 \code{ggpacket}s present a mechanism for easily collecting loose ggplot
 layers into objects that can be reused across multiple plots, as well as

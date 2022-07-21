@@ -11,6 +11,10 @@ e1 \%+\% e2
 
 \item{e2}{Addition rhs.}
 }
+\value{
+A new \code{ggpacket} object with \code{e2} appended as an additional
+layer or layers.
+}
 \description{
 Lazy handler for ggplot addition
 }

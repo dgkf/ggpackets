@@ -2,6 +2,7 @@
 # ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="134px"/>
 
 [![CRAN](https://img.shields.io/cran/v/ggpackets.svg)](https://cran.r-project.org/package=ggpackets)
+[![downloads](https://cranlogs.r-pkg.org/badges/ggpackets)](https://cran.r-project.org/package=ggpackets)
 [![R CMD
 check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https://github.com/dgkf/ggpackets/actions?query=workflow%3AR-CMD-check)
 [![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg)](https://app.codecov.io/gh/dgkf/ggpackets)
@@ -9,43 +10,46 @@ check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https
 ## Overview
 
 Take a look at the **[ggpackets project
-page](https://dgkf.github.io/ggpackets/)**\!
+page](https://dgkf.github.io/ggpackets/)**!
 
-Easily build components of ggplots without sacrificing the ease of
+Easily build components of ggplots without sacraficing the ease of
 ggplot’s layer parameters and construction syntax.
 
 ### Installation
 
-`ggpackets` is not yet available on CRAN. Until it is, you can install
-the most recent development version using the short script below:
-
+``` r
+install.packages("ggpackets")
 ```
-devtools::install_github('dgkf/ggpackets', build_vignettes = TRUE)
+
+*or install the development version*
+
+``` r
+devtools::install_github("dgkf/ggpackets", build_vignettes = TRUE)
 ```
 
 ## Get Involved
 
 There are plenty of ways to help contribute:
 
-1.  **File issues\!**  
+1.  **File issues!**  
     Found a bug? Think the syntax looks ugly? Don’t like the name? Tell
-    me\! [Issues](https://github.com/dgkf/ggpackets/issues) are the best
+    me! [Issues](https://github.com/dgkf/ggpackets/issues) are the best
     way to start the conversation.
 
-2.  **Write documentation\!**  
+2.  **Write documentation!**  
     More resources always helps. Found a function unintuitive? Example
     code and improved function descriptors would be helpful. If you use
     the package and would feel comfortable writing about a topic not yet
     covered in a vignette, feel free to contribute a new vignette for
     it.
 
-3.  **Write Unit Tests\!**  
+3.  **Write Unit Tests!**  
     There’s some pretty sophisticated manipulations going on under the
     hood to make everything as clean as possible, because of that it’s
     important to make sure everything stays working the way we expect it
-    to. Unit test contributions always welcome\!
+    to. Unit test contributions always welcome!
 
-4.  **Contribute Code\!**  
+4.  **Contribute Code!**  
     Last but not least, code contributors are welcome. Reach out and get
     in touch if you’re passionate about the goal of the project.
 
@@ -77,9 +81,9 @@ ggplot(diamonds, aes(x = cut, y = price, color = carat)) +
   ggtitle('Diamond price distribution by cut')
 ```
 
-<img src="https://user-images.githubusercontent.com/18220321/98409555-f0298b80-2027-11eb-83f9-b2d208e1c037.png" width="600px" height="400px" style="display: block; margin: auto;" />
+<img src="README_files/figure-gfm/diamonds.boxplot-1.png" width="600px" height="400px" style="display: block; margin: auto;" />
 
-## Handle custom arguments & parameter propagation
+## Handle custom arguments & parameter propegation
 
 In addition to simply wrapping multiple `ggplot2` layers, `ggpackets`
 can streamline a number of complicated plotting scenarios such as
@@ -120,8 +124,6 @@ In this function we make use of a number of these specialized behaviors.
     together, which allows `ggpackets` to accept non-standard arguments
     before ggplot sends us warnings about them.
 
-<!-- end list -->
-
 ``` r
 ggplot(as.data.frame(OrchardSprays)) + 
   aes(x = rowpos, y = colpos, label = treatment, fill = decrease) + 
@@ -129,4 +131,4 @@ ggplot(as.data.frame(OrchardSprays)) +
   ggtitle('Honeybee population decline in repellent trial grid')
 ```
 
-<img src="https://user-images.githubusercontent.com/18220321/98409633-12230e00-2028-11eb-87c9-163156f03514.png" width="600px" height="400px" style="display: block; margin: auto;" />
+<img src="README_files/figure-gfm/orchid.heatmap-1.png" width="600px" height="400px" style="display: block; margin: auto;" />
