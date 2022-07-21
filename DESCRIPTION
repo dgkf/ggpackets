@@ -1,6 +1,6 @@
 Package: ggpackets
 Title: Package Plot Layers for Easier Portability and Modularization
-Version: 0.2.0
+Version: 0.2.1.9000
 Authors@R: 
     person("Doug", "Kelkhoff", 
         email = "doug.kelkhoff@gmail.com", 
