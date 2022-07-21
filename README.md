@@ -12,7 +12,7 @@ check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https
 Take a look at the **[ggpackets project
 page](https://dgkf.github.io/ggpackets/)**!
 
-Easily build components of ggplots without sacraficing the ease of
+Easily build components of ggplots without sacrificing the ease of
 ggplot’s layer parameters and construction syntax.
 
 ### Installation
