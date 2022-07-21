@@ -11,6 +11,10 @@
 
 \item{e2}{A ggproto object to add.}
 }
+\value{
+A \code{ggplot2} object or \code{ggpacket}, dependent on whether
+\code{e1} is a materialized \code{ggproto} object or a \code{ggpacket}.
+}
 \description{
 Intercept ggplot2 ggproto plus operator
 }

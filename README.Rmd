@@ -5,6 +5,7 @@ output: github_document
 # ggpackets <img src="man/figures/ggpackets-hex-small.png" align="right" width="134px"/>
 
 [![CRAN](https://img.shields.io/cran/v/ggpackets.svg)](https://cran.r-project.org/package=ggpackets)
+[![downloads](https://cranlogs.r-pkg.org/badges/ggpackets)](https://cran.r-project.org/package=ggpackets)
 [![R CMD check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https://github.com/dgkf/ggpackets/actions?query=workflow%3AR-CMD-check)
 [![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg)](https://app.codecov.io/gh/dgkf/ggpackets)
 
@@ -18,10 +19,13 @@ layer parameters and construction syntax.
 
 ### Installation
 
-`ggpackets` is not yet available on CRAN. Until it is, you can install the most
-recent development version using the short script below:
-
+```{r, eval = FALSE}
+install.packages("ggpackets")
 ```
+
+_or install the development version_
+
+```{r, eval = FALSE}
 devtools::install_github("dgkf/ggpackets", build_vignettes = TRUE)
 ```
 

@@ -4,8 +4,9 @@
 .Rhistory
 .RData
 .Ruserdata
-.README.html
 .DS_Store
+README.html
 README_files
 inst/doc
 docs
+

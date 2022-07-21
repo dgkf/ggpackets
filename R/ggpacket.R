@@ -17,7 +17,9 @@ setClass("ggpacket",
     data = "ANY",
     mapping = "ANY",
     dots = "list",
-    ggcalls = "list"))
+    ggcalls = "list"
+  )
+)
 
 
 #' Swallow calls when a ggpacket is added to any expression
@@ -81,28 +83,28 @@ names.ggpacket <- function(x) {
 #'
 #' @rdname ggpacket-methods
 #' @aliases +,ggpacket,ANY-method
-#' 
+#'
 setMethod(`+`, signature("ggpacket", "ANY"), function(e1, e2) {
   ggpacket_plus_ANY(e1, e2)
 })
 
 #' Index into a ggpacket object
-#' 
+#'
 #' @param x A \code{ggpacket} object.
 #' @param i A \code{character} or \code{numeric} vector for indexing.
 #' @param j Unused.
 #' @param drop Unused.
 #' @param ... Unused.
-#' 
+#'
 setMethod("[", c("ggpacket", "ANY", "ANY"), `[.ggpacket`)
 
 #' Index into a ggpacket object
-#' 
+#'
 #' @param x A \code{ggpacket} object.
 #' @param i A \code{character} or \code{numeric} value for indexing.
 #' @param j Unused.
 #' @param ... Unused.
-#' 
+#'
 setMethod("[[", c("ggpacket", "ANY", "ANY"), `[[.ggpacket`)
 
 #' Get the number of ggcalls within a ggpacket
@@ -148,7 +150,7 @@ gg_plus_ggpacket <- function(e1, e2) {
     # apply substitutions for ..dot.. names
     ggcallf <- rlang::eval_tidy(ggcall[[1]])
 
-    if (identical(ggcallf, .Primitive("(")) || 
+    if (identical(ggcallf, .Primitive("(")) ||
         identical(ggcallf, .Primitive("{"))) {
       ggpk_i <- rlang::eval_tidy(as.call(ggcall))
     } else {
@@ -224,6 +226,7 @@ gg_plus_ggpacket <- function(e1, e2) {
 #' warnings when using a bare \code{+}.
 #'
 #' @inheritDotParams ggpacket_call
+#' @return A new \code{ggpacket} object
 #'
 #' @slot data A lazy reference to the \code{data} parameter of the
 #' \code{ggpacket}, allowing for scoping the data used by a block of
@@ -376,9 +379,9 @@ update_data.formula <- function(d1, d2, ...) {
 
 
 #' Check a ggpacket object for required aesthetic arguments
-#' 
+#'
 #' @param x A \code{ggpacket} object or related \code{ggplot} component
-#' 
+#'
 required_aesthetics <- function(x) {
   UseMethod("required_aesthetics")
 }
@@ -406,7 +409,7 @@ required_aesthetics.quosures <- function(x) {
   layer <- tryCatch(rlang::eval_tidy(x[[1]]), error = function(e) NULL)
   if (is.primitive(layer))
     layer <- tryCatch(rlang::eval_tidy(as.call(x)), error = function(e) NULL)
-  if (is.function(layer)) 
+  if (is.function(layer))
     layer <- do.call(layer, list())
 
   layer_aes <- required_aesthetics(layer)
@@ -418,7 +421,7 @@ required_aesthetics.quosures <- function(x) {
   }))
 
   mapping_dot_aes <- unlist(lapply(
-    rlang::quo_squash(x$mapping)[layer_aes], 
+    rlang::quo_squash(x$mapping)[layer_aes],
     function(expr) {
       aess[match(all.names(expr), names(aess), nomatch = 0L)]
     }))
@@ -426,7 +429,7 @@ required_aesthetics.quosures <- function(x) {
   mapped_aes <- names(rlang::quo_squash(x$mapping)[-1])
 
   setdiff(
-    sort(unique(c(layer_aes, dot_aes, mapping_dot_aes))), 
+    sort(unique(c(layer_aes, dot_aes, mapping_dot_aes))),
     c(mapped_aes, named_aes_args))
 }
 
