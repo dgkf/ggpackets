@@ -81,7 +81,7 @@ ggplot(diamonds, aes(x = cut, y = price, color = carat)) +
   ggtitle('Diamond price distribution by cut')
 ```
 
-<img src="README_files/figure-gfm/diamonds.boxplot-1.png" width="600px" height="400px" style="display: block; margin: auto;" />
+<img src="https://user-images.githubusercontent.com/18220321/98409555-f0298b80-2027-11eb-83f9-b2d208e1c037.png" width="600px" height="400px" style="display: block; margin: auto;" />
 
 ## Handle custom arguments & parameter propegation
 
@@ -131,4 +131,4 @@ ggplot(as.data.frame(OrchardSprays)) +
   ggtitle('Honeybee population decline in repellent trial grid')
 ```
 
-<img src="README_files/figure-gfm/orchid.heatmap-1.png" width="600px" height="400px" style="display: block; margin: auto;" />
+<img src="https://user-images.githubusercontent.com/18220321/98409633-12230e00-2028-11eb-87c9-163156f03514.png" width="600px" height="400px" style="display: block; margin: auto;" />
