@@ -25,6 +25,9 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/news/index.html</loc>
+  </url>
+  <url>
     <loc>/reference/as.list-ggpacket-method.html</loc>
   </url>
   <url>
@@ -41,9 +44,6 @@
   </url>
   <url>
     <loc>/reference/dot-all_aesthetics.html</loc>
-  </url>
-  <url>
-    <loc>/reference/dot-plus_gg.html</loc>
   </url>
   <url>
     <loc>/reference/expand_dots.html</loc>
@@ -95,9 +95,6 @@
   </url>
   <url>
     <loc>/reference/only_formals_and_dots.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plus-.gg.html</loc>
   </url>
   <url>
     <loc>/reference/required_aesthetics.html</loc>
