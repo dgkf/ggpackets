@@ -1,8 +1,7 @@
 # ggpackets v0.2.1
 
-* handle `+.gg` masking a bit more responsibly, avoiding building of 
-  `ggplot2:::+.gg` into the `ggpackets` namespace and instead fetching it upon
-  use.
+* handle `+.gg` using recommended `ggplot2::ggplot_add` instead of intercepting
+  calls (#24, @dgkf)
 
 * remove `crayon` package dependency, only used for console output of missing
   aesthetics
