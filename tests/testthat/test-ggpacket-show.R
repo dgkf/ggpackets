@@ -88,3 +88,10 @@ test_that("ggpacket including required aesthetics considers internal remappings"
     ))
   })
 })
+
+test_that("show(<ggpacket>) behaviors identical to print for command line output", {
+  expect_identical(
+    capture.output(show(ggpacket(aes(y = test)) + geom_line(aes(x = ..y..)))),
+    capture.output(print(ggpacket(aes(y = test)) + geom_line(aes(x = ..y..))))
+  )
+})
