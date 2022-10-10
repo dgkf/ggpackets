@@ -1,7 +1,8 @@
 #' Extracted .all_aesthetics from internal ggplot2 with hardcoded fallback
-.all_aesthetics <- tryCatch({
+.all_aesthetics <- function() {
+  tryCatch({
     # attempt to stay current with ggplot .all_aesthetics upstream
-    get('.all_aesthetics', asNamespace('ggplot2'), inherits = FALSE)
+    get(".all_aesthetics", asNamespace("ggplot2"), inherits = FALSE)
   }, error = function(e) {
     # hard coded fallback in case upstream changes private variable name
     # #est for fallback viability included in testthat tests
@@ -11,6 +12,7 @@
       "upper", "vjust", "weight", "width", "x", "xend", "xmax", "xmin",
       "xintercept", "y", "yend", "ymax", "ymin", "yintercept", "z")
   })
+}
 
 
 
@@ -33,7 +35,7 @@ handle_reset_mapping <- function(mapping) {
 #' @param envir An environment in which the dot aesthetics should be evaluated.
 #'
 substitute_ggcall_dot_aes <- function(mapping, ggcall, envir = parent.frame()) {
-  aess <- .all_aesthetics
+  aess <- .all_aesthetics()
   names(aess) <- ggplot2::standardise_aes_names(aess)
 
   # add in mappings for alternative naming conventions before substitution
@@ -74,4 +76,3 @@ substitute_quote.quosure <- function(q, env = parent.frame()) {
   # TODO: handle mixed quosure environments instead of retaining original
   rlang::quo_set_expr(q, do.call(substitute, list(rlang::quo_squash(q), env)))
 }
-

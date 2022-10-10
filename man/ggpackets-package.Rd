@@ -11,6 +11,7 @@ another, reducing redundant code and improving the ability to format many
 plots that draw from the same source ggpacket layers.
 }
 \examples{
+library(ggplot2)
 
 # Prep a tidy data.frame to plot with
 airquality_long <- rbind(
@@ -54,7 +55,9 @@ vignette(package = "ggpackets")
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://github.com/dgkf/ggpackets}
   \item \url{https://dgkf.github.io/ggpackets/}
+  \item Report bugs at \url{https://github.com/dgkf/ggpackets/issues}
 }
 
 }

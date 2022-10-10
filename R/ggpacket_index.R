@@ -11,4 +11,3 @@ subset_ggpacket.character <- function(x, i, ...) {
   xs <- vapply(x@ggcalls, function(xi) any(i %in% attr(xi, "ids")), logical(1L))
   x[xs, ...]
 }
-

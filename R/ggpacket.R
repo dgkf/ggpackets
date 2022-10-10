@@ -403,7 +403,7 @@ required_aesthetics.LayerInstance <- function(x) {
 }
 
 required_aesthetics.quosures <- function(x) {
-  aess <- .all_aesthetics
+  aess <- .all_aesthetics()
   names(aess) <- paste0("..", aess, "..")
 
   layer <- tryCatch(rlang::eval_tidy(x[[1]]), error = function(e) NULL)

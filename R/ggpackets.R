@@ -4,6 +4,7 @@
 #' plots that draw from the same source ggpacket layers.
 #'
 #' @examples
+#' library(ggplot2)
 #'
 #' # Prep a tidy data.frame to plot with
 #' airquality_long <- rbind(

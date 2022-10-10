@@ -1,9 +1,12 @@
-#' ggplot2 internal gg addition method
+#' Retrieve ggplot2 internal gg addition method
 #'
-#' @param e1 Addition lhs
-#' @param e2 Addition rhs
+#' @return ggplot2's unexported `+.gg` handler
 #'
-.plus_gg <- getNamespace("ggplot2")[["+.gg"]]
+#' @keywords internal
+#'
+.get_ggplot2_internal_plus_gg <- function() {
+  getNamespace("ggplot2")[["+.gg"]]
+}
 
 
 #' Intercept ggplot2 ggproto plus operator
@@ -20,8 +23,10 @@
   if (inherits(e2, "ggpacket"))
     return(gg_plus_ggpacket(e1, e2))
 
-  if (!inherits(e1, "ggproto"))
-   return(.plus_gg(e1, e2))
+  if (!inherits(e1, "ggproto")) {
+    plus_fn <- .get_ggplot2_internal_plus_gg()
+    return(plus_fn(e1, e2))
+  }
 
   methods::new(
     "ggpacket",
