@@ -1,39 +1,9 @@
-#' Retrieve ggplot2 internal gg addition method
-#'
-#' @return ggplot2's unexported `+.gg` handler
-#'
-#' @keywords internal
-#'
-.get_ggplot2_internal_plus_gg <- function() {
-  getNamespace("ggplot2")[["+.gg"]]
-}
-
-
-#' Intercept ggplot2 ggproto plus operator
-#'
-#' @param e1 An object to add to a ggproto object.
-#' @param e2 A ggproto object to add.
-#'
-#' @return A \code{ggplot2} object or \code{ggpacket}, dependent on whether
-#'   \code{e1} is a materialized \code{ggproto} object or a \code{ggpacket}.
-#'
-#' @importFrom methods new
+#' @importFrom ggplot2 ggplot_add
 #' @export
-"+.gg" <- function(e1, e2) {
-  if (inherits(e2, "ggpacket"))
-    return(gg_plus_ggpacket(e1, e2))
-
-  if (!inherits(e1, "ggproto")) {
-    plus_fn <- .get_ggplot2_internal_plus_gg()
-    return(plus_fn(e1, e2))
-  }
-
-  methods::new(
-    "ggpacket",
-    ggpacket_call,
-    ggcalls = list(as_gg_call(e1), as_gg_call(e2))
-  )
+ggplot_add.ggpacket <- function(object, plot, object_name) {
+  gg_plus_ggpacket(plot, object)
 }
+
 
 
 #' Lazy handler for ggplot addition
