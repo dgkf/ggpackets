@@ -12,3 +12,4 @@ infer_ggcall_name(expr)
 \description{
 Label ggcall with function name if it can be deduced
 }
+\keyword{internal}

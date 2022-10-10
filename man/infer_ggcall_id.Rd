@@ -12,3 +12,4 @@ infer_ggcall_id(x)
 \description{
 Convert ggplot geom layers to friendly names
 }
+\keyword{internal}

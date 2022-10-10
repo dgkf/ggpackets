@@ -62,15 +62,15 @@ test_that("ggpacket with a bound ggcall layer prints bound ggcall expression", {
 
 test_that("ggpacket lacking required aesthetics indicates aesthetic missing", {
   expect_match({
-    crayon::strip_style(paste(capture.output({
+    paste(capture.output({
       ggpacket() + geom_line()
-    }), collapse = "\n"))
+    }), collapse = "\n")
   }, c("`x` -> <missing>"))
 
   expect_match({
-    crayon::strip_style(paste(capture.output({
+    paste(capture.output({
       ggpacket() + geom_line()
-    }), collapse = "\n"))
+    }), collapse = "\n")
   }, c("`y` -> <missing>"))
 })
 
@@ -87,4 +87,11 @@ test_that("ggpacket including required aesthetics considers internal remappings"
       capture.output(ggpacket(aes(y = test)) + geom_line(aes(x = ..y..)))
     ))
   })
+})
+
+test_that("show(<ggpacket>) behaviors identical to print for command line output", {
+  expect_identical(
+    capture.output(show(ggpacket(aes(y = test)) + geom_line(aes(x = ..y..)))),
+    capture.output(print(ggpacket(aes(y = test)) + geom_line(aes(x = ..y..))))
+  )
 })
