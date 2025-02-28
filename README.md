@@ -3,8 +3,7 @@
 
 [![CRAN](https://img.shields.io/cran/v/ggpackets.svg)](https://cran.r-project.org/package=ggpackets)
 [![downloads](https://cranlogs.r-pkg.org/badges/ggpackets)](https://cran.r-project.org/package=ggpackets)
-[![R CMD
-check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https://github.com/dgkf/ggpackets/actions?query=workflow%3AR-CMD-check)
+[![R-CMD-check](https://github.com/dgkf/ggpackets/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dgkf/ggpackets/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/dgkf/ggpackets/graph/badge.svg)](https://app.codecov.io/gh/dgkf/ggpackets)
 
