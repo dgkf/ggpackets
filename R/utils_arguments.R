@@ -33,7 +33,7 @@ expand_dots <- function(expr, envir = parent.frame(2L)) {
 #' Filter a named list by ids
 #'
 #' Filter a named list (often an aesthetic mapping or argument list) for only
-#' unprefixed elements, elements which don't match any of \code{all_ids} and 
+#' unprefixed elements, elements which don't match any of \code{all_ids} and
 #' those which match one of \code{call_ids}. For those that match, remove the
 #' id prefix.
 #'
@@ -46,22 +46,27 @@ filter_by_ggcall_ids <- function(x, call_ids, all_ids) {
 
   in_xnames <- names(x)
   names(x) <- gsub(
-    sprintf("^(%s)\\.(.+)", paste0(call_ids, collapse = "|")), 
-    "\\2", 
-    names(x))
+    sprintf("^(%s)\\.(.+)", paste0(call_ids, collapse = "|")),
+    "\\2",
+    names(x)
+  )
 
   x_name_matches <- matrix(
-    apply(as.matrix(all_ids), 1L, function(id, xnames) {
-        grepl(sprintf("^%s\\..+", id), xnames)
-      }, names(x)), 
-    nrow = length(x), 
-    ncol = length(all_ids), 
-    dimnames = list(names(x), all_ids))
+    apply(
+      as.matrix(all_ids),
+      1L,
+      function(id, xnames) grepl(sprintf("^%s\\..+", id), xnames),
+      names(x)
+    ),
+    nrow = length(x),
+    ncol = length(all_ids),
+    dimnames = list(names(x), all_ids)
+  )
 
   x <- x[!apply(x_name_matches, 1L, any)]
 
   # prefer arguments that have been explicitly prefixed with an id
-  is_prefixed <- !in_xnames %in% names(x) 
+  is_prefixed <- !in_xnames %in% names(x)
   x[names(is_prefixed)] <- x[is_prefixed]
 
   x[!duplicated(names(x), fromLast = TRUE)]
@@ -77,7 +82,7 @@ filter_by_ggcall_ids <- function(x, call_ids, all_ids) {
 #' they will be collapsed into a single mapping argument, appropriately
 #' updating aesthetic mappings.
 #'
-collapse_mappings <- function(args) { 
+collapse_mappings <- function(args) {
   aes_args <- unname(args[names(args) %in% "mapping"])
   if (!length(aes_args)) return(args)
   args <- args[!names(args) %in% "mapping"]
@@ -95,7 +100,7 @@ collapse_mappings <- function(args) {
 #' they will be collapsed into a single mapping argument, appropriately
 #' updating datasets and applying functions as needed.
 #'
-collapse_data <- function(args) { 
+collapse_data <- function(args) {
   data_args <- unname(args[names(args) %in% "data"])
   if (!length(data_args)) return(args)
   args <- args[!names(args) %in% "data"]
@@ -120,10 +125,12 @@ match_unnamed_args <- function(f, args, envir = parent.frame()) {
   # only match unnamed, possibly redundaant args
   idx_unnamed <- is.null(names(args)) | names(args) == ""
   matched_args <- match.call(
-    f, 
-    as.call(append(f, args[idx_unnamed])), 
-    expand.dots = TRUE, 
-    envir = envir)[-1]
+    f,
+    as.call(append(f, args[idx_unnamed])),
+    expand.dots = TRUE,
+    envir = envir
+  )[-1]
+
   names(args)[idx_unnamed] <- names(matched_args)
   args
 }

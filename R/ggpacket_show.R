@@ -130,48 +130,65 @@ format_ggpacket_data.default <- function(
 
 #' @importFrom utils head
 #' @export
-format_ggpacket_data.data.frame <- function(x,
-    width = getOption("width", 80) * 0.9) {
+format_ggpacket_data.data.frame <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   n <- 3L
   dfout <- format_ggpacket_data.default(utils::head(x, n), width = width)
   nr_omit <- nrow(x) - n
   c_omit <- length(dfout) - (n + 1L)
   c(dfout[1:(n + 1)],
     if (nr_omit > 0L || c_omit > 0L)
-      sprintf("# \u2026 with %s%s%s",
+      sprintf(
+        "# \u2026 with %s%s%s",
         if (nr_omit) sprintf("%d more rows", nr_omit) else "",
         if (nr_omit && c_omit) ", " else "",
-        if (c_omit) "columns omitted" else ""))
+        if (c_omit) "columns omitted" else ""
+      )
+  )
 }
 
 #' @export
-format_ggpacket_data.tbl <- function(x,
-    width = getOption("width", 80) * 0.9) {
+format_ggpacket_data.tbl <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   format(x, n = 3L, width = width)
 }
 
-format_ggpacket_mapping <- function(x,
-    width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
+format_ggpacket_mapping <- function(
+  x,
+  width = getOption("width", 80) * 0.9,
+  missing_aes = character(0L)
+) {
   UseMethod("format_ggpacket_mapping")
 }
 
 #' @export
-format_ggpacket_mapping.NULL <- function(x,
-    width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
+format_ggpacket_mapping.NULL <- function(
+  x,
+  width = getOption("width", 80) * 0.9,
+  missing_aes = character(0L)
+) {
   format_ggpacket_mapping(aes(), width = width, missing_aes = missing_aes)
 }
 
 #' @importFrom utils capture.output
 #' @export
-format_ggpacket_mapping.default <- function(x,
-    width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
-
+format_ggpacket_mapping.default <- function(
+  x,
+  width = getOption("width", 80) * 0.9,
+  missing_aes = character(0L)
+) {
   x[missing_aes] <- " MISSING "
   gsub("\" MISSING \"", "<missing>", utils::capture.output(x)[-1])
 }
 
-format_ggpacket_ggcalls <- function(x,
-    width = getOption("width", 80) * 0.9) {
+format_ggpacket_ggcalls <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   if (!length(x)) return("empty")
   UseMethod("format_ggpacket_ggcalls")
 }

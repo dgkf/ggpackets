@@ -28,7 +28,7 @@ setClass(
 #' @param e1 A ggpacket object.
 #' @param e2 Any object.
 #'
-ggpacket_plus_ANY <- function(e1, e2) {
+ggpacket_plus_ANY <- function(e1, e2) {  # nolint: object_name
   e1@ggcalls <- append(e1@ggcalls, as_gg_call(e2))
   e1
 }
@@ -303,7 +303,12 @@ ggpacket <- function(...) {
 #' @importFrom methods new
 #' @importFrom ggplot2 standardise_aes_names
 #'
-ggpacket_call <- function(mapping = NULL, data = NULL, ..., .id = character(0L)) {
+ggpacket_call <- function(
+  mapping = NULL,
+  data = NULL,
+  ...,
+  .id = character(0L)
+) {
   calling_ggpk <- self()
 
   if (!is.null(mapping) && !inherits(mapping, "uneval")) {
@@ -315,13 +320,15 @@ ggpacket_call <- function(mapping = NULL, data = NULL, ..., .id = character(0L))
   dots <- as.list(rlang::enquos(...))
   names(dots) <- ggplot2::standardise_aes_names(names(dots))
 
-  methods::new("ggpacket",
+  methods::new(
+    "ggpacket",
     ggpacket_call,
     id = .id,
     data = update_data(calling_ggpk@data, data),
     mapping = update_mapping(calling_ggpk@mapping, mapping),
     dots = dots,
-    ggcalls = calling_ggpk@ggcalls)
+    ggcalls = calling_ggpk@ggcalls
+  )
 }
 
 
@@ -379,9 +386,14 @@ update_data.NULL <- function(d1, d2, ...) {
 update_data.waiver <- update_data.NULL
 
 update_data.function <- function(d1, d2, ...) {
-  d <- if (is.function(d1)) update_data(function(...) d2(d1(...)), ...)
-       else if (is.null(d1) || inherits(d1, "waiver")) update_data(d2, ...)
-       else update_data(d2(d1), ...)
+  d <- if (is.function(d1)) {
+    update_data(function(...) d2(d1(...)), ...)
+  } else if (is.null(d1) || inherits(d1, "waiver")) {
+    update_data(d2, ...)
+  } else {
+    update_data(d2(d1), ...)
+  }
+
   if (inherits(d, "waiver")) NULL else d
 }
 
@@ -436,13 +448,15 @@ required_aesthetics.quosures <- function(x) {
     rlang::quo_squash(x$mapping)[layer_aes],
     function(expr) {
       aess[match(all.names(expr), names(aess), nomatch = 0L)]
-    }))
+    }
+  ))
 
   mapped_aes <- names(rlang::quo_squash(x$mapping)[-1])
 
   setdiff(
     sort(unique(c(layer_aes, dot_aes, mapping_dot_aes))),
-    c(mapped_aes, named_aes_args))
+    c(mapped_aes, named_aes_args)
+  )
 }
 
 required_aesthetics.list <- function(x) {

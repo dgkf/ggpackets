@@ -129,7 +129,7 @@ function to fullfil our needs. At this point, wrapping our original ggplot call
 in a function starts to become pretty appealing.
 
 ```{r ex1.ggplot.func}
-my_plot <- function(data, x, y, fun.data = mean_se) {
+my_plot <- function(data, x, y, fun.data = mean_se) {  # nolint: object_name
   ggplot(data) +
     aes_string(x = x, y = y) +
 
