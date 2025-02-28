@@ -138,7 +138,7 @@ setMethod("names", "ggpacket", names.ggpacket)
 #' @importFrom ggplot2 waiver
 #'
 gg_plus_ggpacket <- function(e1, e2) {
-  all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))
+  all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))  # nolint
 
   # aesthetic mapping and data for ggpacket scope
   ggpk_data <- update_data(e1$data, e2@data)
