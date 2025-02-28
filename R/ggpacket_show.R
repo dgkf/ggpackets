@@ -10,17 +10,21 @@
 #'
 setMethod("show", "ggpacket", function(object) {
   warnings <- list()
-  ggout <- tryCatch(withCallingHandlers(
-    ggplot2::ggplot_build(ggobj <- ggplot2::ggplot() + object),
-    warning = function(w) {
-      append(warnings, w)
-      invokeRestart("muffleWarning")
-    }),
+  ggout <- tryCatch(
+    withCallingHandlers(
+      ggplot2::ggplot_build(ggobj <- ggplot2::ggplot() + object),
+      warning = function(w) {
+        append(warnings, w)
+        invokeRestart("muffleWarning")
+      }
+    ),
     error = function(e) {
       e
-    })
+    }
+  )
 
-  if (!inherits(ggout, "error") && length(ggout$data) && nrow(ggout$data[[1]])) {
+  if (!inherits(ggout, "error") &&
+        length(ggout$data) && nrow(ggout$data[[1]])) {
     for (w in warnings) warning(w)
     print(ggobj)
   } else {
@@ -42,10 +46,16 @@ format.ggpacket <- function(x, ...) {
 
   width <- getOption("width", 80) - 3L
   data_strs <- format_ggpacket_data(x@data, width)
-  aes_strs <- format_ggpacket_mapping(x@mapping, width, missing_aes = missing_aes)
+  aes_strs <- format_ggpacket_mapping(
+    x@mapping,
+    width,
+    missing_aes = missing_aes
+  )
+
   layers_strs <- format_ggpacket_ggcalls(x@ggcalls)
 
-  sprintf(multistr("
+  sprintf(
+    multistr("
     <ggpacket>
     Data:
     %s
@@ -57,12 +67,16 @@ format.ggpacket <- function(x, ...) {
     "),
     paste0("  ", data_strs, collapse = "\n"),
     paste0("  ", aes_strs, collapse = "\n"),
-    paste0("  ", layers_strs, collapse = "\n"))
+    paste0("  ", layers_strs, collapse = "\n")
+  )
 }
 
-number_strings <- function(strs, width = getOption("width", 80) * 0.9,
-    wrap = FALSE, ...) {
-
+number_strings <- function(
+  strs,
+  width = getOption("width", 80) * 0.9,
+  wrap = FALSE,
+  ...
+) {
   if (!length(strs)) return(strs)
   nchars <- nchar(length(strs)) + 2 + 1
 
@@ -72,35 +86,50 @@ number_strings <- function(strs, width = getOption("width", 80) * 0.9,
     })
 
   unlist(strsplit(
-    sprintf("%s[%d] %s",
+    sprintf(
+      "%s[%d] %s",
       strrep(" ", nchar(length(strs)) - nchar(seq_along(strs))),
       seq_along(strs),
-      gsub("\n", paste0("\n", strrep(" ", nchars)), strs)),
-    "\n"))
+      gsub("\n", paste0("\n", strrep(" ", nchars)), strs)
+    ),
+    "\n"
+  ))
 }
 
-format_ggpacket_data <- function(x,
-    width = getOption("width", 80) * 0.9) {
+format_ggpacket_data <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   UseMethod("format_ggpacket_data")
 }
 
-format_ggpacket_data.NULL <- function(x,
-    width = getOption("width", 80) * 0.9) {
+#' @export
+format_ggpacket_data.NULL <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   "awaiting data"
 }
 
-format_ggpacket_data.waiver <- function(x,
-    width = getOption("width", 80) * 0.9) {
+#' @export
+format_ggpacket_data.waiver <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   "awaiting data"
 }
 
 #' @importFrom utils capture.output
-format_ggpacket_data.default <- function(x,
-    width = getOption("width", 80) * 0.9) {
+#' @export
+format_ggpacket_data.default <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   utils::capture.output(print(x, width = width))
 }
 
 #' @importFrom utils head
+#' @export
 format_ggpacket_data.data.frame <- function(x,
     width = getOption("width", 80) * 0.9) {
   n <- 3L
@@ -115,6 +144,7 @@ format_ggpacket_data.data.frame <- function(x,
         if (c_omit) "columns omitted" else ""))
 }
 
+#' @export
 format_ggpacket_data.tbl <- function(x,
     width = getOption("width", 80) * 0.9) {
   format(x, n = 3L, width = width)
@@ -125,12 +155,14 @@ format_ggpacket_mapping <- function(x,
   UseMethod("format_ggpacket_mapping")
 }
 
+#' @export
 format_ggpacket_mapping.NULL <- function(x,
     width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
   format_ggpacket_mapping(aes(), width = width, missing_aes = missing_aes)
 }
 
 #' @importFrom utils capture.output
+#' @export
 format_ggpacket_mapping.default <- function(x,
     width = getOption("width", 80) * 0.9, missing_aes = character(0L)) {
 
@@ -144,23 +176,31 @@ format_ggpacket_ggcalls <- function(x,
   UseMethod("format_ggpacket_ggcalls")
 }
 
-format_ggpacket_ggcalls.default <- function(x,
-    width = getOption("width", 80) * 0.9) {
+#' @export
+format_ggpacket_ggcalls.default <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   number_strings(
-    vapply(x, function(...) format_ggpacket_ggcall(...), character(1L)),
+    vcapply(x, format_ggpacket_ggcall),
     width = width - nchar(length(x)) - 2,
     wrap = TRUE,
-    exdent = 2L)
+    exdent = 2L
+  )
 }
 
-format_ggpacket_ggcall <- function(x,
-    width = getOption("width", 80) * 0.9) {
+format_ggpacket_ggcall <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   UseMethod("format_ggpacket_ggcall")
 }
 
-format_ggpacket_ggcall.default <- function(x,
-    width = getOption("width", 80) * 0.9) {
-
+#' @export
+format_ggpacket_ggcall.default <- function(
+  x,
+  width = getOption("width", 80) * 0.9
+) {
   id_str <- if (length(attr(x, "ids"))) {
     paste0(paste0("#", attr(x, "ids"), collapse = " "), "\n")
   } else {
@@ -168,37 +208,61 @@ format_ggpacket_ggcall.default <- function(x,
   }
 
   x <- x[[1]] # unpack after using outer attributes
-  if (!grepl("\\w", rlang::quo_get_expr(x[[1]])))
+
+  if (rlang::is_quosure(x)) {
+    return(rlang::quo_text(x))
+  }
+
+  if (!grepl("\\w", rlang::quo_get_expr(x[[1]]))) {
     return(paste(
-      gsub("(^\\s*|\\s*$)", "",
-        format(as.call(lapply(x, rlang::quo_get_expr)))),
-      collapse = " "))
+      gsub(
+        "(^\\s*|\\s*$)",
+        "",
+        format(as.call(lapply(x, rlang::quo_get_expr)))
+      ),
+      collapse = " "
+    ))
+  }
 
   non_breaking_space <- "\u00A0"
-
   args <- mapply(
-    function(...) format_ggpacket_ggcall_arg(...),
+    format_ggpacket_ggcall_arg,
     x,
     name = names(x),
-    MoreArgs = list(width = width))
+    MoreArgs = list(width = width)
+  )
 
-  sprintf("%s%s(%s)\n",
+  sprintf(
+    "%s%s(%s)\n",
     id_str,
     args[[1]],
-    paste(sprintf("%s%s",
-        ifelse(names(args[-1]) == "", "",
-          paste0(names(args[-1]), non_breaking_space, "=", non_breaking_space)),
-        args[-1]),
-      collapse = ", "))
+    paste(
+      sprintf("%s%s",
+        ifelse(
+          names(args[-1]) == "",
+          "",
+          paste0(names(args[-1]), non_breaking_space, "=", non_breaking_space)
+        ),
+        args[-1]
+      ),
+      collapse = ", "
+    )
+  )
 }
 
-format_ggpacket_ggcall_arg <- function(x,
-    width = getOption("width", 80) * 0.9, name = NULL) {
+format_ggpacket_ggcall_arg <- function(
+  x,
+  width = getOption("width", 80) * 0.9, name = NULL
+) {
   UseMethod("format_ggpacket_ggcall_arg", x)
 }
 
-format_ggpacket_ggcall_arg.quosure <- function(x,
-    width = getOption("width", 80) * 0.9, name = NULL) {
+#' @export
+format_ggpacket_ggcall_arg.quosure <- function(
+  x,
+  width = getOption("width", 80) * 0.9,
+  name = NULL
+) {
   if (!is.null(name) && name == "mapping")
     return(format_ggpacket_ggcall_arg(rlang::eval_tidy(x)))
   xsq <- rlang::quo_squash(x)
@@ -206,23 +270,38 @@ format_ggpacket_ggcall_arg.quosure <- function(x,
   tryCatch(format(xsq), error = function(e) as.character(xsq))
 }
 
-format_ggpacket_ggcall_arg.default <- function(x,
-    width = getOption("width", 80) * 0.9, name = NULL) {
+#' @export
+format_ggpacket_ggcall_arg.default <- function(
+  x,
+  width = getOption("width", 80) * 0.9,
+  name = NULL
+) {
   format(x)
 }
 
-format_ggpacket_ggcall_arg.uneval <- function(x,
-    width = getOption("width", 80) * 0.9, name = NULL) {
-  sprintf("aes(%s)",
+#' @export
+format_ggpacket_ggcall_arg.uneval <- function(
+  x,
+  width = getOption("width", 80) * 0.9,
+  name = NULL
+) {
+  sprintf(
+    "aes(%s)",
     paste0(
       sprintf("%s = %s", names(x), sapply(x, rlang::quo_squash)),
-      collapse = ", "))
+      collapse = ", "
+    )
+  )
 }
 
 multistr <- function(s) {
   lines <- strsplit(s, "\n")[[1]]
   if (!length(lines)) return(s)
   if (!grepl("\\w", lines[[1]])) lines <- lines[-1]
-  nchar_leader <- min(nchar(gsub("^(\\W*).*", "\\1", lines[grepl("\\w", lines)])))
+  nchar_leader <- min(nchar(gsub(
+    "^(\\W*).*",
+    "\\1",
+    lines[grepl("\\w", lines)]
+  )))
   paste0(substring(lines, nchar_leader + 1L), collapse = "\n")
 }

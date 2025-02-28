@@ -10,9 +10,10 @@
 #' @keywords internal
 #'
 as_gg_call <- function(x, which = -3L) {
-  xexpr <- eval(bquote(
-    substitute(.(substitute(x)))),
-    envir = parent.frame(-which - 1L))
+  xexpr <- eval(
+    bquote(substitute(.(substitute(x)))),
+    envir = parent.frame(-which - 1L)
+  )
 
   xids <- c()
   if (is.call(xexpr)) {
@@ -34,6 +35,7 @@ as_gg_call <- function(x, which = -3L) {
     ids = if (length(xids)) xids else infer_ggcall_id(xcallname),
     class = c("ggcall", "list")
   ))
+
   names(xcall) <- xcallname
   xcall
 }

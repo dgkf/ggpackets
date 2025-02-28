@@ -10,7 +10,8 @@
 #' @docType methods
 #' @rdname ggpacket-methods
 #'
-setClass("ggpacket",
+setClass(
+  "ggpacket",
   contains = "function",
   slots = list(
     id = "character",
@@ -147,13 +148,16 @@ gg_plus_ggpacket <- function(e1, e2) {
     ggcall_ids <- attr(ggcall, "ids")
     ggcall <- ggcall[[1]]
 
-    # apply substitutions for ..dot.. names
-    ggcallf <- rlang::eval_tidy(ggcall[[1]])
-
-    if (identical(ggcallf, .Primitive("(")) ||
-        identical(ggcallf, .Primitive("{"))) {
-      ggpk_i <- rlang::eval_tidy(as.call(ggcall))
+    ggpk_i <- if (rlang::is_quosure(ggcall)) {
+      rlang::eval_tidy(ggcall, env = rlang::quo_get_env(ggcall))
+    } else if (is_primitive_ggcall(ggcall)) {
+      rlang::eval_tidy(as.call(ggcall), env = rlang::quo_get_env(ggcall[[1]]))
     } else {
+      ggcallf <- rlang::eval_tidy(
+        expr = ggcall[[1]],
+        env = rlang::quo_get_env(ggcall[[1]])
+      )
+
       ggcall <- substitute_ggcall_dot_aes(ggpk_mapping, ggcall)
       ggcallargs <- append(e2@dots, as.list(ggcall)[-1])
 
@@ -164,8 +168,7 @@ gg_plus_ggpacket <- function(e1, e2) {
       ggcallargs <- smart_swap_mapping_data(ggcallargs)
       ggcallargs <- deduplicate_params(ggcallargs)
       ggcallargs <- only_formals_and_dots(ggcallf, ggcallargs)
-
-      ggpk_i <- with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
+      with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
     }
 
     if (inherits(ggpk_i, "ggpacket")) {
@@ -175,7 +178,11 @@ gg_plus_ggpacket <- function(e1, e2) {
       ggcall_ids <- ggpk_i@id
       all_ids <- unique(c(ggcall_ids, all_ids))
 
-      ggpk_i@mapping <- filter_by_ggcall_ids(ggpk_i@mapping, ggcall_ids, all_ids)
+      ggpk_i@mapping <- filter_by_ggcall_ids(
+        ggpk_i@mapping,
+        ggcall_ids,
+        all_ids
+      )
 
     } else if (inherits(ggpk_i, "ggproto")) {
       # apply data scoping
@@ -185,7 +192,12 @@ gg_plus_ggpacket <- function(e1, e2) {
       # apply mapping scoping
       if (!isFALSE(ggpk_i$inherit.aes)) {
         ggpk_i$mapping <- update_mapping(ggpk_mapping, ggpk_i$mapping)
-        ggpk_i$mapping <- filter_by_ggcall_ids(ggpk_i$mapping, ggcall_ids, all_ids)
+        ggpk_i$mapping <- filter_by_ggcall_ids(
+          ggpk_i$mapping,
+          ggcall_ids,
+          all_ids
+        )
+
         ggpk_i$inherit.aes <- FALSE
       }
 
