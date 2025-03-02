@@ -39,16 +39,18 @@ substitute_ggcall_dot_aes <- function(mapping, ggcall, envir = parent.frame()) {
   names(aess) <- ggplot2::standardise_aes_names(aess)
 
   # add in mappings for alternative naming conventions before substitution
-  for (name in names(mapping))
+  for (name in names(mapping)) {
     mapping[aess[names(aess) %in% name]] <- mapping[name]
+  }
 
   names(mapping) <- sprintf("..%s..", names(mapping))
   dot_names <- unlist(lapply(ggcall, all.names))
   dot_names <- dot_names[grepl("^\\.\\.(.*)\\.\\.$", dot_names)]
   mapping <- as.environment(mapping)
 
-  for (var in setdiff(dot_names, names(mapping)))
+  for (var in setdiff(dot_names, names(mapping))) {
     mapping[[var]] <- NA
+  }
 
   substitute_quote(ggcall, env = mapping)
 }

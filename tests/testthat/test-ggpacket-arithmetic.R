@@ -52,5 +52,3 @@ test_that("%+% and + are equal aside from avoiding initial evaluation", {
     ggpacket() + geom_line(color = "red")
   })
 })
-
-

@@ -34,9 +34,9 @@ test_that("ggpackets can be indexed by character id to subset ggcalls", {
   })
 
   expect_equal({
-    ggpk <- ggpacket() %+% 
-      geom_line() %+% 
-      geom_point() %+% 
+    ggpk <- ggpacket() %+%
+      geom_line() %+%
+      geom_point() %+%
       geom_bar(.id = "line")
     ggpk["line"]
   }, {
