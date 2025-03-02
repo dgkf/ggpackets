@@ -41,6 +41,7 @@ ggpacket_plus_ANY <- function(e1, e2) {  # nolint: object_name
 #' @param i A vector upon which to subset the ggpacket ggcalls.
 #' @param ... Additional arguments unused.
 #'
+#' @export
 `[.ggpacket` <- function(x, i, ...) {
   subset_ggpacket(x, i, ...)
 }
@@ -53,24 +54,28 @@ ggpacket_plus_ANY <- function(e1, e2) {  # nolint: object_name
 #' @param i A vector upon which to subset the ggpacket ggcalls.
 #' @param ... Additional arguments unused.
 #'
+#' @export
 `[[.ggpacket` <- function(x, i, ...) {
   x[i, ...]
 }
 
 
 
+#' @export
 length.ggpacket <- function(x) {
   length(x@ggcalls)
 }
 
 
 
+#' @export
 as.list.ggpacket <- function(x) {
   lapply(seq_along(x), function(i) x[[i]])
 }
 
 
 
+#' @export
 names.ggpacket <- function(x) {
   lapply(x@ggcalls, attr, "ids")
 }
@@ -373,18 +378,22 @@ update_data <- function(d1, d2, ...) {
   UseMethod("update_data", d2)
 }
 
+#' @export
 update_data.default <- function(d1, d2, ...) {
   d <- update_data(d2, ...)
   if (inherits(d, "waiver")) NULL else d
 }
 
+#' @export
 update_data.NULL <- function(d1, d2, ...) {
   d <- update_data(d1, ...)
   if (inherits(d, "waiver")) NULL else d
 }
 
+#' @export
 update_data.waiver <- update_data.NULL
 
+#' @export
 update_data.function <- function(d1, d2, ...) {
   d <- if (is.function(d1)) {
     update_data(function(...) d2(d1(...)), ...)
@@ -397,6 +406,7 @@ update_data.function <- function(d1, d2, ...) {
   if (inherits(d, "waiver")) NULL else d
 }
 
+#' @export
 update_data.formula <- function(d1, d2, ...) {
   update_data(d1, rlang::as_function(d2), ...)
 }
@@ -410,10 +420,12 @@ required_aesthetics <- function(x) {
   UseMethod("required_aesthetics")
 }
 
+#' @export
 required_aesthetics.default <- function(x) {
   character(0L)
 }
 
+#' @export
 required_aesthetics.ggpacket <- function(x) {
   if (length(x@ggcalls) > 1L) {
     sort(unique(unlist(lapply(as.list(x), function(i) required_aesthetics(i)))))
@@ -422,10 +434,12 @@ required_aesthetics.ggpacket <- function(x) {
   }
 }
 
+#' @export
 required_aesthetics.LayerInstance <- function(x) {
   x$geom$required_aes
 }
 
+#' @export
 required_aesthetics.quosures <- function(x) {
   aess <- .all_aesthetics()
   names(aess) <- paste0("..", aess, "..")
@@ -459,6 +473,7 @@ required_aesthetics.quosures <- function(x) {
   )
 }
 
+#' @export
 required_aesthetics.list <- function(x) {
   sort(unique(unlist(sapply(x, function(i) required_aesthetics(i)))))
 }

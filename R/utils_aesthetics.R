@@ -66,14 +66,17 @@ substitute_quote <- function(q, env = parent.frame()) {
   UseMethod("substitute_quote")
 }
 
+#' @export
 substitute_quote.default <- function(q, env = parent.frame()) {
   eval(bquote(substitute(.(q), env)))
 }
 
+#' @export
 substitute_quote.quosures <- function(q, env = parent.frame()) {
   rlang::as_quosures(lapply(q, function(...) substitute_quote(...), env = env))
 }
 
+#' @export
 substitute_quote.quosure <- function(q, env = parent.frame()) {
   # TODO: handle mixed quosure environments instead of retaining original
   rlang::quo_set_expr(q, do.call(substitute, list(rlang::quo_squash(q), env)))

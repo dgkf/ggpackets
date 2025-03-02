@@ -36,8 +36,8 @@ ggpk_dot_matrix <- function(..., width = 10) {
     geom_point(
       data = . %>%
         mutate(
-          xvar = seq_len(nrow(.) - 1) %%  width,
-          yvar = seq_len(nrow(.) - 1) %/% width
+          xvar = (seq_len(nrow(.)) - 1) %%  width,
+          yvar = (seq_len(nrow(.)) - 1) %/% width
         ),
       mapping = aes(x = xvar, y = yvar),
       ...
