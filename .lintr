@@ -1,0 +1,8 @@
+exclusions:
+	list(
+		"README.Rmd" = list(object_usage_linter = Inf),
+		"vignettes/miscellaneous-examples.Rmd" = list(
+			object_usage_linter = Inf
+		)
+	)
+

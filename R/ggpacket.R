@@ -10,7 +10,8 @@
 #' @docType methods
 #' @rdname ggpacket-methods
 #'
-setClass("ggpacket",
+setClass(
+  "ggpacket",
   contains = "function",
   slots = list(
     id = "character",
@@ -27,7 +28,7 @@ setClass("ggpacket",
 #' @param e1 A ggpacket object.
 #' @param e2 Any object.
 #'
-ggpacket_plus_ANY <- function(e1, e2) {
+ggpacket_plus_ANY <- function(e1, e2) {  # nolint: object_name
   e1@ggcalls <- append(e1@ggcalls, as_gg_call(e2))
   e1
 }
@@ -40,6 +41,7 @@ ggpacket_plus_ANY <- function(e1, e2) {
 #' @param i A vector upon which to subset the ggpacket ggcalls.
 #' @param ... Additional arguments unused.
 #'
+#' @export
 `[.ggpacket` <- function(x, i, ...) {
   subset_ggpacket(x, i, ...)
 }
@@ -52,24 +54,28 @@ ggpacket_plus_ANY <- function(e1, e2) {
 #' @param i A vector upon which to subset the ggpacket ggcalls.
 #' @param ... Additional arguments unused.
 #'
+#' @export
 `[[.ggpacket` <- function(x, i, ...) {
   x[i, ...]
 }
 
 
 
+#' @export
 length.ggpacket <- function(x) {
   length(x@ggcalls)
 }
 
 
 
-as.list.ggpacket <- function(x) {
+#' @exportS3Method as.list ggpacket
+as.list.ggpacket <- function(x, ...) {
   lapply(seq_along(x), function(i) x[[i]])
 }
 
 
 
+#' @export
 names.ggpacket <- function(x) {
   lapply(x@ggcalls, attr, "ids")
 }
@@ -116,6 +122,7 @@ setMethod("length", "ggpacket", length.ggpacket)
 #' Convert a ggpacket to a list of ggcalls
 #'
 #' @param x A \code{ggpacket} object
+#' @param ... Additional arguments unused
 #'
 setMethod("as.list", "ggpacket", as.list.ggpacket)
 
@@ -137,7 +144,7 @@ setMethod("names", "ggpacket", names.ggpacket)
 #' @importFrom ggplot2 waiver
 #'
 gg_plus_ggpacket <- function(e1, e2) {
-  all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))
+  all_ids <- unique(unlist(lapply(e2@ggcalls, attr, "ids")))  # nolint
 
   # aesthetic mapping and data for ggpacket scope
   ggpk_data <- update_data(e1$data, e2@data)
@@ -147,13 +154,16 @@ gg_plus_ggpacket <- function(e1, e2) {
     ggcall_ids <- attr(ggcall, "ids")
     ggcall <- ggcall[[1]]
 
-    # apply substitutions for ..dot.. names
-    ggcallf <- rlang::eval_tidy(ggcall[[1]])
-
-    if (identical(ggcallf, .Primitive("(")) ||
-        identical(ggcallf, .Primitive("{"))) {
-      ggpk_i <- rlang::eval_tidy(as.call(ggcall))
+    ggpk_i <- if (rlang::is_quosure(ggcall)) {
+      rlang::eval_tidy(ggcall, env = rlang::quo_get_env(ggcall))
+    } else if (is_primitive_ggcall(ggcall)) {
+      rlang::eval_tidy(as.call(ggcall), env = rlang::quo_get_env(ggcall[[1]]))
     } else {
+      ggcallf <- rlang::eval_tidy(
+        expr = ggcall[[1]],
+        env = rlang::quo_get_env(ggcall[[1]])
+      )
+
       ggcall <- substitute_ggcall_dot_aes(ggpk_mapping, ggcall)
       ggcallargs <- append(e2@dots, as.list(ggcall)[-1])
 
@@ -164,8 +174,7 @@ gg_plus_ggpacket <- function(e1, e2) {
       ggcallargs <- smart_swap_mapping_data(ggcallargs)
       ggcallargs <- deduplicate_params(ggcallargs)
       ggcallargs <- only_formals_and_dots(ggcallf, ggcallargs)
-
-      ggpk_i <- with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
+      with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
     }
 
     if (inherits(ggpk_i, "ggpacket")) {
@@ -175,7 +184,11 @@ gg_plus_ggpacket <- function(e1, e2) {
       ggcall_ids <- ggpk_i@id
       all_ids <- unique(c(ggcall_ids, all_ids))
 
-      ggpk_i@mapping <- filter_by_ggcall_ids(ggpk_i@mapping, ggcall_ids, all_ids)
+      ggpk_i@mapping <- filter_by_ggcall_ids(
+        ggpk_i@mapping,
+        ggcall_ids,
+        all_ids
+      )
 
     } else if (inherits(ggpk_i, "ggproto")) {
       # apply data scoping
@@ -185,7 +198,12 @@ gg_plus_ggpacket <- function(e1, e2) {
       # apply mapping scoping
       if (!isFALSE(ggpk_i$inherit.aes)) {
         ggpk_i$mapping <- update_mapping(ggpk_mapping, ggpk_i$mapping)
-        ggpk_i$mapping <- filter_by_ggcall_ids(ggpk_i$mapping, ggcall_ids, all_ids)
+        ggpk_i$mapping <- filter_by_ggcall_ids(
+          ggpk_i$mapping,
+          ggcall_ids,
+          all_ids
+        )
+
         ggpk_i$inherit.aes <- FALSE
       }
 
@@ -291,7 +309,12 @@ ggpacket <- function(...) {
 #' @importFrom methods new
 #' @importFrom ggplot2 standardise_aes_names
 #'
-ggpacket_call <- function(mapping = NULL, data = NULL, ..., .id = character(0L)) {
+ggpacket_call <- function(
+  mapping = NULL,
+  data = NULL,
+  ...,
+  .id = character(0L)
+) {
   calling_ggpk <- self()
 
   if (!is.null(mapping) && !inherits(mapping, "uneval")) {
@@ -303,13 +326,15 @@ ggpacket_call <- function(mapping = NULL, data = NULL, ..., .id = character(0L))
   dots <- as.list(rlang::enquos(...))
   names(dots) <- ggplot2::standardise_aes_names(names(dots))
 
-  methods::new("ggpacket",
+  methods::new(
+    "ggpacket",
     ggpacket_call,
     id = .id,
     data = update_data(calling_ggpk@data, data),
     mapping = update_mapping(calling_ggpk@mapping, mapping),
     dots = dots,
-    ggcalls = calling_ggpk@ggcalls)
+    ggcalls = calling_ggpk@ggcalls
+  )
 }
 
 
@@ -354,25 +379,35 @@ update_data <- function(d1, d2, ...) {
   UseMethod("update_data", d2)
 }
 
+#' @export
 update_data.default <- function(d1, d2, ...) {
   d <- update_data(d2, ...)
   if (inherits(d, "waiver")) NULL else d
 }
 
+#' @export
 update_data.NULL <- function(d1, d2, ...) {
   d <- update_data(d1, ...)
   if (inherits(d, "waiver")) NULL else d
 }
 
+#' @export
 update_data.waiver <- update_data.NULL
 
+#' @export
 update_data.function <- function(d1, d2, ...) {
-  d <- if (is.function(d1)) update_data(function(...) d2(d1(...)), ...)
-       else if (is.null(d1) || inherits(d1, "waiver")) update_data(d2, ...)
-       else update_data(d2(d1), ...)
+  d <- if (is.function(d1)) {
+    update_data(function(...) d2(d1(...)), ...)
+  } else if (is.null(d1) || inherits(d1, "waiver")) {
+    update_data(d2, ...)
+  } else {
+    update_data(d2(d1), ...)
+  }
+
   if (inherits(d, "waiver")) NULL else d
 }
 
+#' @export
 update_data.formula <- function(d1, d2, ...) {
   update_data(d1, rlang::as_function(d2), ...)
 }
@@ -386,10 +421,12 @@ required_aesthetics <- function(x) {
   UseMethod("required_aesthetics")
 }
 
+#' @export
 required_aesthetics.default <- function(x) {
   character(0L)
 }
 
+#' @export
 required_aesthetics.ggpacket <- function(x) {
   if (length(x@ggcalls) > 1L) {
     sort(unique(unlist(lapply(as.list(x), function(i) required_aesthetics(i)))))
@@ -398,10 +435,12 @@ required_aesthetics.ggpacket <- function(x) {
   }
 }
 
+#' @export
 required_aesthetics.LayerInstance <- function(x) {
   x$geom$required_aes
 }
 
+#' @export
 required_aesthetics.quosures <- function(x) {
   aess <- .all_aesthetics()
   names(aess) <- paste0("..", aess, "..")
@@ -424,15 +463,18 @@ required_aesthetics.quosures <- function(x) {
     rlang::quo_squash(x$mapping)[layer_aes],
     function(expr) {
       aess[match(all.names(expr), names(aess), nomatch = 0L)]
-    }))
+    }
+  ))
 
   mapped_aes <- names(rlang::quo_squash(x$mapping)[-1])
 
   setdiff(
     sort(unique(c(layer_aes, dot_aes, mapping_dot_aes))),
-    c(mapped_aes, named_aes_args))
+    c(mapped_aes, named_aes_args)
+  )
 }
 
+#' @export
 required_aesthetics.list <- function(x) {
   sort(unique(unlist(sapply(x, function(i) required_aesthetics(i)))))
 }

@@ -7,14 +7,14 @@ test_that("<ggpacket> + <ggplot layer constructor> adds as ggcall", {
   })
 
   expect_equal({
-    ggpk <- ggpacket() + geom_line(size = 3L)
+    ggpk <- ggpacket() + geom_line(linewidth = 3L)
     as.list(ggpk@ggcalls[[1]][[1]][2])
   }, {
-    list(size = rlang::quo(3L))
+    list(linewidth = rlang::quo(3L))
   })
 
   expect_equal({
-    ggpk <- ggpacket() + geom_line(size = 3L) + geom_point(size = 4L)
+    ggpk <- ggpacket() + geom_line(linewidth = 3L) + geom_point(size = 4L)
     as.list(ggpk@ggcalls[[2]][[1]][2])
   }, {
     list(size = rlang::quo(4L))
@@ -52,5 +52,3 @@ test_that("%+% and + are equal aside from avoiding initial evaluation", {
     ggpacket() + geom_line(color = "red")
   })
 })
-
-

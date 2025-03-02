@@ -12,3 +12,5 @@
 ^\.github$
 ^_pkgdown\.yml$
 ^pkgdown$
+^README\.html$
+^\.lintr$

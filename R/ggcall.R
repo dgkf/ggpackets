@@ -9,15 +9,16 @@
 #'
 #' @keywords internal
 #'
-as_gg_call <- function(x, which = -3L) {
-  xexpr <- eval(bquote(
-    substitute(.(substitute(x)))),
-    envir = parent.frame(-which - 1L))
+as_gg_call <- function(x, which = 3L) {
+  xexpr <- eval(
+    bquote(substitute(.(substitute(x)))),
+    envir = parent.frame(which - 1L)
+  )
 
   xids <- c()
   if (is.call(xexpr)) {
-    xexpr <- expand_dots(xexpr, parent.frame(-which))
-    xcall <- do.call(rlang::quos, as.list(xexpr), envir = parent.frame(-which))
+    xexpr <- expand_dots(xexpr, parent.frame(which))
+    xcall <- do.call(rlang::quos, as.list(xexpr), envir = parent.frame(which))
     names(xcall)[-1] <- ggplot2::standardise_aes_names(names(xcall)[-1])
     if (".id" %in% names(xcall)[-1]) {
       xids <- rlang::eval_tidy(xcall[[".id"]])
@@ -25,7 +26,7 @@ as_gg_call <- function(x, which = -3L) {
     }
     xcallname <- infer_ggcall_name(rlang::quo_get_expr(xcall[[1]]))
   } else {
-    xcall <- rlang::quo_set_env(rlang::enquo(xexpr), parent.frame(-which - 1L))
+    xcall <- rlang::quo_set_env(rlang::enquo(xexpr), parent.frame(which))
     xcallname <- infer_ggcall_name(rlang::quo_get_expr(xcall))
   }
 
@@ -34,6 +35,7 @@ as_gg_call <- function(x, which = -3L) {
     ids = if (length(xids)) xids else infer_ggcall_id(xcallname),
     class = c("ggcall", "list")
   ))
+
   names(xcall) <- xcallname
   xcall
 }

@@ -3,14 +3,14 @@
 
 [![CRAN](https://img.shields.io/cran/v/ggpackets.svg)](https://cran.r-project.org/package=ggpackets)
 [![downloads](https://cranlogs.r-pkg.org/badges/ggpackets)](https://cran.r-project.org/package=ggpackets)
-[![R CMD
-check](https://github.com/dgkf/ggpackets/workflows/R-CMD-check/badge.svg)](https://github.com/dgkf/ggpackets/actions?query=workflow%3AR-CMD-check)
-[![Codecov](https://img.shields.io/codecov/c/github/dgkf/ggpackets/master.svg)](https://app.codecov.io/gh/dgkf/ggpackets)
+[![R-CMD-check](https://github.com/dgkf/ggpackets/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dgkf/ggpackets/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/dgkf/ggpackets/graph/badge.svg)](https://app.codecov.io/gh/dgkf/ggpackets)
 
 ## Overview
 
 Take a look at the **[ggpackets project
-page](https://dgkf.github.io/ggpackets/)**!
+page](https://dgkf.github.io/ggpackets/)**\!
 
 Easily build components of ggplots without sacrificing the ease of
 ggplot’s layer parameters and construction syntax.
@@ -31,25 +31,25 @@ devtools::install_github("dgkf/ggpackets", build_vignettes = TRUE)
 
 There are plenty of ways to help contribute:
 
-1.  **File issues!**  
+1.  **File issues\!**  
     Found a bug? Think the syntax looks ugly? Don’t like the name? Tell
-    me! [Issues](https://github.com/dgkf/ggpackets/issues) are the best
+    me\! [Issues](https://github.com/dgkf/ggpackets/issues) are the best
     way to start the conversation.
 
-2.  **Write documentation!**  
+2.  **Write documentation\!**  
     More resources always helps. Found a function unintuitive? Example
     code and improved function descriptors would be helpful. If you use
     the package and would feel comfortable writing about a topic not yet
     covered in a vignette, feel free to contribute a new vignette for
     it.
 
-3.  **Write Unit Tests!**  
+3.  **Write Unit Tests\!**  
     There’s some pretty sophisticated manipulations going on under the
     hood to make everything as clean as possible, because of that it’s
     important to make sure everything stays working the way we expect it
-    to. Unit test contributions always welcome!
+    to. Unit test contributions always welcome\!
 
-4.  **Contribute Code!**  
+4.  **Contribute Code\!**  
     Last but not least, code contributors are welcome. Reach out and get
     in touch if you’re passionate about the goal of the project.
 
@@ -123,6 +123,8 @@ In this function we make use of a number of these specialized behaviors.
 5.  We use `%+%` instead of the commonly-used `+` to add layers
     together, which allows `ggpackets` to accept non-standard arguments
     before ggplot sends us warnings about them.
+
+<!-- end list -->
 
 ``` r
 ggplot(as.data.frame(OrchardSprays)) + 

@@ -11,12 +11,13 @@ vignette: >
 
 ```{r setup, include=FALSE} 
 knitr::opts_chunk$set(
-  echo = TRUE, 
-  fig.align='center', 
+  echo = TRUE,
+  fig.align = "center",
   fig.width = 6,
   fig.height = 4,
-  out.width = '600px', 
-  out.height = '400px') 
+  out.width = "600px",
+  out.height = "400px"
+)
 library(ggpackets)
 ```
 
@@ -49,16 +50,16 @@ object. We'll specify some aesthetic parameters - the size the line layer
 (`geom_line()`) and the point layer (`geom_point()`).
 
 ```{r simple_ggpacket}
-ggpk_my_template <- ggpacket() + 
-  geom_line(size = 1) + 
+ggpk_my_template <- ggpacket() +
+  geom_line(size = 1) +
   geom_point(size = 3)
 ```
 
 ```{r simple_ggpacket_output}
-ggplot(Loblolly) + 
-  aes(x = age, y = height, color = Seed) + 
-  ggpk_my_template() + 
-  ggtitle('Growth of Loblolly Pines')
+ggplot(Loblolly) +
+  aes(x = age, y = height, color = Seed) +
+  ggpk_my_template() +
+  ggtitle("Growth of Loblolly Pines")
 ```
 
 Although this might be helpful for making quick, reusable code, it does not 
@@ -85,10 +86,15 @@ ggpk_my_template <- function(...) {
 ```
 
 ```{r function_ggpacket_output}
-ggplot(Loblolly) + 
-  aes(x = age, y = height) + 
-  ggpk_my_template(aes(color = age), stat = 'summary', fun.data = mean_se, size = 5, alpha = 0.5) + 
-  ggtitle('Average Growth of Loblolly Pines')
+ggplot(Loblolly) +
+  aes(x = age, y = height) +
+  ggpk_my_template(aes(color = age),
+    stat = "summary",
+    fun.data = mean_se,
+    size = 5,
+    alpha = 0.5
+  ) +
+  ggtitle("Average Growth of Loblolly Pines")
 ```
 
 In the function we declared above, all arguments passed to our wrapper function
@@ -110,7 +116,8 @@ documentation about what parameters you expect people to use.
 ```{r function_ggpacket_standalone_output}
 ggpk_my_template(
   data = Loblolly,
-  mapping = aes(x = age, y = height, color = Seed))
+  mapping = aes(x = age, y = height, color = Seed)
+)
 ```
 
 
@@ -135,16 +142,16 @@ others.
 ```{r granular_ggpacket}
 ggpk_my_template <- function(...) {
   ggpacket() %+%
-  geom_line(.id = 'line', size = 1, ...) %+% 
-  geom_point(.id = 'point', size = 3, ...)
+    geom_line(.id = "line", size = 1, ...) %+%
+    geom_point(.id = "point", size = 3, ...)
 }
 ```
 
 ```{r granular_ggpacket_output}
-ggplot(Loblolly) + 
-  aes(x = age, y = height, color = Seed) + 
-  ggpk_my_template(point.size = 5, line.size = 0.5) + 
-  ggtitle('Average Growth of Loblolly Pines')
+ggplot(Loblolly) +
+  aes(x = age, y = height, color = Seed) +
+  ggpk_my_template(point.size = 5, line.size = 0.5) +
+  ggtitle("Average Growth of Loblolly Pines")
 ```
 
 Lists are also permitted as an `id`, allowing for any one of a number of
@@ -153,17 +160,21 @@ different prefixes to capture arguments for a particular layer.
 ```{r granular_ggpacket2}
 ggpk_my_template <- function(...) {
   ggpacket() %+%
-  geom_line(.id = c('all', 'line'), size = 1, ...) %+%
-  geom_point(.id = c('all', 'point'), size = 3, ...)
+    geom_line(.id = c("all", "line"), size = 1, ...) %+%
+    geom_point(.id = c("all", "point"), size = 3, ...)
 }
 ```
 
 ```{r granular_ggpacket_output2}
-ggplot(Loblolly) + 
-  aes(x = age, y = height) + 
-  ggpk_my_template(stat = 'summary', fun.data = mean_se,
-    point.size = 5, line.size = 0.5) + 
-  ggtitle('Average Growth of Loblolly Pines')
+ggplot(Loblolly) +
+  aes(x = age, y = height) +
+  ggpk_my_template(
+    stat = "summary",
+    fun.data = mean_se,
+    point.size = 5,
+    line.size = 0.5
+  ) +
+  ggtitle("Average Growth of Loblolly Pines")
 ```
 
 # Default, User and Fixed Parameters
@@ -183,8 +194,8 @@ declared before the parameters passed in by the user, whereas the second has
 ```{r parameters_ggpacket}
 ggpk_my_template <- function(...) {
   ggpacket() %+%
-  geom_line(.id = 'line', size = 3, ...) %+%
-  geom_point(.id = 'point', ..., size = 3)
+    geom_line(.id = "line", size = 3, ...) %+%
+    geom_point(.id = "point", ..., size = 3)
 }
 ```
 
@@ -195,8 +206,8 @@ gives considerable control over what impact the user can have over the plot
 template.
 
 ```{r parameters_ggpacket_output}
-ggplot(Loblolly) + 
-  aes(x = age, y = height, color = Seed) + 
-  ggpk_my_template(line.size = 0.1, point.size = 10) + 
-  ggtitle('Average Growth of Loblolly Pines')
+ggplot(Loblolly) +
+  aes(x = age, y = height, color = Seed) +
+  ggpk_my_template(line.size = 0.1, point.size = 10) +
+  ggtitle("Average Growth of Loblolly Pines")
 ```
