@@ -68,8 +68,8 @@ length.ggpacket <- function(x) {
 
 
 
-#' @export
-as.list.ggpacket <- function(x) {
+#' @exportS3Method as.list ggpacket
+as.list.ggpacket <- function(x, ...) {
   lapply(seq_along(x), function(i) x[[i]])
 }
 
@@ -122,6 +122,7 @@ setMethod("length", "ggpacket", length.ggpacket)
 #' Convert a ggpacket to a list of ggcalls
 #'
 #' @param x A \code{ggpacket} object
+#' @param ... Additional arguments unused
 #'
 setMethod("as.list", "ggpacket", as.list.ggpacket)
 

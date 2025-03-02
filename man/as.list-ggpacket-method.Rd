@@ -4,10 +4,12 @@
 \alias{as.list,ggpacket-method}
 \title{Convert a ggpacket to a list of ggcalls}
 \usage{
-\S4method{as.list}{ggpacket}(x)
+\S4method{as.list}{ggpacket}(x, ...)
 }
 \arguments{
 \item{x}{A \code{ggpacket} object}
+
+\item{...}{Additional arguments unused}
 }
 \description{
 Convert a ggpacket to a list of ggcalls
