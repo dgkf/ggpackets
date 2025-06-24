@@ -188,7 +188,7 @@ with_ignore_unknown_params <- function(expr, envir = parent.frame()) {
   withCallingHandlers({
     eval(expr, envir = envir)
   }, warning = function(w) {
-    if (grepl("^Ignoring unknown (parameters|aesthetics):", w$message))
+    if (any(grepl("^Ignoring unknown (parameters|aesthetics):", w$message)))
       invokeRestart("muffleWarning")
   })
 }
