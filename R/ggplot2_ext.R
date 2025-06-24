@@ -1,6 +1,6 @@
 #' @importFrom ggplot2 ggplot_add
 #' @export
-ggplot_add.ggpacket <- function(object, plot, object_name) {
+ggplot_add.ggpacket <- function(object, plot, ...) {
   gg_plus_ggpacket(plot, object)
 }
 
