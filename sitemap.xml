@@ -43,5 +43,6 @@
 <url><loc>/reference/update_data.html</loc></url>
 <url><loc>/reference/update_mapping.html</loc></url>
 <url><loc>/reference/with_ignore_unknown_params.html</loc></url>
+<url><loc>/reference/with_ignore_unused_argument.html</loc></url>
 </urlset>
 
