@@ -205,7 +205,6 @@ with_ignore_unused_argument <- function(call, envir = parent.frame()) {
   msg_re <- "^unused arguments?\\s\\((.*)\\)$"
 
   repeat {
-    last_call <- call
     tryCatch(
       {
         return(eval(call, envir = envir))
