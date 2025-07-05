@@ -87,6 +87,6 @@ ggpk_func <- function(...) {
 }
 
 ggplot(mtcars, aes(x = wt, y = mpg)) +
-  ggpk_func(color = "purple", size = 2, point.size = 4)
+  ggpk_func(color = "purple", line.linewidth = 2, point.size = 4)
 
 }

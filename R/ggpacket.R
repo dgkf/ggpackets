@@ -174,7 +174,11 @@ gg_plus_ggpacket <- function(e1, e2) {
       ggcallargs <- smart_swap_mapping_data(ggcallargs)
       ggcallargs <- deduplicate_params(ggcallargs)
       ggcallargs <- only_formals_and_dots(ggcallf, ggcallargs)
-      with_ignore_unknown_params(do.call(ggcallf, ggcallargs))
+
+      call <- as.call(append(list(ggcallf), ggcallargs))
+      with_ignore_unknown_params({
+        with_ignore_unused_argument(call)
+      })
     }
 
     if (inherits(ggpk_i, "ggpacket")) {
@@ -277,7 +281,7 @@ gg_plus_ggpacket <- function(e1, e2) {
 #' }
 #'
 #' ggplot(mtcars, aes(x = wt, y = mpg)) +
-#'   ggpk_func(color = "purple", size = 2, point.size = 4)
+#'   ggpk_func(color = "purple", line.linewidth = 2, point.size = 4)
 #'
 #' @importFrom methods new
 #' @export

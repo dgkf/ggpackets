@@ -9,4 +9,6 @@ README.html
 README_files
 inst/doc
 docs
+*.tar.gz
+*.html
 
