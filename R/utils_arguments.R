@@ -192,3 +192,37 @@ with_ignore_unknown_params <- function(expr, envir = parent.frame()) {
       invokeRestart("muffleWarning")
   })
 }
+
+#' Evaluate a call, ignore base R errors for unused arguments
+#'
+#' In actuality, the expression is repeatedly called while catching errors and
+#' removing error-causing arguments.
+#'
+#' @param call A call to evaluate.
+#' @param envir An environment to evaluate the given expression in.
+#'
+with_ignore_unused_argument <- function(call, envir = parent.frame()) {
+  msg_re <- "^unused arguments?\\s\\((.*)\\)$"
+
+  repeat {
+    last_call <- call
+    tryCatch(
+      {
+        return(eval(call, envir = envir))
+        break
+      }, error = function(e) {
+        if (any(grepl(msg_re, e$message, perl = TRUE))) {
+          str <- gsub(msg_re, "\\1", e$message, perl = TRUE)
+          expr_str <- paste0("fn(", str, ")")
+          expr <- parse(text = expr_str, keep.source = FALSE)[[1]]
+          to_remove <- names(call) %in% names(expr[-1])
+          call <<- call[!to_remove]
+          if (any(to_remove)) return()
+        }
+
+        # throw error if call didn't change since last attempt
+        stop(e)
+      }
+    )
+  }
+}
